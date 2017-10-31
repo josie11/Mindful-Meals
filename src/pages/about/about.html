@@ -1,11 +1,51 @@
 <ion-header>
-  <ion-navbar>
-    <ion-title>
-      About
-    </ion-title>
-  </ion-navbar>
+  <ion-toolbar color="primary">
+  <ion-title>Diary</ion-title>
+    <!-- <ion-buttons end>
+      <button ion-button icon-only>
+        <ion-icon name="funnel"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-searchbar (ionInput)="getItems($event)"></ion-searchbar> -->
+    <ion-buttons end>
+      <button ion-button icon-only>
+        <ion-icon name="share"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
-
+<ion-content>
+  <ion-list>
+    <!-- <ion-toolbar>
+      <ion-buttons end>
+        <button ion-button icon-only>
+          <ion-icon name="funnel"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-searchbar (ionInput)="getItems($event)"></ion-searchbar>
+    </ion-toolbar> -->
+    <ion-item-divider>
+      <ion-searchbar (ionInput)="getItems($event)" class="search-filter"></ion-searchbar>
+      <button ion-button item-end color="secondary" (click)="buttonClick()">Filter</button>
+    </ion-item-divider>
+    <ion-list-header>
+      October 25
+    </ion-list-header>
+    <ion-item detail-push>
+      <h2>3:43 pm</h2>
+      <ion-note item-end>Craving</ion-note>
+      <p>Intesity: 4</p>
+      <p>Feelings: Sad, Shy</p>
+    </ion-item>
+    <ion-list-header>
+      October 3
+    </ion-list-header>
+    <ion-item detail-push>
+      <h2>3:43 pm</h2>
+      <ion-note item-end>Craving</ion-note>
+      <p>Intesity: 4</p>
+      <p>Feelings: Sad, Shy</p>
+    </ion-item>
+  </ion-list>
 </ion-content>

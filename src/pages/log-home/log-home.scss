@@ -1,0 +1,26 @@
+log-home {
+  .container {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    height: 100%;
+
+    h1 {
+      font-size: 2.5em;
+      color: color($colors, dark);
+      margin: 15px 0 0 0;
+    }
+
+    .icon-button {
+      font-size: 11em;
+      color: color($colors, secondary);
+    }
+
+    .before-eating {
+      margin-bottom: 15px;
+    }
+    .after-eating {
+
+    }
+  }
+}

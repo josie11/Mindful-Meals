@@ -1,0 +1,101 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS meals(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  intensity INTEGER,
+  hungerBefore INTEGER,
+  hungerAfter INTEGER,
+  trigger TEXT,
+  description TEXT,
+  satisfaction INTEGER,
+  mealType CHAR(50)
+);
+
+
+CREATE TABLE IF NOT EXISTS cravings(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  intensity INTEGER,
+  hunger INTEGER,
+  trigger TEXT
+);
+
+CREATE TABLE IF NOT EXISTS emotions(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name CHAR(50) NOT NULL,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS distractions(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name CHAR(50) NOT NULL,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS foods(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name CHAR(50) NOT NULL,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS cravingEmotions(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cravingId INTEGER NOT NULL REFERENCES cravings (id),
+  emotionId INTEGER NOT NULL REFERENCES emotions (id),
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS cravingFoods(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  cravingId INTEGER NOT NULL REFERENCES cravings (id),
+  foodId INTEGER NOT NULL REFERENCES foods (id),
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mealEmotions(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  mealId INTEGER NOT NULL REFERENCES meals (id),
+  emotionId INTEGER NOT NULL REFERENCES emotions (id),
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mealFoods(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  mealId INTEGER NOT NULL REFERENCES meals (id),
+  foodId INTEGER NOT NULL REFERENCES foods (id),
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS mealDistractions(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  mealId INTEGER NOT NULL REFERENCES meals (id),
+  distractionId INTEGER NOT NULL REFERENCES distractions (id),
+  date DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO emotions (name)
+VALUES ('Happy' );
+INSERT INTO emotions (name)
+VALUES ('Stressed' );
+INSERT INTO emotions (name)
+VALUES ('Worried' );
+INSERT INTO emotions (name)
+VALUES ('Depressed' );
+INSERT INTO emotions (name)
+VALUES ('Sad' );
+
+INSERT INTO distractions (name)
+VALUES ('TV' );
+INSERT INTO distractions (name)
+VALUES ('Reading' );
+INSERT INTO distractions (name)
+VALUES ('Cellphone' );
+INSERT INTO distractions (name)
+VALUES ('Conversation' );
+INSERT INTO distractions (name)
+VALUES ('Thoughts' );
+INSERT INTO distractions (name)
+VALUES ('Driving' );
+INSERT INTO distractions (name)
+VALUES ('Work' );

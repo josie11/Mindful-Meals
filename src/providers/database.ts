@@ -1,0 +1,91 @@
+import { Injectable } from '@angular/core';
+import { Platform } from 'ionic-angular';
+import { Http } from '@angular/http';
+import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+import { SQLitePorter } from '@ionic-native/sqlite-porter';
+import { BehaviorSubject } from 'rxjs/Rx';
+import { Storage } from '@ionic/storage';
+import 'rxjs/add/operator/map';
+
+@Injectable()
+export class DatabaseProvider {
+
+  database: SQLiteObject;
+  // kind of an Observable - can emit new values to the subscribers by calling next() on it
+  private databaseReady: BehaviorSubject<boolean>;
+
+  constructor(public http: Http, private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
+  }
+
+  initializeDatabase() {
+    this.databaseReady = new BehaviorSubject(false);
+    this.platform.ready().then(() => {
+      this.sqlite.create({
+        name: 'mindful.db',
+        location: 'default'
+      })
+      .then((db: SQLiteObject) => {
+        this.database = db;
+        return this.select("SELECT name FROM sqlite_master WHERE type='table'")
+      }).then(data => {
+        //If there are tables, database has been seeded
+        if (data.length > 0) {
+          //sets to true and emits to subscribers that database is ready to access
+          this.databaseReady.next(true);
+        } else {
+          this.fillDatabase();
+        }
+      })
+    });
+  }
+
+  fillDatabase() {
+    return this.http.get('assets/sql/tables.sql')
+      .map(res => res.text())
+      .subscribe(sql => {
+        this.sqlitePorter.importSqlToDb(this.database, sql)
+          .then(data => {
+            this.databaseReady.next(true);
+            this.storage.set('database_filled', true);
+          })
+          .catch(e => console.error(e));
+      });
+  }
+
+  processSqlResults(data) {
+    let results = [];
+    if (data.rows && data.rows.length > 0) {
+      for (let i = 0; i < data.rows.length; i++) {
+        results.push(data.rows.item(i));
+      }
+    }
+    return results;
+  }
+
+  executeSql(sql: string) {
+    return this.database.executeSql(sql, {})
+    .then(data => data);
+  }
+
+  select(sql: string) {
+    return this.executeSql(sql)
+    .then(data => this.processSqlResults(data));
+  }
+
+  insert(sql: string, dbName: string) {
+    return this.executeSql(sql)
+    .then(data => this.select(`SELECT MAX(id) FROM ${dbName};`))
+    .then(data => ({ id: data[0]['MAX(id)'] }));
+  }
+
+  // batchSql(sql: Array<object>) {
+  //   return this.database.batchSql(sql, {})
+  //   .then(data => {
+  //     return this.processSqlResults(data)
+  //   }, err => {
+  //     console.log('Error: ', err);
+  //     return err;
+  //   });
+  // }
+
+}

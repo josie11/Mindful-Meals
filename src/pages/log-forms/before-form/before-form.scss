@@ -1,0 +1,11 @@
+page-before-form {
+  ion-range {
+    ion-label {
+      color: color($colors, dark);
+    }
+  }
+
+  ion-note {
+    color: color($colors, secondary) !important;
+  }
+}

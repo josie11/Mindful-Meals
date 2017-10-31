@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>Log</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only>
+        <ion-icon name="information-circle"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-grid class="container">
+    <ion-row>
+      <ion-col col-12 col-sm-6 class="before-eating">
+        <h1>Before Meal</h1>
+        <ion-icon (click)="presentBeforeFormModal()" class="icon-button" name="add-circle"></ion-icon>
+      </ion-col>
+      <ion-col col-12 col-sm-6 class="after-eating">
+        <h1>After Meal</h1>
+        <ion-icon class="icon-button" name="add-circle"></ion-icon>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
