@@ -1,22 +1,17 @@
 <modal>
   <!-- header for ng-content -->
-  <ion-header>
-    <ion-navbar header color="primary">
+  <ion-header header>
+    <ion-navbar color="primary">
       <ion-title>
         Before Meal
       </ion-title>
-      <ion-buttons start>
-        <button ion-button icon-only (click)="dismissForm()">
-          <ion-icon name="trash" showWhen="ios"></ion-icon>
-          <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
-        </button>
-      </ion-buttons>
-      <ion-buttons end>
-        <button ion-button>
-          Done
-        </button>
-      </ion-buttons>
     </ion-navbar>
+    <ion-toolbar color="primary">
+      <ion-segment [(ngModel)]="formType" color="white">
+        <ion-segment-button value="craving">Craving</ion-segment-button>
+        <ion-segment-button value="meal">Meal</ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
   </ion-header>
 
   <!-- content for ng-content -->
@@ -35,9 +30,9 @@
           <ion-datetime displayFormat="h:mm A" placeholder="{{time}}" [(ngModel)]="time">
           </ion-datetime>
         </ion-item>
-         <ion-item>
+         <ion-item *ngIf="formType === 'meal'">
           <ion-label>Meal</ion-label>
-          <ion-select [(ngModel)]="notifications" interface="action-sheet">
+          <ion-select [(ngModel)]="meal" interface="action-sheet">
             <ion-option value="breakfast">Breakfast</ion-option>
             <ion-option value="lunch">Lunch</ion-option>
             <ion-option value="dinner">Dinner</ion-option>
@@ -63,9 +58,6 @@
         <ion-list-header>
           Details
         </ion-list-header>
-        <ion-item detail-push>
-          Trigger Details
-        </ion-item>
         <ion-item detail-push (click)="openEmotionsList()">
           <h2>Emotions</h2>
           <p>{{(emotions | getValues | sortStrings).join(', ')}}</p>
@@ -74,9 +66,27 @@
           <h2>Foods Craved</h2>
           <p>{{(foods | getValues | sortStrings).join(', ')}}</p>
         </ion-item>
+        <ion-item>
+          <ion-label>Trigger Details</ion-label>
+          <ion-textarea [(ngModel)]="trigger"></ion-textarea>
+        </ion-item>
       </ion-list>
-      <button ion-button full (click)="dismissForm()">Submit</button>
     </div>
   </ion-content>
 
+  <ion-footer>
+    <ion-toolbar color="primary">
+      <ion-buttons start>
+        <button ion-button icon-only (click)="dismissForm()">
+          <ion-icon name="trash" showWhen="ios"></ion-icon>
+          <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-buttons end>
+        <button ion-button icon-only (click)="submitForm()">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
 </modal>

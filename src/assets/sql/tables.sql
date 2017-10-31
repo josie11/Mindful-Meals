@@ -3,6 +3,8 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS meals(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  mealTime CHAR(50),
+  mealDate CHAR(50),
   intensity INTEGER,
   hungerBefore INTEGER,
   hungerAfter INTEGER,
@@ -16,6 +18,8 @@ CREATE TABLE IF NOT EXISTS meals(
 CREATE TABLE IF NOT EXISTS cravings(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  cravingTime CHAR(50),
+  cravingDate CHAR(50),
   intensity INTEGER,
   hunger INTEGER,
   trigger TEXT

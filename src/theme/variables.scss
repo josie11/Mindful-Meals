@@ -40,6 +40,7 @@ $colors: (
   light:      #8693AB,
   dark:       #2E282A,
   accent:     #00A6A6,
+  white:      white,
 );
 
 // App iOS Variables
@@ -48,7 +49,7 @@ $colors: (
 
   // Toolbar
   $toolbar-ios-title-font-size: .65em;
-  $toolbar-ios-height: 60px;
+  // $toolbar-ios-height: 60px;
 
   //List Item
   $list-ios-header-color: color($colors, accent);

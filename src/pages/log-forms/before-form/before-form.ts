@@ -28,6 +28,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   intensity: number = 1;
   hungerLevel: number = 1;
   trigger: string = '';
+  formType: string = 'craving';
 
   emotionsSubscription;
   foodsSubscription;
@@ -62,6 +63,10 @@ export class BeforeFormPage implements OnDestroy, OnInit {
 
   openFoodsList() {
     this.modalProvider.presentModal(FoodCravingsListPage);
+  }
+
+  submitForm() {
+    console.log(this)
   }
 
   ngOnDestroy() {
