@@ -14,8 +14,10 @@ import { ContactPage } from '../pages/contact/contact';
 import { LogHomePage } from '../pages/log-home/log-home';
 import { TabsPage } from '../pages/tabs/tabs';
 import { BeforeFormPage } from '../pages/log-forms/before-form/before-form';
+import { AfterFormPage } from '../pages/log-forms/after-form/after-form';
 import { EmotionsListPage } from '../pages/log-forms/emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../pages/log-forms/foods-list/foods-list';
+
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { HttpModule } from '@angular/http';
@@ -160,7 +162,8 @@ class SQLiteMock {
     LogHomePage,
     TabsPage,
     EmotionsListPage,
-    FoodCravingsListPage
+    FoodCravingsListPage,
+    AfterFormPage
   ],
   imports: [
     BrowserModule,
@@ -181,7 +184,8 @@ class SQLiteMock {
     TabsPage,
     BeforeFormPage,
     EmotionsListPage,
-    FoodCravingsListPage
+    FoodCravingsListPage,
+    AfterFormPage
   ],
   providers: [
     StatusBar,

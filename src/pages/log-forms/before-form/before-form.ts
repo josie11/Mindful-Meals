@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, ApplicationRef } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NavController, NavParams } from 'ionic-angular';
 import { ModalProvider } from '../../../providers/modal';
-import { BeforeFormProvider } from '../../../providers/before-form';
+import { FormProvider } from '../../../providers/form';
 import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
 
@@ -33,7 +33,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   emotionsSubscription;
   foodsSubscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public bfProvider: BeforeFormProvider, private ref: ApplicationRef) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public formProvider: FormProvider, private ref: ApplicationRef) {
   }
 
   ngOnInit() {
@@ -41,11 +41,11 @@ export class BeforeFormPage implements OnDestroy, OnInit {
     this.date = this.datePipe.transform(new Date(), 'mediumDate');
     this.time = this.datePipe.transform(new Date(), 'shortTime');
 
-    this.emotionsSubscription = this.bfProvider.selectedEmotions.subscribe(emotions => {
+    this.emotionsSubscription = this.formProvider.selectedBeforeEmotions.subscribe(emotions => {
       this.emotions = emotions;
       this.ref.tick();
     });
-    this.foodsSubscription = this.bfProvider.selectedFoods.subscribe(foods => this.foods = foods);
+    this.foodsSubscription = this.formProvider.selectedBeforeFoods.subscribe(foods => this.foods = foods);
   }
 
   onRangeChange({ name, number }) {
@@ -58,11 +58,11 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   openEmotionsList() {
-    this.modalProvider.presentModal(EmotionsListPage);
+    this.modalProvider.presentModal(EmotionsListPage, { mealType: 'Before'});
   }
 
   openFoodsList() {
-    this.modalProvider.presentModal(FoodCravingsListPage);
+    this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'Before'});
   }
 
   submitForm() {
@@ -72,5 +72,6 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   ngOnDestroy() {
     this.emotionsSubscription.unsubscribe();
     this.foodsSubscription.unsubscribe();
+    this.formProvider.clearBeforeForm();
   }
 }

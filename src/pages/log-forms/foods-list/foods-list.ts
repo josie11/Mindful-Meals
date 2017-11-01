@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { FoodsProvider } from '../../../providers/food';
 import { AlertProvider } from '../../../providers/alert';
-import { BeforeFormProvider } from '../../../providers/before-form';
+import { FormProvider } from '../../../providers/form';
 
 
 @Component({
@@ -27,13 +27,15 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   foodsSubscription;
   selectedFoodsSubscription;
   selectedFoods = {};
+  mealType: string;
 
-  constructor(public navCtrl: NavController, public foodsProvider: FoodsProvider, public navParams: NavParams, public bfProvider: BeforeFormProvider, public alertProvider: AlertProvider) {
+  constructor(public navCtrl: NavController, public foodsProvider: FoodsProvider, public navParams: NavParams, public formProvider: FormProvider, public alertProvider: AlertProvider) {
   }
 
   ngOnInit() {
+    this.mealType = this.navParams.get('mealType');
     this.foodsSubscription = this.foodsProvider.foodsList.subscribe(foods => this.foods = foods);
-    this.selectedFoodsSubscription = this.bfProvider.selectedFoods.subscribe(foods => this.selectedFoods = foods);
+    this.selectedFoodsSubscription = this.formProvider[`selected${this.mealType}Foods`].subscribe(foods => this.selectedFoods = foods);
   }
 
   toggleFood({ id, name }) {
@@ -47,7 +49,7 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   addNewFood(name) {
     if (name.length < 1) return;
 
-    this.bfProvider.addNewFood(name)
+    this.formProvider.addNewFood(name)
     .then((data: any) => {
       this.selectedFoods[data.id] = data.name;
     })
@@ -68,7 +70,7 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    this.bfProvider.updateFoods(this.selectedFoods);
+    this.formProvider.updateFoods(this.selectedFoods, this.mealType);
     this.navCtrl.pop();
   }
 

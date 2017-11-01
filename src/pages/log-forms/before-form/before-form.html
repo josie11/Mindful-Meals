@@ -42,15 +42,15 @@
       </ion-list>
       <ion-list>
         <ion-list-header>
-          Hunger Level
-          <ion-note item-end>{{hungerLevel | hungerRange}}</ion-note>
+          Physical Hunger
+          <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
         </ion-list-header>
         <range name="hungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
       </ion-list>
       <ion-list>
         <ion-list-header>
-          Intensity
-          <ion-note item-end>{{intensity | cravingsRange }}</ion-note>
+          Mental Hunger
+          <ion-note item-end color="secondary">{{intensity | cravingsRange }}</ion-note>
         </ion-list-header>
         <range name="intensity" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
       </ion-list>

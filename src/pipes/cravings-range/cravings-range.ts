@@ -16,7 +16,7 @@ export class CravingsRangePipe implements PipeTransform {
     const rangeValues = {
       1: 'Mild',
       2: 'Moderate',
-      3: 'Intense',
+      3: 'Severe',
       4: 'Extreme'
     }
 

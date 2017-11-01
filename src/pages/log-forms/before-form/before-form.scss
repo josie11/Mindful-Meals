@@ -1,11 +1,5 @@
 page-before-form {
 
-  ion-range {
-    ion-label {
-      color: color($colors, dark);
-    }
-  }
-
   ion-note {
     color: color($colors, secondary) !important;
   }
@@ -13,9 +7,4 @@ page-before-form {
   ion-textarea {
     height: 200px !important;
   }
-
-  // ion-segment {
-  //   width: 75%;
-  //   margin: 0 auto;
-  // }
 }

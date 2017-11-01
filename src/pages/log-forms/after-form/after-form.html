@@ -1,0 +1,69 @@
+<modal>
+  <!-- header for ng-content -->
+  <ion-header header>
+    <ion-navbar color="primary">
+      <ion-title>
+        After Meal
+      </ion-title>
+    </ion-navbar>
+    <ion-toolbar color="primary">
+      <ion-segment [(ngModel)]="formType" color="white">
+        <ion-segment-button value="craving">Craving</ion-segment-button>
+        <ion-segment-button value="meal">Meal</ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- content for ng-content -->
+  <ion-content>
+    <div>
+      <ion-list>
+        <ion-list-header>
+          Physical Hunger
+          <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
+        </ion-list-header>
+        <range name="hungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
+      </ion-list>
+      <ion-list>
+        <ion-list-header>
+          Satisfaction Level
+          <ion-note item-end color="secondary">{{intensity | satisfactionRange }}</ion-note>
+        </ion-list-header>
+        <range name="intensity" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
+      </ion-list>
+      <ion-list>
+        <ion-list-header>
+          Details
+        </ion-list-header>
+        <ion-item detail-push (click)="openEmotionsList()">
+          <h2>Emotions</h2>
+          <p>{{(emotions | getValues | sortStrings).join(', ')}}</p>
+        </ion-item>
+        <ion-item detail-push (click)="openFoodsList()">
+          <h2>Foods Consumed</h2>
+          <p>{{(foods | getValues | sortStrings).join(', ')}}</p>
+        </ion-item>
+        <ion-item>
+          <ion-label>Meal Details</ion-label>
+          <ion-textarea [(ngModel)]="details    "></ion-textarea>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ion-content>
+
+  <ion-footer>
+    <ion-toolbar color="primary">
+      <ion-buttons start>
+        <button ion-button icon-only (click)="dismissForm()">
+          <ion-icon name="trash" showWhen="ios"></ion-icon>
+          <ion-icon name="md-close" showWhen="android,windows"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-buttons end>
+        <button ion-button icon-only (click)="submitForm()">
+          <ion-icon name="checkmark-circle"></ion-icon>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+</modal>

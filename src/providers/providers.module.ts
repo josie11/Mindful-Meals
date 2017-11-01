@@ -4,19 +4,21 @@ import { MealsProvider } from './meals';
 import { ModalProvider } from './modal';
 import { EmotionsProvider } from './emotion';
 import { AlertProvider } from './alert';
-import { BeforeFormProvider } from './before-form';
+import { FormProvider } from './form';
 import { FoodsProvider } from './food';
+import { DistractionsProvider } from './distraction';
 
 @NgModule({
   imports: [],
   providers: [
     AlertProvider,
-    BeforeFormProvider,
+    FormProvider,
     EmotionsProvider,
     DatabaseProvider,
     MealsProvider,
     ModalProvider,
-    FoodsProvider
+    FoodsProvider,
+    DistractionsProvider
    ],
   exports: []
 })

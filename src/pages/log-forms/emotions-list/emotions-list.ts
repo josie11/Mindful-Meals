@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { EmotionsProvider } from '../../../providers/emotion';
 import { AlertProvider } from '../../../providers/alert';
-import { BeforeFormProvider } from '../../../providers/before-form';
+import { FormProvider } from '../../../providers/form';
 
 
 @Component({
@@ -27,13 +27,15 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   emotionsSubscription;
   selectedEmotionsSubscription;
   selectedEmotions = {};
+  mealType: string;
 
-  constructor(public navCtrl: NavController, public emotionsProvider: EmotionsProvider, public navParams: NavParams, public bfProvider: BeforeFormProvider, public alertProvider: AlertProvider) {
+  constructor(public navCtrl: NavController, public emotionsProvider: EmotionsProvider, public navParams: NavParams, public formProvider: FormProvider, public alertProvider: AlertProvider) {
   }
 
   ngOnInit() {
+    this.mealType = this.navParams.get('mealType');
     this.emotionsSubscription = this.emotionsProvider.emotionsList.subscribe(emotions => this.emotions = emotions);
-    this.selectedEmotionsSubscription = this.bfProvider.selectedEmotions.subscribe(emotions => {
+    this.selectedEmotionsSubscription = this.formProvider[`selected${this.mealType}Emotions`].subscribe(emotions => {
       this.selectedEmotions = emotions;
     });
   }
@@ -49,7 +51,7 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   addNewEmotion(name) {
     if (name.length < 1) return;
 
-    this.bfProvider.addNewEmotion(name)
+    this.formProvider.addNewEmotion(name)
     .then((data: any) => {
       this.selectedEmotions[data.id] = data.name;
     })
@@ -70,7 +72,7 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    this.bfProvider.updateEmotions(this.selectedEmotions);
+    this.formProvider.updateEmotions(this.selectedEmotions, this.mealType);
     this.navCtrl.pop();
   }
 

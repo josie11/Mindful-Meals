@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS meals(
   date DATETIME DEFAULT CURRENT_TIMESTAMP,
   mealTime CHAR(50),
   mealDate CHAR(50),
-  intensity INTEGER,
+  mentalHungerLevel INTEGER,
+  satisfactionLevel INTEGER,
   hungerBefore INTEGER,
   hungerAfter INTEGER,
   trigger TEXT,
@@ -61,6 +62,7 @@ CREATE TABLE IF NOT EXISTS mealEmotions(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mealId INTEGER NOT NULL REFERENCES meals (id),
   emotionId INTEGER NOT NULL REFERENCES emotions (id),
+  mealStage: CHAR(50),
   date DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -68,6 +70,7 @@ CREATE TABLE IF NOT EXISTS mealFoods(
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   mealId INTEGER NOT NULL REFERENCES meals (id),
   foodId INTEGER NOT NULL REFERENCES foods (id),
+  mealStage: CHAR(50),
   date DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
