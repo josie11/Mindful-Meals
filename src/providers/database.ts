@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Platform } from 'ionic-angular';
 import { Http } from '@angular/http';
+import { Platform } from 'ionic-angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { BehaviorSubject } from 'rxjs/Rx';
@@ -14,7 +14,7 @@ export class DatabaseProvider {
   // kind of an Observable - can emit new values to the subscribers by calling next() on it
   private databaseReady: BehaviorSubject<boolean>;
 
-  constructor(public http: Http, private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
+  constructor(private http: Http, private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
   }
 
   initializeDatabase() {
@@ -26,7 +26,7 @@ export class DatabaseProvider {
       })
       .then((db: SQLiteObject) => {
         this.database = db;
-        return this.select("SELECT name FROM sqlite_master WHERE type='table'")
+        return this.select({ selection: 'name', dbName: 'sqlite_master', whereStatement: "WHERE type='table'"})
       }).then(data => {
         //If there are tables, database has been seeded
         if (data.length > 0) {
@@ -52,6 +52,75 @@ export class DatabaseProvider {
       });
   }
 
+  formatSqlValue(val) {
+    if (typeof val === 'number') return val;
+    return `'${val}'`
+  }
+
+  createSqlInsertStatement(cols, values, dbName) {
+    const sqlCols = cols.join(', ');
+    const sqlValues = values.map(val => {
+      return this.formatSqlValue(val);
+  }).join(", ");
+    return `INSERT INTO ${dbName} (${sqlCols}) VALUES (${sqlValues});`;
+  }
+
+  createSqlSelectStatement(selection, dbName, whereStatement) {
+    return `SELECT ${selection} FROM ${dbName} ${whereStatement};`
+  }
+
+  createSqlUpdateStatement(values, id, dbName) {
+    const updateSql = values.map(val => `${val.col} = ${this.formatSqlValue(val.value)}`).join(', ');
+    return `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
+  }
+
+  executeSql(sql: string) {
+    return this.database.executeSql(sql, {})
+    .then(data => data);
+  }
+
+  select({ selection, dbName, whereStatement = ''}) {
+    const sql = this.createSqlSelectStatement(selection, dbName, whereStatement);
+    return this.executeSql(sql)
+    .then(data => this.processSqlResults(data));
+  }
+
+  //E.G. items = [{ cols =[mealId, name, foodId], values = [1, 'pizza', 2] }]
+  bulkInsert({ dbName, items}) {
+    const sqlStatements = items.map(({ cols, values }) => this.createSqlInsertStatement(cols, values, dbName));
+    return this.batchSql(sqlStatements);
+  }
+
+  insert({ cols, values, dbName }) {
+    const sql = this.createSqlInsertStatement(cols, values, dbName);
+    return this.executeSql(sql)
+    .then(data => this.select({ dbName, selection: 'MAX(id)' }))
+    .then(data => ({ id: data[0]['MAX(id)'] }));
+  }
+
+  //values = [{col, value}]
+  update({ dbName, values, id }) {
+    const updateSql = values.map(val => `${val.col} = '${val.value}'`).join(', ');
+    const sql = `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
+    return this.executeSql(sql)
+  }
+
+  //E.G. items = [{ cols =[mealId, name, foodId], values = [1, 'pizza', 2] }]
+  bulkUpdate({ dbName, items}) {
+    const sqlStatements = items.map(({ cols, values }) => this.createSqlInsertStatement(cols, values, dbName));
+    return this.batchSql(sqlStatements);
+  }
+
+  batchSql(sql: Array<object>) {
+    return this.database.batchSql(sql, {})
+    .then(data => {
+      return this.processSqlResults(data)
+    }, err => {
+      console.log('Error: ', err);
+      return err;
+    });
+  }
+
   processSqlResults(data) {
     let results = [];
     if (data.rows && data.rows.length > 0) {
@@ -61,31 +130,5 @@ export class DatabaseProvider {
     }
     return results;
   }
-
-  executeSql(sql: string) {
-    return this.database.executeSql(sql, {})
-    .then(data => data);
-  }
-
-  select(sql: string) {
-    return this.executeSql(sql)
-    .then(data => this.processSqlResults(data));
-  }
-
-  insert(sql: string, dbName: string) {
-    return this.executeSql(sql)
-    .then(data => this.select(`SELECT MAX(id) FROM ${dbName};`))
-    .then(data => ({ id: data[0]['MAX(id)'] }));
-  }
-
-  // batchSql(sql: Array<object>) {
-  //   return this.database.batchSql(sql, {})
-  //   .then(data => {
-  //     return this.processSqlResults(data)
-  //   }, err => {
-  //     console.log('Error: ', err);
-  //     return err;
-  //   });
-  // }
 
 }

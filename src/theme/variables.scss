@@ -51,14 +51,21 @@ $colors: (
   $toolbar-ios-title-font-size: .65em;
   // $toolbar-ios-height: 60px;
 
+  //List
+  $list-ios-header-color: color($colors, accent);
+
   //List Item
   $list-ios-header-color: color($colors, accent);
   $item-ios-paragraph-text-color: color($colors, dark);
+  $item-ios-paragraph-text-color: color($colors, light);
 
   // Checkbox
   $checkbox-ios-background-color-on: color($colors, secondary);
   $checkbox-ios-icon-border-color-off: color($colors, secondary);
   $checkbox-ios-icon-border-color-on: color($colors, secondary);
+
+  //RadioGroup
+  $radio-ios-color-on: color($colors, secondary);
 
 // App Material Design Variables
 // --------------------------------------------------

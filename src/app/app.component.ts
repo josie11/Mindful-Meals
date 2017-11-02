@@ -14,9 +14,9 @@ export class MyApp {
 
   constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, databaseProvider: DatabaseProvider) {
 
-    //initialize our database via our service
-    databaseProvider.initializeDatabase();
     platform.ready().then(() => {
+      //initialize our database via our service
+      databaseProvider.initializeDatabase();
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();

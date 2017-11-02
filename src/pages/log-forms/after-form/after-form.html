@@ -6,49 +6,67 @@
         After Meal
       </ion-title>
     </ion-navbar>
-    <ion-toolbar color="primary">
-      <ion-segment [(ngModel)]="formType" color="white">
-        <ion-segment-button value="craving">Craving</ion-segment-button>
-        <ion-segment-button value="meal">Meal</ion-segment-button>
-      </ion-segment>
-    </ion-toolbar>
   </ion-header>
 
   <!-- content for ng-content -->
   <ion-content>
-    <div>
-      <ion-list>
-        <ion-list-header>
-          Physical Hunger
-          <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
-        </ion-list-header>
-        <range name="hungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
-      </ion-list>
-      <ion-list>
-        <ion-list-header>
-          Satisfaction Level
-          <ion-note item-end color="secondary">{{intensity | satisfactionRange }}</ion-note>
-        </ion-list-header>
-        <range name="intensity" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
-      </ion-list>
-      <ion-list>
-        <ion-list-header>
-          Details
-        </ion-list-header>
-        <ion-item detail-push (click)="openEmotionsList()">
-          <h2>Emotions</h2>
-          <p>{{(emotions | getValues | sortStrings).join(', ')}}</p>
-        </ion-item>
-        <ion-item detail-push (click)="openFoodsList()">
-          <h2>Foods Consumed</h2>
-          <p>{{(foods | getValues | sortStrings).join(', ')}}</p>
-        </ion-item>
-        <ion-item>
-          <ion-label>Meal Details</ion-label>
-          <ion-textarea [(ngModel)]="details    "></ion-textarea>
-        </ion-item>
-      </ion-list>
-    </div>
+    <ion-list>
+      <ion-list-header>
+        Timing & Before Meal
+        <button ion-button icon-only item-end clear item-button color="accent"><ion-icon name="information-circle" medium></ion-icon></button>
+      </ion-list-header>
+      <ion-item-divider>
+        <ion-label>Use Existing Details</ion-label>
+        <ion-toggle [(ngModel)]="existingDetails" color="secondary"></ion-toggle>
+      </ion-item-divider>
+      <ion-item *ngIf="!existingDetails">
+        <ion-label>Date</ion-label>
+        <ion-datetime displayFormat="MMM DD, YYYY" pickerFormat="MMM DD YYYY" [placeholder]="date" [(ngModel)]="date"></ion-datetime>
+      </ion-item>
+      <ion-item *ngIf="!existingDetails">
+        <ion-label>Time</ion-label>
+        <ion-datetime displayFormat="h:mm A" [placeholder]="time" [(ngModel)]="time">
+        </ion-datetime>
+      </ion-item>
+      <ion-item detail-push *ngIf="!existingDetails">
+        <ion-label>Before Meal Details</ion-label>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        Physical Hunger
+        <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
+      </ion-list-header>
+      <range name="hungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        Satisfaction Level
+        <ion-note item-end color="secondary">{{satisfactionLevel | satisfactionRange }}</ion-note>
+      </ion-list-header>
+      <range name="satisfactionLevel" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        Details
+      </ion-list-header>
+      <ion-item detail-push (click)="openEmotionsList()">
+        <h2>Emotions</h2>
+        <p>{{(emotions | getValues | sortStrings).join(', ')}}</p>
+      </ion-item>
+      <ion-item detail-push (click)="openDistractionsList()">
+        <h2>Distractions</h2>
+        <p>{{(distractions | getValues | sortStrings).join(', ')}}</p>
+      </ion-item>
+      <ion-item detail-push (click)="openFoodsList()">
+        <h2>Foods Consumed</h2>
+        <p>{{(foods | getValues | sortStrings).join(', ')}}</p>
+      </ion-item>
+      <ion-item>
+        <ion-label>Meal Details:</ion-label>
+        <ion-textarea [(ngModel)]="description"></ion-textarea>
+      </ion-item>
+    </ion-list>
   </ion-content>
 
   <ion-footer>

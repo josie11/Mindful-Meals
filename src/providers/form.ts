@@ -3,6 +3,7 @@ import { DatabaseProvider } from './database';
 import { EmotionsProvider } from './emotion';
 import { FoodsProvider } from './food';
 import { DistractionsProvider } from './distraction';
+import { MealsProvider } from './meals';
 
 import { BehaviorSubject } from "rxjs";
 
@@ -21,7 +22,7 @@ export class FormProvider {
   selectedAfterEmotions: BehaviorSubject<object> = new BehaviorSubject({});
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
 
-  constructor(private databaseProvider: DatabaseProvider, private emotionsProvider: EmotionsProvider, private foodsProvider: FoodsProvider, private distractionsProvider: DistractionsProvider) {
+  constructor(private databaseProvider: DatabaseProvider, private emotionsProvider: EmotionsProvider, private foodsProvider: FoodsProvider, private distractionsProvider: DistractionsProvider, private mealsProvider: MealsProvider) {
   }
 
   updateEmotions(emotions, mealType) {
@@ -52,6 +53,11 @@ export class FormProvider {
     return this.distractionsProvider.addDistraction(name)
     .then((data: any) => ({id : data.id, name}))
     .catch(console.error)
+  }
+
+  submitBeforeForm(cols, values) {
+    this.mealsProvider.addBeforeMeal(cols, values);
+    //get back new id, then do distractions, foods, emotions
   }
 
   clearBeforeForm() {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ApplicationRef } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NavController, NavParams } from 'ionic-angular';
 import { ModalProvider } from '../../../providers/modal';
@@ -20,31 +20,29 @@ import { FoodCravingsListPage } from '../foods-list/foods-list';
 })
 export class BeforeFormPage implements OnDestroy, OnInit {
 
-  date: string;
   emotions: object = {};
   foods: object = {};
-  meal: string;
-  time: string;
-  intensity: number = 1;
-  hungerLevel: number = 1;
-  trigger: string = '';
+  intensityLevel: number = 1;
+  beforeHungerLevel: number = 1;
+  mealType: string;
+  mealDate: string;
+  mealTime: string;
+  triggerDescription: string = '';
+
   formType: string = 'craving';
 
   emotionsSubscription;
   foodsSubscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public formProvider: FormProvider, private ref: ApplicationRef) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public formProvider: FormProvider) {
   }
 
   ngOnInit() {
     //automatically generate date/time to current for form
-    this.date = this.datePipe.transform(new Date(), 'mediumDate');
-    this.time = this.datePipe.transform(new Date(), 'shortTime');
+    this.mealDate = this.datePipe.transform(new Date(), 'mediumDate');
+    this.mealTime = this.datePipe.transform(new Date(), 'shortTime');
 
-    this.emotionsSubscription = this.formProvider.selectedBeforeEmotions.subscribe(emotions => {
-      this.emotions = emotions;
-      this.ref.tick();
-    });
+    this.emotionsSubscription = this.formProvider.selectedBeforeEmotions.subscribe(emotions => this.emotions = emotions);
     this.foodsSubscription = this.formProvider.selectedBeforeFoods.subscribe(foods => this.foods = foods);
   }
 
@@ -66,7 +64,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   submitForm() {
-    console.log(this)
+
   }
 
   ngOnDestroy() {

@@ -27,8 +27,29 @@ export class AlertProvider {
         },
         {
           text: submitButtonText,
+          handler: (data: any) => submitHandler(data),
+        }
+      ]
+    });
+    alert.present();
+  }
+
+  //inputs => [{type, value, label, checked: boolean}]
+  presentRadio({ title, inputs, cancelButtonText = 'Cancel', submitButtonText = 'Submit', submitHandler = (data) => {}, cancelHandler = () => {} }) {
+    const alert = this.alertCtrl.create({
+      title,
+      inputs,
+      buttons: [
+        {
+          text: cancelButtonText,
+          role: 'cancel',
+          handler: cancelHandler
+        },
+        {
+          text: submitButtonText,
           handler: (data: any) => {
-            submitHandler(data.emotion)
+            console.log(data)
+            submitHandler(data)
           }
         }
       ]

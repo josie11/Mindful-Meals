@@ -48,10 +48,10 @@ export class EmotionsListPage implements OnDestroy, OnInit {
     }
   }
 
-  addNewEmotion(name) {
-    if (name.length < 1) return;
+  addNewEmotion({ emotion }) {
+    if (emotion.length < 1) return;
 
-    this.formProvider.addNewEmotion(name)
+    this.formProvider.addNewEmotion(emotion)
     .then((data: any) => {
       this.selectedEmotions[data.id] = data.name;
     })

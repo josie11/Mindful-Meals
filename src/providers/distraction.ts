@@ -18,7 +18,7 @@ export class DistractionsProvider {
   }
 
   getDistractions() {
-    return this.databaseProvider.select('SELECT * from distractions;')
+    return this.databaseProvider.select({ dbName: 'distractions', selection: '*' })
     .then((data: any) => {
       this.distractionsList.next(data);
       return data;
@@ -27,7 +27,11 @@ export class DistractionsProvider {
   }
 
   addDistraction(name) {
-    return this.databaseProvider.insert(`INSERT INTO distractions (name) VALUES ('${name}');`, 'distractions')
+    return this.databaseProvider.insert({
+      dbName: 'distractions',
+      cols: ['name'],
+      values: [name]
+    })
     .then(id => {
       const distractions = [...this.distractionsList.getValue(), {...id, name }];
       this.distractionsList.next(distractions);

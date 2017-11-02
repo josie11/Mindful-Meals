@@ -18,7 +18,7 @@ export class FoodsProvider {
   }
 
   getFoods() {
-    return this.databaseProvider.select('SELECT * from foods;')
+    return this.databaseProvider.select({ dbName: 'foods', selection: '*' })
     .then((data: any) => {
       this.foodsList.next(data);
       return data;
@@ -27,7 +27,11 @@ export class FoodsProvider {
   }
 
   addFood(name) {
-    return this.databaseProvider.insert(`INSERT INTO foods (name) VALUES ('${name}');`, 'foods')
+    return this.databaseProvider.insert({
+      dbName: 'foods',
+      cols: ['name'],
+      values: [name]
+    })
     .then(id => {
       const foods = [...this.foodsList.getValue(), {...id, name }];
       this.foodsList.next(foods);

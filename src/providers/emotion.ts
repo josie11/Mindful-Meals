@@ -12,7 +12,7 @@ export class EmotionsProvider {
   }
 
   getEmotions() {
-    return this.databaseProvider.select('SELECT * from emotions;')
+    return this.databaseProvider.select({ dbName: 'emotions', selection: '*'})
     .then((data) => {
       this.emotionsList.next(data);
       return data;
@@ -21,7 +21,11 @@ export class EmotionsProvider {
   }
 
   addEmotion(name) {
-    return this.databaseProvider.insert(`INSERT INTO emotions (name) VALUES ('${name}');`, 'emotions')
+    return this.databaseProvider.insert({
+      dbName: 'emotions',
+      cols: ['name'],
+      values: [name]
+    })
     .then(id => {
       const emotions = [...this.emotionsList.getValue(), {...id, name }]
       this.emotionsList.next(emotions);

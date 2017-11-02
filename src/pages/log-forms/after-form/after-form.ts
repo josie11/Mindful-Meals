@@ -1,10 +1,11 @@
-import { Component, OnDestroy, OnInit, ApplicationRef } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { NavController, NavParams } from 'ionic-angular';
 import { ModalProvider } from '../../../providers/modal';
 import { FormProvider } from '../../../providers/form';
 import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
+import { DistractionsListPage } from '../distractions-list/distractions-list';
 
 /**
  * Generated class for the AfterFormPage page.
@@ -21,33 +22,35 @@ import { FoodCravingsListPage } from '../foods-list/foods-list';
 export class AfterFormPage implements OnDestroy, OnInit {
 
   date: string;
+  description: string = '';
+  distractions: object = {};
   emotions: object = {};
   foods: object = {};
-  meal: string;
-  time: string;
-  intensity: number = 1;
+  formType: string = 'new';
   hungerLevel: number = 1;
-  trigger: string = '';
-  formType: string = 'craving';
+  satisfactionLevel: number = 1;
+  time: string;
 
   emotionsSubscription;
   foodsSubscription;
+  distractionsSubscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public formProvider: FormProvider, private ref: ApplicationRef) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public formProvider: FormProvider) {
   }
 
   ngOnInit() {
-    this.emotionsSubscription = this.formProvider.selectedAfterEmotions.subscribe(emotions => {
-      this.emotions = emotions;
-      this.ref.tick();
-    });
+    //automatically generate date/time to current for form
+    this.date = this.datePipe.transform(new Date(), 'mediumDate');
+    this.time = this.datePipe.transform(new Date(), 'shortTime');
+
+    this.emotionsSubscription = this.formProvider.selectedAfterEmotions.subscribe(emotions => this.emotions = emotions);
     this.foodsSubscription = this.formProvider.selectedAfterFoods.subscribe(foods => this.foods = foods);
+    this.distractionsSubscription = this.formProvider.selectedDistractions.subscribe(distractions => this.distractions = distractions);
   }
 
   onRangeChange({ name, number }) {
     this[name] = number;
   }
-
 
   dismissForm() {
     this.navCtrl.pop();
@@ -61,6 +64,14 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'After' });
   }
 
+  openDistractionsList() {
+    this.modalProvider.presentModal(DistractionsListPage);
+  }
+
+  presentBeforeMealAlert() {
+
+  }
+
   submitForm() {
     console.log(this)
   }
@@ -68,6 +79,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
   ngOnDestroy() {
     this.emotionsSubscription.unsubscribe();
     this.foodsSubscription.unsubscribe();
+    this.distractionsSubscription.unsubscribe();
     this.formProvider.clearAfterForm();
   }
 }

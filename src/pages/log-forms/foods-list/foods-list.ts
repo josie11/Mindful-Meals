@@ -46,10 +46,10 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
     }
   }
 
-  addNewFood(name) {
-    if (name.length < 1) return;
+  addNewFood({ food }) {
+    if (food.length < 1) return;
 
-    this.formProvider.addNewFood(name)
+    this.formProvider.addNewFood(food)
     .then((data: any) => {
       this.selectedFoods[data.id] = data.name;
     })
@@ -59,7 +59,7 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   triggerFoodPrompt() {
     this.alertProvider.presentPrompt({
       title: 'New Food',
-      inputs: [{ name: 'emotion', placeholder: 'Food' }],
+      inputs: [{ name: 'food', placeholder: 'Food' }],
       submitHandler: this.addNewFood.bind(this),
     })
   }
