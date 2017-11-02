@@ -23,8 +23,8 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   emotions: object = {};
   foods: object = {};
   intensityLevel: number = 1;
-  beforeHungerLevel: number = 1;
-  mealType: string;
+  hungerLevelBefore: number = 1;
+  mealType: string = '';
   mealDate: string;
   mealTime: string;
   triggerDescription: string = '';
@@ -64,7 +64,25 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   submitForm() {
+    const {
+      intensityLevel,
+      hungerLevelBefore,
+      mealType,
+      mealDate,
+      mealTime,
+      triggerDescription,
+    } = this;
 
+    this.formProvider.submitBeforeForm({
+      intensityLevel,
+      hungerLevelBefore,
+      mealType,
+      mealDate,
+      mealTime,
+      triggerDescription,
+    })
+    .then(() => this.dismissForm())
+    .catch(console.error);
   }
 
   ngOnDestroy() {

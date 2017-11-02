@@ -54,14 +54,13 @@ export class DatabaseProvider {
 
   formatSqlValue(val) {
     if (typeof val === 'number') return val;
-    return `'${val}'`
+    val = val.replace(/\'/g, "''")
+    return `'${val}'`;;
   }
 
   createSqlInsertStatement(cols, values, dbName) {
     const sqlCols = cols.join(', ');
-    const sqlValues = values.map(val => {
-      return this.formatSqlValue(val);
-  }).join(", ");
+    const sqlValues = values.map(val => this.formatSqlValue(val)).join(", ");
     return `INSERT INTO ${dbName} (${sqlCols}) VALUES (${sqlValues});`;
   }
 

@@ -55,9 +55,29 @@ export class FormProvider {
     .catch(console.error)
   }
 
-  submitBeforeForm(cols, values) {
-    this.mealsProvider.addBeforeMeal(cols, values);
-    //get back new id, then do distractions, foods, emotions
+  submitBeforeForm(data) {
+    const cols = [], values = [];
+
+    for (let prop in data) {
+      cols.push(prop);
+      values.push(data[prop]);
+    }
+
+    return this.mealsProvider.addBeforeMeal(cols, values)
+    .then((data: any) => this.linkBeforeFormItemsWithMeal(data.id))
+    .then(() => this.mealsProvider.getMeal(data.id));
+  }
+
+  linkBeforeFormItemsWithMeal(id) {
+    const selectedBeforeEmotionIds = Object.keys(this.selectedBeforeEmotions.getValue()).map(val => Number(val));
+    const selectedBeforeFoodsIds = Object.keys(this.selectedBeforeFoods.getValue()).map(val => Number(val));
+
+    const promiseChain = selectedBeforeEmotionIds.length > 0 ? this.mealsProvider.addMealEmotions(id, selectedBeforeEmotionIds, 'before') : Promise.resolve();
+
+    return promiseChain.then(() => {
+      if (selectedBeforeFoodsIds.length > 0) return this.mealsProvider.addMealFoods(id, selectedBeforeFoodsIds, 'before');
+      return id;
+    })
   }
 
   clearBeforeForm() {

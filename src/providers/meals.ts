@@ -14,8 +14,38 @@ export class MealsProvider {
   constructor(private databaseProvider: DatabaseProvider) {
   }
 
-  getTodaysMeals(date) {
-    return this.databaseProvider.select({ dbName: 'meals', selection: '*', whereStatement: `WHERE mealDate = ${date}`});
+  getMeal(mealId) {
+    let meal;
+
+    return this.databaseProvider.select({
+      selection: '*',
+      dbName: 'meals',
+      whereStatement: `WHERE id = ${mealId}`
+    })
+    .then((data: any) => {
+      meal = data[0];
+      return this.getMealFoods(mealId);
+    })
+    .then((data: any) => {
+      meal['foods'] = data;
+      return this.getMealEmotions(mealId);
+    })
+    .then((data: any) => {
+      meal['emotions'] = data
+      return this.getMealDistractions(mealId);
+    })
+    .then((data: any) => {
+      meal['distractions'] = data;
+      return meal;
+    });
+  }
+
+  getMealsForDate(date) {
+    return this.databaseProvider.select({
+      dbName: 'meals',
+      selection: '*',
+      whereStatement: `WHERE mealDate = ${date}`
+    });
   }
 
   addBeforeMeal(cols: Array<string>, values: Array<string>) {
@@ -27,12 +57,16 @@ export class MealsProvider {
     .catch(console.error)
   }
 
-  addAfterMeal(id, columns, values) {
+  getMealEmotions(mealId, mealStage = '') {
+    const parameters = {
+      dbName: 'mealEmotions',
+      selection: '*',
+      whereStatement: `WHERE mealId = ${mealId}`
+    };
 
-  }
+    if (mealStage) parameters.whereStatement += ` AND mealStage = '${mealStage}'`;
 
-  updateMeal() {
-
+    return this.databaseProvider.select(parameters);
   }
 
   addMealEmotion(mealId: number, emotionId: number, mealStage: string) {
@@ -52,6 +86,18 @@ export class MealsProvider {
     return this.databaseProvider.bulkInsert({ dbName: 'mealEmotions', items })
   }
 
+  getMealFoods(mealId, mealStage = '') {
+    const parameters = {
+      dbName: 'mealFoods',
+      selection: '*',
+      whereStatement: `WHERE mealId = ${mealId}`
+    };
+
+    if (mealStage) parameters.whereStatement += ` AND mealStage = '${mealStage}'`;
+
+    return this.databaseProvider.select(parameters);
+  }
+
   addMealFood(mealId: number, foodId: number, mealStage: string) {
     return this.databaseProvider.insert({
       dbName: 'mealFoods',
@@ -67,6 +113,16 @@ export class MealsProvider {
       values: [mealId, foodId, mealStage]
     }));
     return this.databaseProvider.bulkInsert({ dbName: 'mealFoods', items })
+  }
+
+  getMealDistractions(mealId) {
+    const parameters = {
+      dbName: 'mealDistractions',
+      selection: '*',
+      whereStatement: `WHERE mealId = ${mealId}`
+    };
+
+    return this.databaseProvider.select(parameters);
   }
 
   addMealDistraction(mealId: number, distractionId: number) {

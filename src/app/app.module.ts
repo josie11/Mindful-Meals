@@ -136,6 +136,7 @@ class SQLitePorterMock {
 }
 
 class SQLiteMock {
+
   public create(config: SQLiteDatabaseConfig): Promise<SQLiteObject> {
     var db;
     var storeddb = localStorage.getItem("database");
