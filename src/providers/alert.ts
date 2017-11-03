@@ -47,9 +47,8 @@ export class AlertProvider {
         },
         {
           text: submitButtonText,
-          handler: (data: any) => {
-            console.log(data)
-            submitHandler(data)
+          handler: (id: number) => {
+            submitHandler(id)
           }
         }
       ]

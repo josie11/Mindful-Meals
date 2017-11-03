@@ -11,33 +11,63 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class CravingsProvider {
 
+  dbName: string = 'craving';
+
   constructor(private databaseProvider: DatabaseProvider) {
   }
 
-  getTodaysCravings(date) {
-    return this.databaseProvider.select({ dbName: 'cravings', selection: '*', whereStatement: `WHERE cravingDate = ${date}`});
+  getCraving(cravingId: number) {
+    let craving;
+
+    return this.databaseProvider.select({
+      selection: '*',
+      dbName: `${this.dbName}s`,
+      whereStatement: `WHERE id = ${cravingId}`
+    })
+    .then((data: any) => {
+      craving = data[0];
+      return this.getCravingFoods(cravingId);
+    })
+    .then((data: any) => {
+      craving['foods'] = data;
+      return this.getCravingEmotions(cravingId);
+    })
+    .then((data: any) => {
+      craving['emotions'] = data
+      return craving;
+    });
+  }
+
+  getCravingsForDate(date: string) {
+    return this.databaseProvider.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      whereStatement: `WHERE cravingDate = ${date}`
+    });
   }
 
   addCraving(cols: Array<string>, values: Array<string>) {
     return this.databaseProvider.insert({
-      dbName: 'cravings',
+      dbName: `${this.dbName}s`,
       cols,
       values
-    })
-    .catch(console.error)
+    });
   }
 
-  updateCraving() {
-
+  getCravingEmotions(cravingId: number) {
+    return this.databaseProvider.select({
+      dbName: `${this.dbName}Emotions`,
+      selection: '*',
+      whereStatement: `WHERE cravingId = ${cravingId}`
+    });
   }
 
   addCravingEmotion(cravingId: number, emotionId: number) {
     return this.databaseProvider.insert({
-      dbName: 'cravingEmotions',
+      dbName: `${this.dbName}Emotions`,
       cols: ['cravingId', 'emotionId'],
       values: [cravingId, emotionId]
-    })
-    .catch(console.error)
+    });
   }
 
   addCravingEmotions(cravingId: number, emotionIds: Array<number>) {
@@ -45,16 +75,23 @@ export class CravingsProvider {
       cols: ['cravingId', 'emotionId'],
       values: [cravingId, emotionId]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: 'cravingEmotions', items })
+    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
+  }
+
+  getCravingFoods(cravingId: number) {
+    return this.databaseProvider.select({
+      dbName: `${this.dbName}Foods`,
+      selection: '*',
+      whereStatement: `WHERE cravingId = ${cravingId}`
+    });
   }
 
   addCravingFood(cravingId: number, foodId: number) {
     return this.databaseProvider.insert({
-      dbName: 'cravingFoods',
+      dbName: `${this.dbName}Foods`,
       cols: ['cravingId', 'foodId'],
       values: [cravingId, foodId]
-    })
-    .catch(console.error)
+    });
   }
 
   addCravingFoods(cravingId: number, foodIds: Array<number>) {
@@ -62,6 +99,6 @@ export class CravingsProvider {
       cols: ['cravingId', 'foodId'],
       values: [cravingId, foodId]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: 'cravingFoods', items })
+    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
 }

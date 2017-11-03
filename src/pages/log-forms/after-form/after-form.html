@@ -16,20 +16,31 @@
         <button ion-button icon-only item-end clear item-button color="accent"><ion-icon name="information-circle" medium></ion-icon></button>
       </ion-list-header>
       <ion-item-divider>
-        <ion-label>Use Existing Details</ion-label>
-        <ion-toggle [(ngModel)]="existingDetails" color="secondary"></ion-toggle>
+        <ion-icon item-start ios="ios-attach" md="md-attach" color="secondary" *ngIf="!isMealAttached"></ion-icon>
+        <ion-icon item-start ios="ios-checkmark-circle-outline" md="md-checkmark-circle" *ngIf="isMealAttached" color="secondary"></ion-icon>
+        <ion-label>{{ isMealAttached ? 'Before Meal Log Attached' : 'Attach Before Meal Log'}}</ion-label>
+        <!-- HORRENDOUS SOLUTION, I DONT KNOW HOW TO MANUALLY CONTROL TOGGLE -->
+        <ion-toggle *ngIf="!isMealAttached && !toggle" checked="false" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
+        <ion-toggle *ngIf="!isMealAttached && toggle" checked="false" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
+        <ion-toggle *ngIf="isMealAttached" checked="true" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
       </ion-item-divider>
-      <ion-item *ngIf="!existingDetails">
-        <ion-label>Date</ion-label>
-        <ion-datetime displayFormat="MMM DD, YYYY" pickerFormat="MMM DD YYYY" [placeholder]="date" [(ngModel)]="date"></ion-datetime>
+      <ion-item *ngIf="isMealAttached" color="secondary">
+        <button ion-button outline item-end (click)="buttonClick()" color="white">
+          Edit
+        </button>
+        <button ion-button outline item-end (click)="buttonClick()" color="white">
+          Switch
+        </button>
+        <ion-icon item-start ios="ios-attach" md="md-attach" color="white"></ion-icon>
+        <h2>Before Meal Log</h2>
+        <p>{{attachedMeal.mealDate}}</p>
+        <p *ngIf="attachedMeal.mealType">{{attachedMeal.mealType}}</p>
+        <p>{{attachedMeal.mealTime}}</p>
       </ion-item>
-      <ion-item *ngIf="!existingDetails">
-        <ion-label>Time</ion-label>
-        <ion-datetime displayFormat="h:mm A" [placeholder]="time" [(ngModel)]="time">
-        </ion-datetime>
-      </ion-item>
-      <ion-item detail-push *ngIf="!existingDetails">
-        <ion-label>Before Meal Details</ion-label>
+      <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)"></date-time>
+      <ion-item detail-push *ngIf="!isMealAttached">
+        <ion-icon ios="ios-create" md="md-create" item-start color="secondary"></ion-icon>
+        <ion-label>Add Before Meal Details</ion-label>
       </ion-item>
     </ion-list>
     <ion-list>
@@ -50,22 +61,28 @@
       <ion-list-header>
         Details
       </ion-list-header>
-      <ion-item detail-push (click)="openEmotionsList()">
-        <h2>Emotions</h2>
-        <p>{{(emotions | getValues | sortStrings).join(', ')}}</p>
-      </ion-item>
-      <ion-item detail-push (click)="openDistractionsList()">
-        <h2>Distractions</h2>
-        <p>{{(distractions | getValues | sortStrings).join(', ')}}</p>
-      </ion-item>
-      <ion-item detail-push (click)="openFoodsList()">
-        <h2>Foods Consumed</h2>
-        <p>{{(foods | getValues | sortStrings).join(', ')}}</p>
-      </ion-item>
-      <ion-item>
-        <ion-label>Meal Details:</ion-label>
-        <ion-textarea [(ngModel)]="description"></ion-textarea>
-      </ion-item>
+      <checkbox-trigger
+        (onClick)="openEmotionsList($event)"
+        ios="ios-happy"
+        md="md-happy"
+        title="Emotions"
+        [behaviorSubject]="formProvider.selectedAfterEmotions">
+      </checkbox-trigger>
+      <checkbox-trigger
+        (onClick)="openFoodsList($event)"
+        ios="ios-nutrition"
+        md="md-nutrition"
+        title="Foods Consumed"
+        [behaviorSubject]="formProvider.selectedAfterFoods">
+      </checkbox-trigger>
+      <checkbox-trigger
+        (onClick)="openDistractionsList($event)"
+        ios="ios-laptop"
+        md="md-laptop"
+        title="Distractions"
+        [behaviorSubject]="formProvider.selectedDistractions">>
+      </checkbox-trigger>
+      <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)"></detail-textarea>
     </ion-list>
   </ion-content>
 

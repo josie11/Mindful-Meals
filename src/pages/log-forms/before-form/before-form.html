@@ -20,18 +20,11 @@
       <ion-list-header>
         Timing
       </ion-list-header>
-      <ion-item>
-        <ion-label>Date</ion-label>
-        <ion-datetime displayFormat="MMM DD, YYYY" pickerFormat="MMM DD YYYY" [placeholder]="mealDate" [(ngModel)]="mealDate"></ion-datetime>
-      </ion-item>
-      <ion-item>
-        <ion-label>Time</ion-label>
-        <ion-datetime displayFormat="h:mm A" [placeholder]="mealTime" [(ngModel)]="mealTime">
-        </ion-datetime>
-      </ion-item>
+      <date-time (onTimeDateChange)="onTimeDateChange($event)"></date-time>
        <ion-item *ngIf="formType === 'meal'">
+        <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
         <ion-label>Meal</ion-label>
-        <ion-select [(ngModel)]="mealType" interface="action-sheet">
+        <ion-select [(ngModel)]="type" interface="action-sheet">
           <ion-option value="Breakfast">Breakfast</ion-option>
           <ion-option value="Lunch">Lunch</ion-option>
           <ion-option value="Dinner">Dinner</ion-option>
@@ -42,33 +35,36 @@
     <ion-list>
       <ion-list-header>
         Physical Hunger
-        <ion-note item-end color="secondary">{{hungerLevelBefore | hungerRange}}</ion-note>
+        <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
       </ion-list-header>
-      <range name="beforeHungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
+      <range name="hungerLevel" min="1" max="5" (onRangeChange)="onRangeChange($event)"></range>
     </ion-list>
     <ion-list>
       <ion-list-header>
         Mental Hunger
-        <ion-note item-end color="secondary">{{intensity | cravingsRange }}</ion-note>
+        <ion-note item-end color="secondary">{{intensityLevel | cravingsRange }}</ion-note>
       </ion-list-header>
-      <range name="intensityLevel" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
+      <range name="intensityLevel" min="1" max="4" (onRangeChange)="onRangeChange($event)"></range>
     </ion-list>
     <ion-list>
       <ion-list-header>
         Details
       </ion-list-header>
-      <ion-item detail-push (click)="openEmotionsList()">
-        <h2>Emotions</h2>
-        <p>{{(emotions | getValues | sortStrings).join(', ')}}</p>
-      </ion-item>
-      <ion-item detail-push (click)="openFoodsList()">
-        <h2>Food Cravings</h2>
-        <p>{{(foods | getValues | sortStrings).join(', ')}}</p>
-      </ion-item>
-      <ion-item>
-        <ion-label>Trigger Details:</ion-label>
-        <ion-textarea [(ngModel)]="triggerDescription"></ion-textarea>
-      </ion-item>
+      <checkbox-trigger
+        (onClick)="openEmotionsList($event)"
+        ios="ios-happy"
+        md="md-happy"
+        title="Emotions"
+        [behaviorSubject]="formProvider.selectedBeforeEmotions">
+      </checkbox-trigger>
+      <checkbox-trigger
+        (onClick)="openFoodsList($event)"
+        ios="ios-nutrition"
+        md="md-nutrition"
+        title="Food Cravings"
+        [behaviorSubject]="formProvider.selectedBeforeFoods">
+      </checkbox-trigger>
+      <detail-textarea title="Trigger Notes" (onDescriptionChange)="onDescriptionChange($event)"></detail-textarea>
     </ion-list>
   </ion-content>
 

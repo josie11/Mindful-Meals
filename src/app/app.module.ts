@@ -73,6 +73,7 @@ class SQLiteObject{
         try {
           var rows :Array<any> = [];
           for (let statement of statements) {
+            console.log(statement)
             var st = this._objectInstance.prepare(statement,params);
             while(st.step()) {
                 var row = st.getAsObject();

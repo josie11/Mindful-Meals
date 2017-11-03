@@ -5,13 +5,19 @@ import { ModalComponent } from './modal/modal';
 import { RangeComponent } from './form-inputs/range/range';
 import { AlertComponent } from './alert/alert';
 import { CheckboxListComponent } from './lists/checkbox-list/checkbox-list';
+import { DateTimeComponent } from './form-inputs/date-time/date-time';
+import { DetailTextareaComponent } from './form-inputs/detail-textarea/detail-textarea';
+import { CheckboxTriggerComponent } from './form-inputs/checkbox-trigger/checkbox-trigger';
 
 @NgModule({
 	declarations: [
     ModalComponent,
     RangeComponent,
     AlertComponent,
-    CheckboxListComponent
+    CheckboxListComponent,
+    DateTimeComponent,
+    DetailTextareaComponent,
+    CheckboxTriggerComponent
   ],
 	imports: [
     IonicModule,
@@ -21,7 +27,10 @@ import { CheckboxListComponent } from './lists/checkbox-list/checkbox-list';
     ModalComponent,
     RangeComponent,
     AlertComponent,
-    CheckboxListComponent
+    CheckboxListComponent,
+    DateTimeComponent,
+    DetailTextareaComponent,
+    CheckboxTriggerComponent
   ]
 })
 export class ComponentsModule {}

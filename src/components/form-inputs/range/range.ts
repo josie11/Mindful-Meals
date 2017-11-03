@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
   selector: 'range',
   template: `
     <ion-item>
-      <ion-range min="{{min}}" max="{{max}}" step="1" snaps="true" [(ngModel)]="number" (ionChange)="change()" color="secondary">
+      <ion-range [min]="min" [max]="max" step="1" snaps="true" [(ngModel)]="number" (ionChange)="change()" color="secondary">
         <ion-label range-left>{{min}}</ion-label>
         <ion-label range-right>{{max}}</ion-label>
       </ion-range>

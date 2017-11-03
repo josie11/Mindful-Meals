@@ -7,6 +7,7 @@ import { AlertProvider } from './alert';
 import { FormProvider } from './form';
 import { FoodsProvider } from './food';
 import { DistractionsProvider } from './distraction';
+import { CravingsProvider } from './craving';
 
 @NgModule({
   imports: [],
@@ -18,7 +19,8 @@ import { DistractionsProvider } from './distraction';
     MealsProvider,
     ModalProvider,
     FoodsProvider,
-    DistractionsProvider
+    DistractionsProvider,
+    CravingsProvider
    ],
   exports: []
 })

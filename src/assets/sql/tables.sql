@@ -21,9 +21,9 @@ CREATE TABLE IF NOT EXISTS cravings(
   date DATETIME DEFAULT CURRENT_TIMESTAMP,
   cravingTime CHAR(50),
   cravingDate CHAR(50),
-  intensity INTEGER,
-  hunger INTEGER,
-  trigger TEXT
+  intensityLevel INTEGER,
+  hungerLevel INTEGER,
+  triggerDescription TEXT
 );
 
 CREATE TABLE IF NOT EXISTS emotions(

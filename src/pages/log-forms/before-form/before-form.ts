@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { DatePipe } from '@angular/common';
 import { NavController, NavParams } from 'ionic-angular';
 import { ModalProvider } from '../../../providers/modal';
 import { FormProvider } from '../../../providers/form';
@@ -15,18 +14,17 @@ import { FoodCravingsListPage } from '../foods-list/foods-list';
 
 @Component({
   selector: 'page-before-form',
-  templateUrl: 'before-form.html',
-  providers: [DatePipe]
+  templateUrl: 'before-form.html'
 })
 export class BeforeFormPage implements OnDestroy, OnInit {
 
   emotions: object = {};
   foods: object = {};
   intensityLevel: number = 1;
-  hungerLevelBefore: number = 1;
-  mealType: string = '';
-  mealDate: string;
-  mealTime: string;
+  hungerLevel: number = 1;
+  type: string = '';
+  date: string = '';
+  time: string = '';
   triggerDescription: string = '';
 
   formType: string = 'craving';
@@ -34,14 +32,10 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   emotionsSubscription;
   foodsSubscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public datePipe: DatePipe, public modalProvider: ModalProvider, public formProvider: FormProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public formProvider: FormProvider) {
   }
 
   ngOnInit() {
-    //automatically generate date/time to current for form
-    this.mealDate = this.datePipe.transform(new Date(), 'mediumDate');
-    this.mealTime = this.datePipe.transform(new Date(), 'shortTime');
-
     this.emotionsSubscription = this.formProvider.selectedBeforeEmotions.subscribe(emotions => this.emotions = emotions);
     this.foodsSubscription = this.formProvider.selectedBeforeFoods.subscribe(foods => this.foods = foods);
   }
@@ -50,6 +44,14 @@ export class BeforeFormPage implements OnDestroy, OnInit {
     this[name] = number;
   }
 
+  onTimeDateChange({ type, value }) {
+    this[type] = value;
+  }
+
+  onDescriptionChange({ value }) {
+    this.triggerDescription = value;
+    console.log(this.triggerDescription, value)
+  }
 
   dismissForm() {
     this.navCtrl.pop();
@@ -64,21 +66,46 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   submitForm() {
+    if (this.formType === 'meal') this.submitMealForm();
+    if (this.formType === 'craving') this.submitCravingForm();
+  }
+
+  submitMealForm() {
     const {
       intensityLevel,
-      hungerLevelBefore,
-      mealType,
-      mealDate,
-      mealTime,
+      hungerLevel,
+      type,
+      date,
+      time,
       triggerDescription,
     } = this;
 
-    this.formProvider.submitBeforeForm({
+    return this.formProvider.submitBeforeMealForm({
       intensityLevel,
-      hungerLevelBefore,
-      mealType,
-      mealDate,
-      mealTime,
+      hungerLevelBefore: hungerLevel,
+      mealType: type,
+      mealDate: date,
+      mealTime: time,
+      triggerDescription,
+    })
+    .then(() => this.dismissForm())
+    .catch(console.error);
+  }
+
+  submitCravingForm() {
+    const {
+      intensityLevel,
+      hungerLevel,
+      date,
+      time,
+      triggerDescription,
+    } = this;
+
+    return this.formProvider.submitCravingForm({
+      intensityLevel,
+      hungerLevel,
+      cravingDate: date,
+      cravingTime: time,
       triggerDescription,
     })
     .then(() => this.dismissForm())
