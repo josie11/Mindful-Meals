@@ -6,6 +6,6 @@ An Ios app built with Ionic and AngularJs that helps a user practice mindfulness
 * **AngularJs**
 * **SQLite**
 
-##Preview:
-![Mindful Meals](https://s3.amazonaws.com/mindful-eating/Before-Form.png "Mindful Meals")
-
+## Preview:
+![Mindful Meals](https://s3.amazonaws.com/mindful-eating/Screen+Shot+2017-11-03+at+5.00.45+PM.png "Mindful Meals")
+![Mindful Meals](https://s3.amazonaws.com/mindful-eating/Screen+Shot+2017-11-03+at+5.00.11+PM.png "Mindful Meals")
