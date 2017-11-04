@@ -10,58 +10,18 @@
 
   <!-- content for ng-content -->
   <ion-content>
-    <ion-list>
-      <ion-list-header>
-        Timing
-        <button ion-button icon-only item-end clear item-button color="accent"><ion-icon name="information-circle" medium></ion-icon></button>
-      </ion-list-header>
-      <date-time (onTimeDateChange)="onTimeDateChange($event)"></date-time>
-      <ion-item detail-push *ngIf="!isMealAttached">
-        <ion-icon ios="ios-create" md="md-create" item-start color="secondary"></ion-icon>
-        <ion-label>Add Before Meal Details</ion-label>
-      </ion-item>
-    </ion-list>
-    <ion-list>
-      <ion-list-header>
-        Physical Hunger
-        <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
-      </ion-list-header>
-      <range name="hungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
-    </ion-list>
-    <ion-list>
-      <ion-list-header>
-        Satisfaction Level
-        <ion-note item-end color="secondary">{{satisfactionLevel | satisfactionRange }}</ion-note>
-      </ion-list-header>
-      <range name="satisfactionLevel" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
-    </ion-list>
-    <ion-list>
-      <ion-list-header>
-        Details
-      </ion-list-header>
-      <checkbox-trigger
-        (onClick)="openEmotionsList($event)"
-        ios="ios-happy"
-        md="md-happy"
-        title="Emotions"
-        [behaviorSubject]="formProvider.selectedAfterEmotions">
-      </checkbox-trigger>
-      <checkbox-trigger
-        (onClick)="openFoodsList($event)"
-        ios="ios-nutrition"
-        md="md-nutrition"
-        title="Foods Consumed"
-        [behaviorSubject]="formProvider.selectedAfterFoods">
-      </checkbox-trigger>
-      <checkbox-trigger
-        (onClick)="openDistractionsList($event)"
-        ios="ios-laptop"
-        md="md-laptop"
-        title="Distractions"
-        [behaviorSubject]="formProvider.selectedDistractions">>
-      </checkbox-trigger>
-      <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)"></detail-textarea>
-    </ion-list>
+    <before-form-content
+      [emotionsBehaviorSubject]="formProvider.selectedBeforeEmotions"
+      [foodsBehaviorSubject]="formProvider.selectedBeforeFoods"
+      [type]="formType"
+      [date]="date"
+      [time]="time"
+      [intensityLevel]="log.intensityLevel"
+      [hungerLevel]="log.hungerLevel"
+      [triggerDescription]="log.triggerDescription"
+      [formType]="formType"
+      (onFormItemChange)="onFormItemChange($event)"
+    ></before-form-content>
   </ion-content>
 
   <ion-footer>

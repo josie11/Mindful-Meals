@@ -70,7 +70,8 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    this.formProvider.updateFoods(this.selectedFoods, this.mealType);
+    if (this.mealType === 'Before') this.formProvider.updateBeforeFoods(this.selectedFoods);
+    if (this.mealType === 'After') this.formProvider.updateAfterFoods(this.selectedFoods);
     this.navCtrl.pop();
   }
 

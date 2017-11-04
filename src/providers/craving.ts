@@ -22,7 +22,7 @@ export class CravingsProvider {
     return this.databaseProvider.select({
       selection: '*',
       dbName: `${this.dbName}s`,
-      whereStatement: `WHERE id = ${cravingId}`
+      extraStatement: `WHERE id = ${cravingId}`
     })
     .then((data: any) => {
       craving = data[0];
@@ -42,7 +42,7 @@ export class CravingsProvider {
     return this.databaseProvider.select({
       dbName: `${this.dbName}s`,
       selection: '*',
-      whereStatement: `WHERE cravingDate = ${date}`
+      extraStatement: `WHERE cravingDate = ${date}`
     });
   }
 
@@ -58,7 +58,7 @@ export class CravingsProvider {
     return this.databaseProvider.select({
       dbName: `${this.dbName}Emotions`,
       selection: '*',
-      whereStatement: `WHERE cravingId = ${cravingId}`
+      extraStatement: `WHERE cravingId = ${cravingId}`
     });
   }
 
@@ -82,7 +82,7 @@ export class CravingsProvider {
     return this.databaseProvider.select({
       dbName: `${this.dbName}Foods`,
       selection: '*',
-      whereStatement: `WHERE cravingId = ${cravingId}`
+      extraStatement: `WHERE cravingId = ${cravingId}`
     });
   }
 

@@ -34,8 +34,12 @@ export class FormProvider {
     ) {
   }
 
-  updateEmotions(emotions, mealType) {
-    this[`selected${mealType}Emotions`].next({...emotions});
+  updateBeforeEmotions(emotions) {
+    this.selectedBeforeEmotions.next({...emotions});
+  }
+
+  updateAfterEmotions(emotions) {
+    this.selectedAfterEmotions.next({...emotions});
   }
 
   addNewEmotion(name) {
@@ -44,8 +48,12 @@ export class FormProvider {
     .catch(console.error)
   }
 
-  updateFoods(foods, mealType) {
-    this[`selected${mealType}Foods`].next({...foods});
+  updateBeforeFoods(foods) {
+    this.selectedBeforeFoods.next({...foods});
+  }
+
+  updateAfterFoods(foods) {
+    this.selectedAfterFoods.next({...foods});
   }
 
   addNewFood(name) {

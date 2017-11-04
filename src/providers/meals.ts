@@ -22,7 +22,7 @@ export class MealsProvider {
     return this.databaseProvider.select({
       selection: '*',
       dbName: `${this.dbName}s`,
-      whereStatement: `WHERE id = ${mealId}`
+      extraStatement: `WHERE id = ${mealId}`
     })
     .then((data: any) => {
       meal = data[0];
@@ -38,6 +38,7 @@ export class MealsProvider {
     })
     .then((data: any) => {
       meal['distractions'] = data;
+      console.log(meal)
       return meal;
     });
   }
@@ -46,7 +47,7 @@ export class MealsProvider {
     return this.databaseProvider.select({
       dbName: `${this.dbName}s`,
       selection: '*',
-      whereStatement: `WHERE mealDate = ${date}`
+      extraStatement: `WHERE mealDate = ${date}`
     });
   }
 
@@ -54,7 +55,7 @@ export class MealsProvider {
     return this.databaseProvider.select({
       dbName: `${this.dbName}s`,
       selection: '*',
-      whereStatement: `WHERE completed = 0`
+      extraStatement: `WHERE completed = 0`
     });
   }
 
@@ -70,10 +71,10 @@ export class MealsProvider {
     const parameters = {
       dbName: `${this.dbName}Emotions`,
       selection: '*',
-      whereStatement: `WHERE mealId = ${mealId}`
+      extraStatement: `INNER JOIN emotions on emotions.id = ${this.dbName}Emotions.emotionId WHERE ${this.dbName}Emotions.mealId = ${mealId}`
     };
 
-    if (mealStage) parameters.whereStatement += ` AND mealStage = '${mealStage}'`;
+    if (mealStage) parameters.extraStatement += ` AND mealStage = '${mealStage}'`;
 
     return this.databaseProvider.select(parameters);
   }
@@ -93,15 +94,15 @@ export class MealsProvider {
     }));
     return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
   }
-
+// `WHERE mealId = ${mealId}`
   getMealFoods(mealId: number, mealStage: string = '') {
     const parameters = {
       dbName: `${this.dbName}Foods`,
       selection: '*',
-      whereStatement: `WHERE mealId = ${mealId}`
+      extraStatement: `INNER JOIN foods on foods.id = ${this.dbName}Foods.foodId WHERE ${this.dbName}Foods.mealId = ${mealId}`
     };
 
-    if (mealStage) parameters.whereStatement += ` AND mealStage = '${mealStage}'`;
+    if (mealStage) parameters.extraStatement += ` AND mealStage = '${mealStage}'`;
 
     return this.databaseProvider.select(parameters);
   }
@@ -126,7 +127,7 @@ export class MealsProvider {
     const parameters = {
       dbName: `${this.dbName}Distractions`,
       selection: '*',
-      whereStatement: `WHERE mealId = ${mealId}`
+      extraStatement: `INNER JOIN distractions on distractions.id = ${this.dbName}Distractions.distractionId WHERE ${this.dbName}Distractions.mealId = ${mealId}`
     };
 
     return this.databaseProvider.select(parameters);
@@ -146,5 +147,12 @@ export class MealsProvider {
       values: [mealId, distractionId]
     }));
     return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Distractions`, items })
+  }
+
+  formatMealItemsToCheckboxObject(items: Array<object>) {
+    return items.reduce((obj, item: any) => {
+      obj[item.id] = item.name;
+      return obj;
+    }, {});
   }
 }

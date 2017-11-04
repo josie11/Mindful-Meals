@@ -72,7 +72,8 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    this.formProvider.updateEmotions(this.selectedEmotions, this.mealType);
+    if (this.mealType === 'Before') this.formProvider.updateBeforeEmotions(this.selectedEmotions);
+    if (this.mealType === 'After') this.formProvider.updateAfterEmotions(this.selectedEmotions);
     this.navCtrl.pop();
   }
 

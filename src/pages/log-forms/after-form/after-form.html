@@ -25,7 +25,7 @@
         <ion-toggle *ngIf="isMealAttached" checked="true" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
       </ion-item-divider>
       <ion-item *ngIf="isMealAttached" color="secondary">
-        <button ion-button outline item-end (click)="buttonClick()" color="white">
+        <button ion-button outline item-end (click)="openBeforeFormAddOrEdit()" color="white">
           Edit
         </button>
         <button ion-button outline item-end (click)="presentBeforeMealPrompt()" color="white">

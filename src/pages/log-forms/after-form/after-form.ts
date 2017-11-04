@@ -8,7 +8,7 @@ import { MealsProvider } from '../../../providers/meals';
 import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
 import { DistractionsListPage } from '../distractions-list/distractions-list';
-
+import { AddAdjustBeforeFormPage } from '../add-adjust-before-form/add-adjust-before-form';
 /**
  * Generated class for the AfterFormPage page.
  *
@@ -81,6 +81,10 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.modalProvider.presentModal(DistractionsListPage);
   }
 
+  openBeforeFormAddOrEdit() {
+    this.modalProvider.presentModal(AddAdjustBeforeFormPage, { log: this.attachedMeal, formType: 'meal' });
+  }
+
   beforeFormToggle(e) {
     this.toggle = !this.toggle;
     if (!this.isMealAttached) {
@@ -88,19 +92,24 @@ export class AfterFormPage implements OnDestroy, OnInit {
     } else {
       this.isMealAttached = false;
       this.attachedMeal = {};
+      this.formProvider.clearBeforeForm();
     }
   }
 
   linkWithExistingMeal(id) {
     if (id == this.attachedMeal['id']) return;
-    this.isMealAttached = true;
-    return this.mealsProvider.getMeal(id).then(meal => this.attachedMeal = meal);
+    return this.mealsProvider.getMeal(id).then((meal: any) => {
+      if (meal.emotions.length > 0) this.formProvider.updateBeforeEmotions(this.mealsProvider.formatMealItemsToCheckboxObject(meal.emotions));
+      if (meal.foods.length > 0) this.formProvider.updateBeforeFoods(this.mealsProvider.formatMealItemsToCheckboxObject(meal.foods));
+      this.attachedMeal = meal
+      this.isMealAttached = true;
+    }).catch(console.error);
   }
 
   presentBeforeMealPrompt() {
     const options = this.incompleteMeals.map((meal: any) => ({
       value: meal.id,
-      label: this.datePipe.transform(`${this.date}T${this.time}`, ' MMM d, y, h:mm a'),
+      label: this.datePipe.transform(`${meal.mealDate}T${meal.mealTime}`, ' MMM d, y, h:mm a'),
       checked: false,
       type: 'radio'
     }))

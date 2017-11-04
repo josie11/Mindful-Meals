@@ -26,7 +26,7 @@ export class DatabaseProvider {
       })
       .then((db: SQLiteObject) => {
         this.database = db;
-        return this.select({ selection: 'name', dbName: 'sqlite_master', whereStatement: "WHERE type='table'"})
+        return this.select({ selection: 'name', dbName: 'sqlite_master', extraStatement: "WHERE type='table'"})
       }).then(data => {
         //If there are tables, database has been seeded
         if (data.length > 0) {
@@ -64,8 +64,8 @@ export class DatabaseProvider {
     return `INSERT INTO ${dbName} (${sqlCols}) VALUES (${sqlValues});`;
   }
 
-  createSqlSelectStatement(selection, dbName, whereStatement) {
-    return `SELECT ${selection} FROM ${dbName} ${whereStatement};`
+  createSqlSelectStatement(selection, dbName, extraStatement) {
+    return `SELECT ${selection} FROM ${dbName} ${extraStatement};`
   }
 
   createSqlUpdateStatement(values, id, dbName) {
@@ -78,8 +78,8 @@ export class DatabaseProvider {
     .then(data => data);
   }
 
-  select({ selection, dbName, whereStatement = ''}) {
-    const sql = this.createSqlSelectStatement(selection, dbName, whereStatement);
+  select({ selection, dbName, extraStatement = ''}) {
+    const sql = this.createSqlSelectStatement(selection, dbName, extraStatement);
     return this.executeSql(sql)
     .then(data => this.processSqlResults(data));
   }

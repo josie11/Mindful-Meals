@@ -18,6 +18,7 @@ import { AfterFormPage } from '../pages/log-forms/after-form/after-form';
 import { EmotionsListPage } from '../pages/log-forms/emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../pages/log-forms/foods-list/foods-list';
 import { DistractionsListPage } from '../pages/log-forms/distractions-list/distractions-list';
+import { AddAdjustBeforeFormPage } from '../pages/log-forms/add-adjust-before-form/add-adjust-before-form';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -167,7 +168,8 @@ class SQLiteMock {
     EmotionsListPage,
     FoodCravingsListPage,
     AfterFormPage,
-    DistractionsListPage
+    DistractionsListPage,
+    AddAdjustBeforeFormPage
   ],
   imports: [
     BrowserModule,
@@ -190,7 +192,8 @@ class SQLiteMock {
     EmotionsListPage,
     FoodCravingsListPage,
     AfterFormPage,
-    DistractionsListPage
+    DistractionsListPage,
+    AddAdjustBeforeFormPage
   ],
   providers: [
     StatusBar,

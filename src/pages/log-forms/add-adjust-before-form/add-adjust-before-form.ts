@@ -9,54 +9,47 @@ import { FoodCravingsListPage } from '../foods-list/foods-list';
 import { DistractionsListPage } from '../distractions-list/distractions-list';
 
 /**
- * Generated class for the AfterFormPage page.
+ * Generated class for the AddAjustBeforeFormPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
  * Ionic pages and navigation.
  */
 
 @Component({
-  selector: 'edit-form',
-  templateUrl: 'edit-form.html'
+  selector: 'add-adjust-before-form',
+  templateUrl: 'add-adjust-before-form.html'
 })
-export class EditFormPage implements OnDestroy, OnInit {
+export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
 
-  hungerLevel: number = 1;
-  satisfactionLevel: number = 1;
+  log: object;
+  formType: string;
+  date: string;
+  time: string;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public alertProvider: AlertProvider, public formProvider: FormProvider, public mealsProvider: MealsProvider) {
   }
 
   ngOnInit() {
-
+    this.log = this.navParams.get('log');
+    this.formType = this.navParams.get('formType');
+    this.time = this.log[`${this.formType}Time`];
+    this.date = this.log[`${this.formType}Date`];
   }
 
-  onRangeChange({ name, number }) {
-    this[name] = number;
-  }
-
-  onTimeDateChange({ type, value }) {
-    this[type] = value;
-  }
-
-  onDescriptionChange({ value }) {
-    // this.mealDescription = value;
+  onFormItemChange({ item, value }) {
+    this.log[item] = value;
   }
 
   dismissForm() {
     this.navCtrl.pop();
   }
 
-  openEmotionsList(stage) {
-    this.modalProvider.presentModal(EmotionsListPage, { mealType: stage });
+  openEmotionsList() {
+    this.modalProvider.presentModal(EmotionsListPage, { mealType: 'Before' });
   }
 
-  openFoodsList(stage) {
-    this.modalProvider.presentModal(FoodCravingsListPage, { mealType: stage });
-  }
-
-  openDistractionsList() {
-    this.modalProvider.presentModal(DistractionsListPage);
+  openFoodsList() {
+    this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'Before' });
   }
 
   submitForm() {
