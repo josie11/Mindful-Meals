@@ -6,7 +6,7 @@
    <ion-item *ngIf="formType === 'meal'">
     <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
     <ion-label>Meal</ion-label>
-    <ion-select (ionChange)="onMealTypeChange($event)" interface="action-sheet">
+    <ion-select (ionChange)="onMealTypeChange($event)" [(ngModel)]="type" interface="action-sheet">
       <ion-option value="Breakfast">Breakfast</ion-option>
       <ion-option value="Lunch">Lunch</ion-option>
       <ion-option value="Dinner">Dinner</ion-option>
@@ -19,14 +19,14 @@
     Physical Hunger
     <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
   </ion-list-header>
-  <range name="hungerLevel" min="1" max="5" (onRangeChange)="onRangeChange($event)"></range>
+  <range name="hungerLevel" min="1" max="5" [initialValue]="hungerLevel" (onRangeChange)="onRangeChange($event)"></range>
 </ion-list>
 <ion-list>
   <ion-list-header>
     Mental Hunger
     <ion-note item-end color="secondary">{{intensityLevel | cravingsRange }}</ion-note>
   </ion-list-header>
-  <range name="intensityLevel" min="1" max="4" (onRangeChange)="onRangeChange($event)"></range>
+  <range name="intensityLevel" min="1" max="4" [initialValue]="intensityLevel" (onRangeChange)="onRangeChange($event)"></range>
 </ion-list>
 <ion-list>
   <ion-list-header>

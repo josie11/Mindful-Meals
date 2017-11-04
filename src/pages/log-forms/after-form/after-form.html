@@ -25,16 +25,16 @@
         <ion-toggle *ngIf="isMealAttached" checked="true" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
       </ion-item-divider>
       <ion-item *ngIf="isMealAttached" color="secondary">
-        <button ion-button outline item-end (click)="openBeforeFormAddOrEdit()" color="white">
+        <button ion-button outline item-end (click)="openBeforeLogAddOrEdit()" color="white">
           Edit
         </button>
         <button ion-button outline item-end (click)="presentBeforeMealPrompt()" color="white">
           Switch
         </button>
         <ion-icon item-start ios="ios-attach" md="md-attach" color="white"></ion-icon>
-        <p>{{attachedMeal.mealDate | date:'mediumDate'}}</p>
-        <p>{{attachedMeal.mealDate + 'T' + attachedMeal.mealTime | date:'shortTime'}}</p>
-        <p *ngIf="attachedMeal.mealType">{{attachedMeal.mealType}}</p>
+        <p>{{logEdits.date | date:'mediumDate'}}</p>
+        <p>{{logEdits.date + 'T' + logEdits.time | date:'shortTime'}}</p>
+        <p *ngIf="logEdits.type">{{logEdits.type}}</p>
       </ion-item>
       <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)"></date-time>
       <ion-item detail-push *ngIf="!isMealAttached">

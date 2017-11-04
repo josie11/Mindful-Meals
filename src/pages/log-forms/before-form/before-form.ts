@@ -41,14 +41,6 @@ export class BeforeFormPage implements OnDestroy, OnInit {
     this.navCtrl.pop();
   }
 
-  // openEmotionsList() {
-  //   this.modalProvider.presentModal(EmotionsListPage, { mealType: 'Before'});
-  // }
-
-  // openFoodsList() {
-  //   this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'Before'});
-  // }
-
   submitForm() {
     if (this.formType === 'meal') this.submitMealForm();
     if (this.formType === 'craving') this.submitCravingForm();

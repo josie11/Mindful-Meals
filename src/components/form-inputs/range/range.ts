@@ -14,6 +14,7 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 export class RangeComponent implements OnInit {
   @Input() min: number | string;
   @Input() max: number | string;
+  @Input() initialValue: number | string;
   @Input() name: string;
 
   @Output() onRangeChange = new EventEmitter();
@@ -24,7 +25,7 @@ export class RangeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.number = this.min;
+    this.number = this.initialValue;
   }
 
   change() {

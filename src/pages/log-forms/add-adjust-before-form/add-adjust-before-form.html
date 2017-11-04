@@ -13,9 +13,9 @@
     <before-form-content
       [emotionsBehaviorSubject]="formProvider.selectedBeforeEmotions"
       [foodsBehaviorSubject]="formProvider.selectedBeforeFoods"
-      [type]="formType"
-      [date]="date"
-      [time]="time"
+      [type]="log.type"
+      [date]="log.date"
+      [time]="log.time"
       [intensityLevel]="log.intensityLevel"
       [hungerLevel]="log.hungerLevel"
       [triggerDescription]="log.triggerDescription"
@@ -27,12 +27,12 @@
   <ion-footer>
     <ion-toolbar color="primary">
       <ion-buttons start>
-        <button ion-button icon-only (click)="dismissForm()">
+        <button ion-button icon-only (click)="onCancel()">
           <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
         </button>
       </ion-buttons>
       <ion-buttons end>
-        <button ion-button icon-only (click)="submitForm()">
+        <button ion-button icon-only (click)="onSubmit()">
           <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
         </button>
       </ion-buttons>

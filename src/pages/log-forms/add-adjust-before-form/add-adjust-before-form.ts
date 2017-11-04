@@ -6,7 +6,6 @@ import { FormProvider } from '../../../providers/form';
 import { MealsProvider } from '../../../providers/meals';
 import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
-import { DistractionsListPage } from '../distractions-list/distractions-list';
 
 /**
  * Generated class for the AddAjustBeforeFormPage page.
@@ -23,17 +22,20 @@ export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
 
   log: object;
   formType: string;
-  date: string;
-  time: string;
+  submit;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public alertProvider: AlertProvider, public formProvider: FormProvider, public mealsProvider: MealsProvider) {
   }
 
   ngOnInit() {
-    this.log = this.navParams.get('log');
+    //prevent mutations!
+    const log: any = {...this.navParams.get('log')};
+    log.emotions = {...log.emotions}
+    log.foods = {...log.foods}
+
+    this.log = log;
     this.formType = this.navParams.get('formType');
-    this.time = this.log[`${this.formType}Time`];
-    this.date = this.log[`${this.formType}Date`];
+    this.submit = this.navParams.get('submit');
   }
 
   onFormItemChange({ item, value }) {
@@ -52,8 +54,18 @@ export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
     this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'Before' });
   }
 
-  submitForm() {
-    console.log(this)
+  onCancel() {
+    //have to undo any edits to emotions/foods
+    this.formProvider.updateBeforeEmotions(this.log['emotions']);
+    this.formProvider.updateBeforeFoods(this.log['foods']);
+    this.dismissForm();
+  }
+
+  onSubmit() {
+    this.log['emotions'] = {...this.formProvider.selectedBeforeEmotions.getValue()};
+    this.log['foods'] = {...this.formProvider.selectedBeforeFoods.getValue()};
+    this.submit(this.log)
+    this.dismissForm();
   }
 
   ngOnDestroy() {

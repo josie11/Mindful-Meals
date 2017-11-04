@@ -34,8 +34,18 @@ export class AfterFormPage implements OnDestroy, OnInit {
   time: string = '';
 
   incompleteMeals: Array<object> = [];
-  attachedMeal: object = {};
+  attachedMeal: any = {};
   isMealAttached: boolean = false;
+  logEdits: any = {
+    intensityLevel: 1,
+    hungerLevel:  1,
+    date:'',
+    time: '',
+    type: '',
+    triggerDescription: '',
+    emotions: {},
+    foods: {}
+  };
 
   toggle: boolean = false;
 
@@ -81,31 +91,6 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.modalProvider.presentModal(DistractionsListPage);
   }
 
-  openBeforeFormAddOrEdit() {
-    this.modalProvider.presentModal(AddAdjustBeforeFormPage, { log: this.attachedMeal, formType: 'meal' });
-  }
-
-  beforeFormToggle(e) {
-    this.toggle = !this.toggle;
-    if (!this.isMealAttached) {
-      this.presentBeforeMealPrompt();
-    } else {
-      this.isMealAttached = false;
-      this.attachedMeal = {};
-      this.formProvider.clearBeforeForm();
-    }
-  }
-
-  linkWithExistingMeal(id) {
-    if (id == this.attachedMeal['id']) return;
-    return this.mealsProvider.getMeal(id).then((meal: any) => {
-      if (meal.emotions.length > 0) this.formProvider.updateBeforeEmotions(this.mealsProvider.formatMealItemsToCheckboxObject(meal.emotions));
-      if (meal.foods.length > 0) this.formProvider.updateBeforeFoods(this.mealsProvider.formatMealItemsToCheckboxObject(meal.foods));
-      this.attachedMeal = meal
-      this.isMealAttached = true;
-    }).catch(console.error);
-  }
-
   presentBeforeMealPrompt() {
     const options = this.incompleteMeals.map((meal: any) => ({
       value: meal.id,
@@ -118,6 +103,83 @@ export class AfterFormPage implements OnDestroy, OnInit {
       inputs: options,
       submitHandler: this.linkWithExistingMeal.bind(this)
     })
+  }
+
+  beforeFormToggle(e) {
+    this.toggle = !this.toggle;
+    if (!this.isMealAttached) {
+      this.presentBeforeMealPrompt();
+    } else {
+      this.isMealAttached = false;
+      this.attachedMeal = {};
+      this.clearLogEdits();
+    }
+  }
+
+  linkWithExistingMeal(id) {
+    if (id == this.attachedMeal['id']) return;
+    return this.mealsProvider.getMeal(id).then((meal: any) => {
+      const formattedEmotions = this.mealsProvider.formatMealItemsToCheckboxObject(meal.emotions);
+      const formattedFoods = this.mealsProvider.formatMealItemsToCheckboxObject(meal.foods);
+
+      if (meal.emotions.length > 0) this.formProvider.updateBeforeEmotions(formattedEmotions);
+      if (meal.foods.length > 0) this.formProvider.updateBeforeFoods(formattedFoods);
+
+      this.attachedMeal = meal
+      this.isMealAttached = true;
+
+      this.setLogToAttachedMeal({...formattedEmotions}, {...formattedFoods});
+    }).catch(console.error);
+  }
+
+  openBeforeLogAddOrEdit() {
+    this.modalProvider.presentModal(
+      AddAdjustBeforeFormPage,
+      {
+        log: this.logEdits,
+        formType: 'meal',
+        submit: this.submitLogEdits.bind(this)
+      });
+  }
+
+  setLogToAttachedMeal(emotions, foods) {
+    const {
+      mealTime,
+      mealDate,
+      mealType,
+      hungerLevelBefore,
+      intensityLevel,
+      triggerDescription
+    } = this.attachedMeal;
+
+    this.logEdits = {
+      intensityLevel,
+      hungerLevel:  hungerLevelBefore,
+      date: mealDate,
+      time: mealTime,
+      type: mealType,
+      triggerDescription: triggerDescription,
+      emotions,
+      foods
+    };
+  }
+
+  submitLogEdits(log) {
+    this.logEdits = log;
+  }
+
+  clearLogEdits() {
+    this.logEdits = {
+      intensityLevel: 1,
+      hungerLevel:  1,
+      date:'',
+      time: '',
+      type: '',
+      triggerDescription: '',
+      emotions: {},
+      foods: {}
+    };
+    this.formProvider.clearBeforeForm();
   }
 
   submitForm() {
