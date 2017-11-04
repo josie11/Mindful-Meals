@@ -37,9 +37,9 @@
         <p *ngIf="logEdits.type">{{logEdits.type}}</p>
       </ion-item>
       <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)"></date-time>
-      <ion-item detail-push *ngIf="!isMealAttached">
+      <ion-item detail-push *ngIf="!isMealAttached" (click)="openBeforeLogAddOrEdit()">
         <ion-icon ios="ios-create" md="md-create" item-start color="secondary"></ion-icon>
-        <ion-label>Add Before Meal Details</ion-label>
+        <ion-label>Edit Before Log Details</ion-label>
       </ion-item>
     </ion-list>
     <ion-list>

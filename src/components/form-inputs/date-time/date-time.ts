@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, Input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -19,8 +19,8 @@ import { DatePipe } from '@angular/common';
   providers: [DatePipe]
 })
 export class DateTimeComponent implements OnInit {
-  time: string;
-  date: string;
+  @Input() time: string;
+  @Input() date: string;
 
   @Output() onTimeDateChange = new EventEmitter();
 
@@ -29,11 +29,15 @@ export class DateTimeComponent implements OnInit {
 
   ngOnInit() {
     //automatically generate date/time to current for form
-    this.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
-    this.onTimeDateChange.emit({ type: 'date', value: this.date });
+    if (!this.date) {
+      this.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
+      this.onTimeDateChange.emit({ type: 'date', value: this.date });
+    }
 
-    this.time = this.datePipe.transform(new Date(), 'HH:mm');
-    this.onTimeDateChange.emit({ type: 'time', value: this.time });
+    if (!this.time) {
+      this.time = this.datePipe.transform(new Date(), 'HH:mm');
+      this.onTimeDateChange.emit({ type: 'time', value: this.time });
+    }
   }
 
   onDateChange() {

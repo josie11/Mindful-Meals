@@ -2,8 +2,8 @@
   <ion-list-header>
     Timing
   </ion-list-header>
-  <date-time (onTimeDateChange)="onTimeDateChange($event)"></date-time>
-   <ion-item *ngIf="formType === 'meal'">
+  <date-time (onTimeDateChange)="onTimeDateChange($event)" [date]="date" [time]="time"></date-time>
+   <ion-item *ngIf="showMealType">
     <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
     <ion-label>Meal</ion-label>
     <ion-select (ionChange)="onMealTypeChange($event)" [(ngModel)]="type" interface="action-sheet">
@@ -46,5 +46,5 @@
     title="Food Cravings"
     [behaviorSubject]="foodsBehaviorSubject">
   </checkbox-trigger>
-  <detail-textarea title="Trigger Notes" (onDescriptionChange)="onDescriptionChange($event)"></detail-textarea>
+  <detail-textarea title="Trigger Notes" (onDescriptionChange)="onDescriptionChange($event)" [triggerDescription]="triggerDescription"></detail-textarea>
 </ion-list>

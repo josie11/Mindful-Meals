@@ -25,7 +25,7 @@ export class RangeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.number = this.initialValue;
+    this.number = this.initialValue || this.min;
   }
 
   change() {

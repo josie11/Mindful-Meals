@@ -37,8 +37,8 @@ export class AfterFormPage implements OnDestroy, OnInit {
   attachedMeal: any = {};
   isMealAttached: boolean = false;
   logEdits: any = {
-    intensityLevel: 1,
-    hungerLevel:  1,
+    intensityLevel: '',
+    hungerLevel:  '',
     date:'',
     time: '',
     type: '',
@@ -91,6 +91,17 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.modalProvider.presentModal(DistractionsListPage);
   }
 
+  beforeFormToggle(e) {
+    this.toggle = !this.toggle;
+    if (!this.isMealAttached) {
+      this.presentBeforeMealPrompt();
+    } else {
+      this.isMealAttached = false;
+      this.attachedMeal = {};
+      this.clearLogEdits();
+    }
+  }
+
   presentBeforeMealPrompt() {
     const options = this.incompleteMeals.map((meal: any) => ({
       value: meal.id,
@@ -103,17 +114,6 @@ export class AfterFormPage implements OnDestroy, OnInit {
       inputs: options,
       submitHandler: this.linkWithExistingMeal.bind(this)
     })
-  }
-
-  beforeFormToggle(e) {
-    this.toggle = !this.toggle;
-    if (!this.isMealAttached) {
-      this.presentBeforeMealPrompt();
-    } else {
-      this.isMealAttached = false;
-      this.attachedMeal = {};
-      this.clearLogEdits();
-    }
   }
 
   linkWithExistingMeal(id) {
@@ -170,8 +170,8 @@ export class AfterFormPage implements OnDestroy, OnInit {
 
   clearLogEdits() {
     this.logEdits = {
-      intensityLevel: 1,
-      hungerLevel:  1,
+      intensityLevel: '',
+      hungerLevel:  '',
       date:'',
       time: '',
       type: '',

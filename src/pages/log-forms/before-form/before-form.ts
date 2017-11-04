@@ -2,8 +2,6 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { ModalProvider } from '../../../providers/modal';
 import { FormProvider } from '../../../providers/form';
-import { EmotionsListPage } from '../emotions-list/emotions-list';
-import { FoodCravingsListPage } from '../foods-list/foods-list';
 
 /**
  * Generated class for the BeforeFormPage page.
@@ -26,11 +24,16 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   triggerDescription: string = '';
 
   formType: string = 'craving';
+  showMealType: boolean = this.formType === 'meal';
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public formProvider: FormProvider) {
   }
 
   ngOnInit() {
+  }
+
+  onFormTypeChange() {
+    this.showMealType = this.formType === 'meal';
   }
 
   onFormItemChange({ item, value }) {

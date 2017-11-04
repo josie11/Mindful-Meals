@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { DatabaseProvider } from './database';
 import { EmotionsProvider } from './emotion';
 import { FoodsProvider } from './food';
 import { DistractionsProvider } from './distraction';
@@ -25,7 +24,6 @@ export class FormProvider {
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
 
   constructor(
-      private databaseProvider: DatabaseProvider,
       private emotionsProvider: EmotionsProvider,
       private foodsProvider: FoodsProvider,
       private distractionsProvider: DistractionsProvider,

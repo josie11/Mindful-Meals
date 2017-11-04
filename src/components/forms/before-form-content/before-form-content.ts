@@ -25,7 +25,7 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   @Input() date: string;
   @Input() time: string;
   @Input() triggerDescription: string;
-  @Input() formType: string;
+  @Input() showMealType: boolean;
   @Input() emotionsBehaviorSubject;
   @Input() foodsBehaviorSubject;
 
@@ -38,6 +38,7 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
+    console.log(this.showMealType)
     this.emotionsSubscription = this.emotionsBehaviorSubject.subscribe(emotions => this.emotions = emotions);
     this.foodsSubscription = this.foodsBehaviorSubject.subscribe(foods => this.foods = foods);
   }

@@ -38,7 +38,6 @@ export class MealsProvider {
     })
     .then((data: any) => {
       meal['distractions'] = data;
-      console.log(meal)
       return meal;
     });
   }

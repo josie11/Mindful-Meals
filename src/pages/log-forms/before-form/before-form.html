@@ -7,7 +7,7 @@
       </ion-title>
     </ion-navbar>
     <ion-toolbar color="primary">
-      <ion-segment [(ngModel)]="formType" color="white">
+      <ion-segment [(ngModel)]="formType" (ionChange)="onFormTypeChange()" color="white">
         <ion-segment-button value="craving">Craving</ion-segment-button>
         <ion-segment-button value="meal">Meal</ion-segment-button>
       </ion-segment>
@@ -25,7 +25,7 @@
       [intensityLevel]="intensityLevel"
       [hungerLevel]="hungerLevel"
       [triggerDescription]="triggerDescription"
-      [formType]="formType"
+      [showMealType]="showMealType"
       (onFormItemChange)="onFormItemChange($event)"
     ></before-form-content>
   </ion-content>
