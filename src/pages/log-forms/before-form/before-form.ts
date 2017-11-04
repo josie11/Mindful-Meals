@@ -18,8 +18,6 @@ import { FoodCravingsListPage } from '../foods-list/foods-list';
 })
 export class BeforeFormPage implements OnDestroy, OnInit {
 
-  emotions: object = {};
-  foods: object = {};
   intensityLevel: number = 1;
   hungerLevel: number = 1;
   type: string = '';
@@ -29,28 +27,14 @@ export class BeforeFormPage implements OnDestroy, OnInit {
 
   formType: string = 'craving';
 
-  emotionsSubscription;
-  foodsSubscription;
-
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public formProvider: FormProvider) {
   }
 
   ngOnInit() {
-    this.emotionsSubscription = this.formProvider.selectedBeforeEmotions.subscribe(emotions => this.emotions = emotions);
-    this.foodsSubscription = this.formProvider.selectedBeforeFoods.subscribe(foods => this.foods = foods);
   }
 
-  onRangeChange({ name, number }) {
-    this[name] = number;
-  }
-
-  onTimeDateChange({ type, value }) {
-    this[type] = value;
-  }
-
-  onDescriptionChange({ value }) {
-    this.triggerDescription = value;
-    console.log(this.triggerDescription, value)
+  onFormItemChange({ item, value }) {
+    this[item] = value;
   }
 
   dismissForm() {
@@ -113,8 +97,6 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.emotionsSubscription.unsubscribe();
-    this.foodsSubscription.unsubscribe();
     this.formProvider.clearBeforeForm();
   }
 }

@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController } from 'ionic-angular';
+import { DatePipe } from '@angular/common';
 import { AlertProvider } from '../../../providers/alert';
 import { ModalProvider } from '../../../providers/modal';
 import { FormProvider } from '../../../providers/form';
@@ -17,7 +18,8 @@ import { DistractionsListPage } from '../distractions-list/distractions-list';
 
 @Component({
   selector: 'page-after-form',
-  templateUrl: 'after-form.html'
+  templateUrl: 'after-form.html',
+  providers: [DatePipe]
 })
 export class AfterFormPage implements OnDestroy, OnInit {
 
@@ -41,7 +43,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
   foodsSubscription;
   distractionsSubscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public alertProvider: AlertProvider, public formProvider: FormProvider, public mealsProvider: MealsProvider) {
+  constructor(private navCtrl: NavController, private modalProvider: ModalProvider, private alertProvider: AlertProvider, private formProvider: FormProvider, private mealsProvider: MealsProvider, private datePipe: DatePipe) {
   }
 
   ngOnInit() {
@@ -92,18 +94,18 @@ export class AfterFormPage implements OnDestroy, OnInit {
   linkWithExistingMeal(id) {
     if (id == this.attachedMeal['id']) return;
     this.isMealAttached = true;
-    this.attachedMeal = this.incompleteMeals.find(meal => meal['id'] == id);
+    return this.mealsProvider.getMeal(id).then(meal => this.attachedMeal = meal);
   }
 
   presentBeforeMealPrompt() {
     const options = this.incompleteMeals.map((meal: any) => ({
       value: meal.id,
-      label: `${meal.mealTime}, ${meal.mealDate}`,
+      label: this.datePipe.transform(`${this.date}T${this.time}`, ' MMM d, y, h:mm a'),
       checked: false,
       type: 'radio'
     }))
     this.alertProvider.presentRadio({
-      title: 'Incomplete Logs',
+      title: 'Incomplete Meal Logs',
       inputs: options,
       submitHandler: this.linkWithExistingMeal.bind(this)
     })

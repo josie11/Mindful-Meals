@@ -124,6 +124,7 @@ export class FormProvider {
   }
 
   clearAfterForm() {
+    this.clearBeforeForm();
     this.selectedAfterEmotions.next({});
     this.selectedAfterFoods.next({});
     this.selectedDistractions.next({});

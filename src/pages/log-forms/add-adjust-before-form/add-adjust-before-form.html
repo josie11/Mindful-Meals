@@ -3,7 +3,7 @@
   <ion-header>
     <ion-navbar color="primary">
       <ion-title>
-        After Meal
+        Edit Before Log
       </ion-title>
     </ion-navbar>
   </ion-header>
@@ -12,31 +12,10 @@
   <ion-content>
     <ion-list>
       <ion-list-header>
-        Timing & Before Meal
+        Timing
         <button ion-button icon-only item-end clear item-button color="accent"><ion-icon name="information-circle" medium></ion-icon></button>
       </ion-list-header>
-      <ion-item-divider>
-        <ion-icon item-start ios="ios-attach" md="md-attach" color="secondary" *ngIf="!isMealAttached"></ion-icon>
-        <ion-icon item-start ios="ios-checkmark-circle-outline" md="md-checkmark-circle" *ngIf="isMealAttached" color="secondary"></ion-icon>
-        <ion-label>{{ isMealAttached ? 'Before Meal Log Attached' : 'Attach Before Meal Log'}}</ion-label>
-        <!-- HORRENDOUS SOLUTION, I DONT KNOW HOW TO MANUALLY CONTROL TOGGLE -->
-        <ion-toggle *ngIf="!isMealAttached && !toggle" checked="false" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
-        <ion-toggle *ngIf="!isMealAttached && toggle" checked="false" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
-        <ion-toggle *ngIf="isMealAttached" checked="true" color="secondary" (ionChange)="beforeFormToggle()"></ion-toggle>
-      </ion-item-divider>
-      <ion-item *ngIf="isMealAttached" color="secondary">
-        <button ion-button outline item-end (click)="buttonClick()" color="white">
-          Edit
-        </button>
-        <button ion-button outline item-end (click)="presentBeforeMealPrompt()" color="white">
-          Switch
-        </button>
-        <ion-icon item-start ios="ios-attach" md="md-attach" color="white"></ion-icon>
-        <p>{{attachedMeal.mealDate | date:'mediumDate'}}</p>
-        <p>{{attachedMeal.mealDate + 'T' + attachedMeal.mealTime | date:'shortTime'}}</p>
-        <p *ngIf="attachedMeal.mealType">{{attachedMeal.mealType}}</p>
-      </ion-item>
-      <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)"></date-time>
+      <date-time (onTimeDateChange)="onTimeDateChange($event)"></date-time>
       <ion-item detail-push *ngIf="!isMealAttached">
         <ion-icon ios="ios-create" md="md-create" item-start color="secondary"></ion-icon>
         <ion-label>Add Before Meal Details</ion-label>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 @Component({
@@ -7,12 +7,12 @@ import { DatePipe } from '@angular/common';
     <ion-item>
       <ion-icon ios="ios-calendar" md="md-calendar" item-start color="secondary"></ion-icon>
       <ion-label>Date</ion-label>
-      <ion-datetime displayFormat="MMM DD, YYYY" pickerFormat="MMM DD YYYY" [placeholder]="date" [(ngModel)]="date" (ionChange)="onChange('date')"></ion-datetime>
+      <ion-datetime displayFormat="MMM DD, YYYY" pickerFormat="MMM DD, YYYY" [placeholder]="date | date:'mediumDate'" [(ngModel)]="date" (ionChange)="onDateChange()"></ion-datetime>
     </ion-item>
     <ion-item>
       <ion-icon ios="ios-time" md="md-time" item-start color="secondary"></ion-icon>
       <ion-label>Time</ion-label>
-      <ion-datetime displayFormat="h:mm A" [placeholder]="time" [(ngModel)]="time" (ionChange)="onChange('time')">
+      <ion-datetime displayFormat="h:mm A" pickerFormat="h:mm A" [placeholder]="date + 'T' + time | date:'shortTime'" [(ngModel)]="time" (ionChange)="onTimeChange()">
       </ion-datetime>
     </ion-item>
   `,
@@ -29,15 +29,19 @@ export class DateTimeComponent implements OnInit {
 
   ngOnInit() {
     //automatically generate date/time to current for form
-    this.date = this.datePipe.transform(new Date(), 'mediumDate');
+    this.date = this.datePipe.transform(new Date(), 'yyyy-MM-dd');
     this.onTimeDateChange.emit({ type: 'date', value: this.date });
 
-    this.time = this.datePipe.transform(new Date(), 'shortTime');
+    this.time = this.datePipe.transform(new Date(), 'HH:mm');
     this.onTimeDateChange.emit({ type: 'time', value: this.time });
   }
 
-  onChange(type) {
-    this.onTimeDateChange.emit({ type, value: this[type] });
+  onDateChange() {
+    this.onTimeDateChange.emit({ type: 'date', value: this.date });
+  }
+
+  onTimeChange() {
+    this.onTimeDateChange.emit({ type: 'time', value: this.time });
   }
 
 }

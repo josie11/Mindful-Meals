@@ -111,7 +111,7 @@ export class DatabaseProvider {
   }
 
   batchSql(sql: Array<object>) {
-    return this.database.batchSql(sql, {})
+    return this.database['batchSql'](sql, {})
     .then(data => {
       return this.processSqlResults(data)
     }, err => {
