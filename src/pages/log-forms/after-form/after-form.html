@@ -36,7 +36,17 @@
         <p>{{logEdits.date + 'T' + logEdits.time | date:'shortTime'}}</p>
         <p *ngIf="logEdits.type">{{logEdits.type}}</p>
       </ion-item>
-      <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)"></date-time>
+      <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)" [time]="logEdits.time" [date]="logEdits.date"></date-time>
+      <ion-item *ngIf="!isMealAttached">
+        <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
+        <ion-label>Meal</ion-label>
+        <ion-select [(ngModel)]="logEdits.type" interface="action-sheet">
+          <ion-option value="Breakfast">Breakfast</ion-option>
+          <ion-option value="Lunch">Lunch</ion-option>
+          <ion-option value="Dinner">Dinner</ion-option>
+          <ion-option value="Snack">Snack</ion-option>
+        </ion-select>
+      </ion-item>
       <ion-item detail-push *ngIf="!isMealAttached" (click)="openBeforeLogAddOrEdit()">
         <ion-icon ios="ios-create" md="md-create" item-start color="secondary"></ion-icon>
         <ion-label>Edit Before Log Details</ion-label>
@@ -81,7 +91,7 @@
         title="Distractions"
         [behaviorSubject]="formProvider.selectedDistractions">>
       </checkbox-trigger>
-      <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)"></detail-textarea>
+      <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)" [description]="mealDescription"></detail-textarea>
     </ion-list>
   </ion-content>
 

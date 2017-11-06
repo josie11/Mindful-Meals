@@ -58,6 +58,13 @@ export class DatabaseProvider {
     return `'${val}'`;;
   }
 
+  //items = [{col, value, selector }] -> [{col: id, val: 1, selector: '=' }]
+  //conditions = ['OR', 'AND']
+  createWhereStatement(items, conditions) {
+    const whereStatements = items.map(({ col, value, selector = '=' }, idx) => `${col} ${selector} ${this.formatSqlValue(value)} ${conditions[idx] || ''}`).join(' ');
+    return `WHERE ${whereStatements}`
+  }
+
   createSqlInsertStatement(cols, values, dbName) {
     const sqlCols = cols.join(', ');
     const sqlValues = values.map(val => this.formatSqlValue(val)).join(", ");
@@ -71,6 +78,10 @@ export class DatabaseProvider {
   createSqlUpdateStatement(values, id, dbName) {
     const updateSql = values.map(val => `${val.col} = ${this.formatSqlValue(val.value)}`).join(', ');
     return `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
+  }
+
+  createSqlDeleteStatement(dbName, extraStatement) {
+    return `DELETE FROM ${dbName} ${extraStatement};`;
   }
 
   executeSql(sql: string) {
@@ -97,7 +108,7 @@ export class DatabaseProvider {
     .then(data => ({ id: data[0]['MAX(id)'] }));
   }
 
-  //values = [{col, value}]
+  // values = [{ col, value }]
   update({ dbName, values, id }) {
     const updateSql = values.map(val => `${val.col} = '${val.value}'`).join(', ');
     const sql = `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
@@ -110,7 +121,19 @@ export class DatabaseProvider {
     return this.batchSql(sqlStatements);
   }
 
-  batchSql(sql: Array<object>) {
+  delete({ dbName, extraStatement}) {
+    if (!extraStatement) return Promise.reject('No Where Statement Provided');
+    const sql = this.createSqlDeleteStatement(dbName, extraStatement);
+    return this.executeSql(sql);
+  }
+
+  bulkDelete({ dbName, extraStatements }) {
+    if (!extraStatements || extraStatements.length < 1) return Promise.reject('No Where Statements Provided');
+    const sqlStatements = extraStatements.map(statement => this.createSqlDeleteStatement(dbName, statement));
+    return this.batchSql(sqlStatements);
+  }
+
+  batchSql(sql: Array<string>) {
     return this.database['batchSql'](sql, {})
     .then(data => {
       return this.processSqlResults(data)

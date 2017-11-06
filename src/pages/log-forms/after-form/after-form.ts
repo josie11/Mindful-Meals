@@ -23,19 +23,18 @@ import { AddAdjustBeforeFormPage } from '../add-adjust-before-form/add-adjust-be
 })
 export class AfterFormPage implements OnDestroy, OnInit {
 
-  date: string = '';
   distractions: object = {};
   emotions: object = {};
   foods: object = {};
-  formType: string = 'new';
   hungerLevel: number = 1;
   mealDescription: string = '';
   satisfactionLevel: number = 1;
-  time: string = '';
 
   incompleteMeals: Array<object> = [];
   attachedMeal: any = {};
   isMealAttached: boolean = false;
+
+  //represents before meal data
   logEdits: any = {
     intensityLevel: '',
     hungerLevel:  '',
@@ -68,7 +67,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   onTimeDateChange({ type, value }) {
-    this[type] = value;
+    this.logEdits[type] = value;
   }
 
   onDescriptionChange({ value }) {
@@ -119,11 +118,11 @@ export class AfterFormPage implements OnDestroy, OnInit {
   linkWithExistingMeal(id) {
     if (id == this.attachedMeal['id']) return;
     return this.mealsProvider.getMeal(id).then((meal: any) => {
-      const formattedEmotions = this.mealsProvider.formatMealItemsToCheckboxObject(meal.emotions);
-      const formattedFoods = this.mealsProvider.formatMealItemsToCheckboxObject(meal.foods);
+      const formattedEmotions = this.mealsProvider.formatMealItemsToCheckboxObject(meal.beforeEmotions);
+      const formattedFoods = this.mealsProvider.formatMealItemsToCheckboxObject(meal.beforeFoods);
 
-      if (meal.emotions.length > 0) this.formProvider.updateBeforeEmotions(formattedEmotions);
-      if (meal.foods.length > 0) this.formProvider.updateBeforeFoods(formattedFoods);
+      if (meal.beforeEmotions.length > 0) this.formProvider.updateBeforeEmotions(formattedEmotions);
+      if (meal.beforeFoods.length > 0) this.formProvider.updateBeforeFoods(formattedFoods);
 
       this.attachedMeal = meal
       this.isMealAttached = true;
@@ -169,21 +168,67 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   clearLogEdits() {
+    //have to do this here or triggers on change check error
+    const newDate = new Date();
+    const date = this.datePipe.transform(newDate, 'yyyy-MM-dd');
+    const time = this.datePipe.transform(newDate, 'HH:mm');
+
     this.logEdits = {
       intensityLevel: '',
       hungerLevel:  '',
-      date:'',
-      time: '',
+      date: date,
+      time: time,
       type: '',
       triggerDescription: '',
       emotions: {},
       foods: {}
     };
+
     this.formProvider.clearBeforeForm();
   }
 
   submitForm() {
+    if (this.isMealAttached) this.submitUpdateForm()
+    else this.submitNewForm();
+  }
+
+  submitNewForm() {
     console.log(this)
+    const {
+      intensityLevel,
+      hungerLevel,
+      type,
+      date,
+      time,
+      triggerDescription,
+    } = this.logEdits;
+
+    const {
+      mealDescription,
+      satisfactionLevel,
+    } = this;
+
+    const hungerLevelAfter = this.hungerLevel;
+
+    return this.formProvider.submitNewAfterMealForm({
+      intensityLevel,
+      hungerLevelBefore: hungerLevel,
+      mealType: type,
+      mealDate: date,
+      mealTime: time,
+      triggerDescription,
+      completed: 1,
+      hungerLevelAfter,
+      mealDescription,
+      satisfactionLevel
+    })
+    .then(() => this.dismissForm())
+    .catch(console.error);
+
+  }
+
+  submitUpdateForm() {
+
   }
 
   ngOnDestroy() {

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DatabaseProvider } from './database';
+import difference from 'lodash.difference';
+
 import 'rxjs/add/operator/map';
 
 /*
@@ -26,20 +28,9 @@ export class MealsProvider {
     })
     .then((data: any) => {
       meal = data[0];
-      return this.getMealFoods(mealId);
+      return this.getMealDetails(mealId);
     })
-    .then((data: any) => {
-      meal['foods'] = data;
-      return this.getMealEmotions(mealId);
-    })
-    .then((data: any) => {
-      meal['emotions'] = data
-      return this.getMealDistractions(mealId);
-    })
-    .then((data: any) => {
-      meal['distractions'] = data;
-      return meal;
-    });
+    .then(details => ({ ...meal, ...details }));
   }
 
   getMealsForDate(date: string) {
@@ -58,11 +49,34 @@ export class MealsProvider {
     });
   }
 
-  addBeforeMeal(cols: Array<string>, values: Array<string>) {
+  addMeal(cols: Array<string>, values: Array<string>) {
     return this.databaseProvider.insert({
       dbName: `${this.dbName}s`,
       cols,
       values
+    });
+  }
+
+  getMealDetails(mealId: number) {
+    const meal: any = {};
+
+    return this.getMealFoods(mealId)
+    .then((data: any) => {
+      const { after, before } = this.seperateBeforeAfterItems(data);
+      meal.beforeFoods = before;
+      meal.afterFoods = after;
+
+      return this.getMealEmotions(mealId);
+    })
+    .then((data: any) => {
+      const { after, before } = this.seperateBeforeAfterItems(data);
+      meal.beforeEmotions = before;
+      meal.afterEmotions = after;
+      return this.getMealDistractions(mealId);
+    })
+    .then((data: any) => {
+      meal.distractions = data;
+      return meal;
     });
   }
 
@@ -86,14 +100,41 @@ export class MealsProvider {
     });
   }
 
+  updateMeal(mealId: number, values: Array<object>) {
+    if(values.length < 1) return Promise.resolve();
+
+    return this.databaseProvider.update({
+      dbName: `${this.dbName}s`,
+      values,
+      id: mealId
+    });
+  }
+
   addMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
+    if (emotionIds.length < 1) return Promise.resolve();
+
     const items = emotionIds.map(emotionId => ({
       cols: ['mealId', 'emotionId', 'mealStage'],
       values: [mealId, emotionId, mealStage]
     }));
     return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
   }
-// `WHERE mealId = ${mealId}`
+
+  updateMealEmotions(mealId: number, mealStage: string, beforeEmotions: Array<number>, afterEmotions: Array<number>) {
+    const { addIds, deleteIds } = this.findChangesToMealItems(beforeEmotions, afterEmotions);
+
+    return this.addMealEmotions(mealId, addIds, mealStage)
+    .then(() => this.deleteMealEmotions(mealId, deleteIds, mealStage));
+  }
+
+  deleteMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
+    if (emotionIds.length < 1) return Promise.resolve();
+
+    const extraStatements = emotionIds.map(emotionId => `WHERE emotionId = ${emotionId} AND mealId = ${mealId} AND mealStage = ${mealStage}`);
+
+    return this.databaseProvider.bulkDelete({ dbName: `${this.dbName}Emotions`, extraStatements });
+  }
+
   getMealFoods(mealId: number, mealStage: string = '') {
     const parameters = {
       dbName: `${this.dbName}Foods`,
@@ -115,11 +156,28 @@ export class MealsProvider {
   }
 
   addMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
+    if (foodIds.length < 1) return Promise.resolve();
+
     const items = foodIds.map(foodId => ({
       cols: ['mealId', 'foodId', 'mealStage'],
       values: [mealId, foodId, mealStage]
     }));
     return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Foods`, items })
+  }
+
+  updateMealFoods(mealId: number, mealStage: string, beforeFoods: Array<number>, afterFoods: Array<number>) {
+    const { addIds, deleteIds } = this.findChangesToMealItems(beforeFoods, afterFoods);
+
+    return this.addMealFoods(mealId, addIds, mealStage)
+    .then(() => this.deleteMealFoods(mealId, deleteIds, mealStage));
+  }
+
+  deleteMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
+    if (foodIds.length < 1) return Promise.resolve();
+
+    const extraStatements = foodIds.map(foodId => `WHERE foodId = ${foodId} AND mealId = ${mealId} AND mealStage = ${mealStage}`);
+
+    return this.databaseProvider.bulkDelete({ dbName: `${this.dbName}Foods`, extraStatements });
   }
 
   getMealDistractions(mealId: number) {
@@ -141,6 +199,8 @@ export class MealsProvider {
   }
 
   addMealDistractions(mealId: number, distractionIds: Array<number>) {
+    if (distractionIds.length < 1) return Promise.resolve();
+
     const items = distractionIds.map(distractionId => ({
       cols: ['mealId', 'distractionId'],
       values: [mealId, distractionId]
@@ -153,5 +213,26 @@ export class MealsProvider {
       obj[item.id] = item.name;
       return obj;
     }, {});
+  }
+
+  // => returns { add: [], delete: [] }
+  findChangesToMealItems(beforeIds: Array<number>, afterIds: Array<number>) {
+
+    const deleteIds = difference(beforeIds, afterIds);
+    const addIds = difference(afterIds, beforeIds);
+
+    return { addIds, deleteIds };
+  }
+
+  seperateBeforeAfterItems(items: Array<object>) {
+    const before = [];
+    const after = [];
+
+    items.forEach((item: any) => {
+      if (item.mealStage === 'before') before.push(item)
+      else if (item.mealStage === 'after') after.push(item);
+    });
+
+    return { after, before };
   }
 }

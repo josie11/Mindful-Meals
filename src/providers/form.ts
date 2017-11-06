@@ -71,56 +71,83 @@ export class FormProvider {
   }
 
   submitBeforeMealForm(data) {
-    const cols = [], values = [];
+    const { cols, values } = this.formatDataforInsert(data);
 
-    for (let prop in data) {
-      cols.push(prop);
-      values.push(data[prop]);
-    }
-
-    return this.mealsProvider.addBeforeMeal(cols, values)
+    return this.mealsProvider.addMeal(cols, values)
     .then((data: any) => {
-      this.linkBeforeFormItemsWithMeal(data.id)
-      .then(() => this.mealsProvider.getMeal(data.id));
+      return this.linkBeforeFormItemsWithMeal(data.id)
+      .then((data: any) => {
+        this.clearBeforeForm();
+        return this.mealsProvider.getMeal(data.id);
+      });
     });
   }
 
   linkBeforeFormItemsWithMeal(id) {
-    const selectedBeforeEmotionIds = Object.keys(this.selectedBeforeEmotions.getValue()).map(val => Number(val));
-    const selectedBeforeFoodsIds = Object.keys(this.selectedBeforeFoods.getValue()).map(val => Number(val));
+    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
-    const promiseChain = selectedBeforeEmotionIds.length > 0 ? this.mealsProvider.addMealEmotions(id, selectedBeforeEmotionIds, 'before') : Promise.resolve();
-
-    return promiseChain.then(() => {
-      if (selectedBeforeFoodsIds.length > 0) return this.mealsProvider.addMealFoods(id, selectedBeforeFoodsIds, 'before');
-      return id;
-    });
+    return this.mealsProvider.addMealEmotions(id, selectedBeforeEmotionIds, 'before')
+    .then(() => this.mealsProvider.addMealFoods(id, selectedBeforeFoodsIds, 'before'))
+    .then(() => ({id: id}));
   }
 
   submitCravingForm(data) {
-    const cols = [], values = [];
-
-    for (let prop in data) {
-      cols.push(prop);
-      values.push(data[prop]);
-    }
+    const { cols, values } = this.formatDataforInsert(data);
 
     return this.cravingsProvider.addCraving(cols, values)
     .then((data: any) => {
       this.linkCravingItemsWithCraving(data.id)
-      .then(() => this.cravingsProvider.getCraving(data.id));
+      .then(() => {
+        this.clearBeforeForm();
+        return this.cravingsProvider.getCraving(data.id);
+      });
     });
   }
 
   linkCravingItemsWithCraving(id) {
-    const selectedBeforeEmotionIds = Object.keys(this.selectedBeforeEmotions.getValue()).map(val => Number(val));
-    const selectedBeforeFoodsIds = Object.keys(this.selectedBeforeFoods.getValue()).map(val => Number(val));
+    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
-    const promiseChain = selectedBeforeEmotionIds.length > 0 ? this.cravingsProvider.addCravingEmotions(id, selectedBeforeEmotionIds) : Promise.resolve();
+    return this.cravingsProvider.addCravingEmotions(id, selectedBeforeEmotionIds)
+    .then(() => this.cravingsProvider.addCravingFoods(id, selectedBeforeFoodsIds))
+    .then(() => ({id: id}));
+  }
 
-    return promiseChain.then(() => {
-      if (selectedBeforeFoodsIds.length > 0) return this.cravingsProvider.addCravingFoods(id, selectedBeforeFoodsIds);
-      return id;
+  linkAfterItemsWithMeal(id) {
+    const { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds } = this.getSelectedAfterItemsIds();
+
+    return this.mealsProvider.addMealEmotions(id, selectedAfterEmotionIds, 'after')
+    .then(() => this.mealsProvider.addMealFoods(id, selectedAfterFoodsIds, 'after'))
+    .then(() => this.mealsProvider.addMealDistractions(id, selectedDistractionsIds))
+    .then(() => ({id: id}));
+  }
+
+  updateBeforeMealItems(id, previousEmotions, previousFoods) {
+    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
+    const previousEmotionsIds = Object.keys(previousEmotions).map(val => Number(val));
+    const previousFoodsIds = Object.keys(previousFoods).map(val => Number(val));
+
+    return this.mealsProvider.updateMealEmotions(id, 'before', previousEmotionsIds, selectedBeforeEmotionIds)
+    .then(() => this.mealsProvider.updateMealFoods(id, 'before', previousFoodsIds, selectedBeforeFoodsIds))
+    .then(() => ({id: id}));
+  }
+
+  submitNewAfterMealForm(data) {
+    return this.submitBeforeMealForm(data)
+    .then((data: any) => this.linkAfterItemsWithMeal(data.id))
+    .then((data: any) => {
+      this.clearAfterForm();
+      return this.mealsProvider.getMeal(data.id);
+    });
+  }
+
+  submitExistingMealAfterForm(mealId, data, beforeEmotions, beforeFoods ) {
+    const mealData = this.formatDataForUpdate(data);
+
+    return this.mealsProvider.updateMeal(mealId, mealData)
+    .then(() => this.updateBeforeMealItems(mealId, beforeEmotions, beforeEmotions))
+    .then(() => {
+      this.clearAfterForm();
+      return this.mealsProvider.getMeal(mealId)
     });
   }
 
@@ -134,6 +161,40 @@ export class FormProvider {
     this.selectedAfterEmotions.next({});
     this.selectedAfterFoods.next({});
     this.selectedDistractions.next({});
+  }
+
+  getSelectedBeforeItemsIds() {
+    const selectedBeforeEmotionIds = Object.keys(this.selectedBeforeEmotions.getValue()).map(val => Number(val));
+    const selectedBeforeFoodsIds = Object.keys(this.selectedBeforeFoods.getValue()).map(val => Number(val));
+
+    return { selectedBeforeEmotionIds, selectedBeforeFoodsIds };
+  }
+
+  getSelectedAfterItemsIds() {
+    const selectedAfterEmotionIds = Object.keys(this.selectedAfterEmotions.getValue()).map(val => Number(val));
+    const selectedAfterFoodsIds = Object.keys(this.selectedAfterFoods.getValue()).map(val => Number(val));
+    const selectedDistractionsIds = Object.keys(this.selectedDistractions.getValue()).map(val => Number(val));
+
+    return { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds };
+  }
+
+  formatDataforInsert(data) {
+    const cols = [], values = [];
+
+    for (let prop in data) {
+      cols.push(prop);
+      values.push(data[prop]);
+    }
+
+    return { cols, values };
+  }
+
+  formatDataForUpdate(data) {
+    const values = [];
+    for (let col in data) {
+      values.push({col, value: data[col]});
+    }
+    return values;
   }
 
 }

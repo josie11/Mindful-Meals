@@ -6,13 +6,13 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
     <ion-item>
       <ion-label stacked><h2>{{title}}:</h2></ion-label>
       <ion-icon ios="ios-book" md="md-book" item-start color="secondary"></ion-icon>
-      <ion-textarea [(ngModel)]="triggerDescription" (ionChange)="change()"></ion-textarea>
+      <ion-textarea [(ngModel)]="details" (ionChange)="change()"></ion-textarea>
     </ion-item>
   `,
 })
 export class DetailTextareaComponent implements OnInit {
   @Input() title: string;
-  @Input() triggerDescription: string;
+  @Input() description: string;
 
   details: string = '';
 
@@ -22,7 +22,7 @@ export class DetailTextareaComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.details = this.triggerDescription;
+    this.details = this.description;
   }
 
   change() {
