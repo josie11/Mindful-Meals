@@ -71,7 +71,7 @@ export class CravingsProvider {
   }
 
   addCravingEmotions(cravingId: number, emotionIds: Array<number>) {
-    if (emotionIds.length < 1) return Promise.resolve();
+    if (emotionIds.length < 1) return Promise.resolve({ id: cravingId });
 
     const items = emotionIds.map(emotionId => ({
       cols: ['cravingId', 'emotionId'],
@@ -97,7 +97,7 @@ export class CravingsProvider {
   }
 
   addCravingFoods(cravingId: number, foodIds: Array<number>) {
-    if (foodIds.length < 1) return Promise.resolve();
+    if (foodIds.length < 1) return Promise.resolve({ id: cravingId });
 
     const items = foodIds.map(foodId => ({
       cols: ['cravingId', 'foodId'],

@@ -101,7 +101,7 @@ export class MealsProvider {
   }
 
   updateMeal(mealId: number, values: Array<object>) {
-    if(values.length < 1) return Promise.resolve();
+    if(values.length < 1) return Promise.resolve({id : mealId });
 
     return this.databaseProvider.update({
       dbName: `${this.dbName}s`,
@@ -111,7 +111,7 @@ export class MealsProvider {
   }
 
   addMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
-    if (emotionIds.length < 1) return Promise.resolve();
+    if (emotionIds.length < 1) return Promise.resolve({id : mealId });
 
     const items = emotionIds.map(emotionId => ({
       cols: ['mealId', 'emotionId', 'mealStage'],
@@ -128,7 +128,7 @@ export class MealsProvider {
   }
 
   deleteMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
-    if (emotionIds.length < 1) return Promise.resolve();
+    if (emotionIds.length < 1) return Promise.resolve({id : mealId });
 
     const extraStatements = emotionIds.map(emotionId => `WHERE emotionId = ${emotionId} AND mealId = ${mealId} AND mealStage = ${mealStage}`);
 
@@ -156,7 +156,7 @@ export class MealsProvider {
   }
 
   addMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
-    if (foodIds.length < 1) return Promise.resolve();
+    if (foodIds.length < 1) return Promise.resolve({id : mealId });
 
     const items = foodIds.map(foodId => ({
       cols: ['mealId', 'foodId', 'mealStage'],
@@ -173,7 +173,7 @@ export class MealsProvider {
   }
 
   deleteMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
-    if (foodIds.length < 1) return Promise.resolve();
+    if (foodIds.length < 1) return Promise.resolve({id : mealId });
 
     const extraStatements = foodIds.map(foodId => `WHERE foodId = ${foodId} AND mealId = ${mealId} AND mealStage = ${mealStage}`);
 
@@ -199,7 +199,7 @@ export class MealsProvider {
   }
 
   addMealDistractions(mealId: number, distractionIds: Array<number>) {
-    if (distractionIds.length < 1) return Promise.resolve();
+    if (distractionIds.length < 1) return Promise.resolve({id : mealId });
 
     const items = distractionIds.map(distractionId => ({
       cols: ['mealId', 'distractionId'],

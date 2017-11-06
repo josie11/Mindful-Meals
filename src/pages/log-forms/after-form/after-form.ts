@@ -193,7 +193,6 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   submitNewForm() {
-    console.log(this)
     const {
       intensityLevel,
       hungerLevel,
