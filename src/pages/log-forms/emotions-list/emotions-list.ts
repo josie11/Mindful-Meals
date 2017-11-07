@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-import { EmotionsProvider } from '../../../providers/emotion';
-import { AlertProvider } from '../../../providers/alert';
-import { FormProvider } from '../../../providers/form';
+import { NavParams } from 'ionic-angular';
+import { EmotionsService } from '../../../providers/emotion.service';
+import { AlertService } from '../../../providers/alert.service';
+import { FormService } from '../../../providers/form.service';
 
 
 @Component({
@@ -29,15 +29,13 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   selectedEmotions = {};
   mealType: string;
 
-  constructor(public navCtrl: NavController, public emotionsProvider: EmotionsProvider, public navParams: NavParams, public formProvider: FormProvider, public alertProvider: AlertProvider) {
+  constructor(public emotionsService: EmotionsService, public navParams: NavParams, public formService: FormService, public alertService: AlertService) {
   }
 
   ngOnInit() {
     this.mealType = this.navParams.get('mealType');
-    this.emotionsSubscription = this.emotionsProvider.emotionsList.subscribe(emotions => this.emotions = emotions);
-    this.selectedEmotionsSubscription = this.formProvider[`selected${this.mealType}Emotions`].subscribe(emotions => {
-      this.selectedEmotions = emotions;
-    });
+    this.emotionsSubscription = this.emotionsService.emotionsList.subscribe(emotions => this.emotions = emotions);
+    this.selectedEmotionsSubscription = this.formService[`selected${this.mealType}Emotions`].subscribe(emotions => this.selectedEmotions = {...emotions});
   }
 
   toggleEmotion({ id, name }) {
@@ -51,7 +49,7 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   addNewEmotion({ emotion }) {
     if (emotion.length < 1) return;
 
-    this.formProvider.addNewEmotion(emotion)
+    this.formService.addNewEmotion(emotion)
     .then((data: any) => {
       this.selectedEmotions[data.id] = data.name;
     })
@@ -59,7 +57,7 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   }
 
   triggerEmotionPrompt() {
-    this.alertProvider.presentPrompt({
+    this.alertService.presentPrompt({
       title: 'New Emotion',
       inputs: [{ name: 'emotion', placeholder: 'Emotion' }],
       submitHandler: this.addNewEmotion.bind(this),
@@ -72,9 +70,8 @@ export class EmotionsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    if (this.mealType === 'Before') this.formProvider.updateBeforeEmotions(this.selectedEmotions);
-    if (this.mealType === 'After') this.formProvider.updateAfterEmotions(this.selectedEmotions);
-    this.navCtrl.pop();
+    if (this.mealType === 'Before') this.formService.updateBeforeEmotions(this.selectedEmotions);
+    if (this.mealType === 'After') this.formService.updateAfterEmotions(this.selectedEmotions);
   }
 
 }

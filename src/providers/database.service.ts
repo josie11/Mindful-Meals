@@ -8,20 +8,21 @@ import { Storage } from '@ionic/storage';
 import 'rxjs/add/operator/map';
 
 @Injectable()
-export class DatabaseProvider {
+export class DatabaseService {
 
   database: SQLiteObject;
   // kind of an Observable - can emit new values to the subscribers by calling next() on it
   private databaseReady: BehaviorSubject<boolean>;
 
   constructor(private http: Http, private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
+    this.initializeDatabase();
   }
 
-  initializeDatabase() {
+  initializeDatabase(dbName: string = 'mindful') {
     this.databaseReady = new BehaviorSubject(false);
     this.platform.ready().then(() => {
       this.sqlite.create({
-        name: 'mindful.db',
+        name: `${dbName}.db`,
         location: 'default'
       })
       .then((db: SQLiteObject) => {
@@ -43,12 +44,11 @@ export class DatabaseProvider {
     return this.http.get('assets/sql/tables.sql')
       .map(res => res.text())
       .subscribe(sql => {
-        this.sqlitePorter.importSqlToDb(this.database, sql)
+        return this.sqlitePorter.importSqlToDb(this.database, sql)
           .then(data => {
             this.databaseReady.next(true);
             this.storage.set('database_filled', true);
           })
-          .catch(e => console.error(e));
       });
   }
 
@@ -110,7 +110,7 @@ export class DatabaseProvider {
 
   // values = [{ col, value }]
   update({ dbName, values, id }) {
-    const updateSql = values.map(val => `${val.col} = '${val.value}'`).join(', ');
+    const updateSql = values.map(val => `${val.col} = ${this.formatSqlValue(val.value)}`).join(', ');
     const sql = `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
     return this.executeSql(sql)
   }

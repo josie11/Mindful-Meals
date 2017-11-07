@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-import { DistractionsProvider } from '../../../providers/distraction';
-import { AlertProvider } from '../../../providers/alert';
-import { FormProvider } from '../../../providers/form';
+import { NavParams } from 'ionic-angular';
+import { DistractionsService } from '../../../providers/distraction.service';
+import { AlertService } from '../../../providers/alert.service';
+import { FormService } from '../../../providers/form.service';
 
 
 @Component({
@@ -28,13 +28,13 @@ export class DistractionsListPage implements OnDestroy, OnInit {
   selectedDistractionsSubscription;
   selectedDistractions = {};
 
-  constructor(public navCtrl: NavController, public distractionsProvider: DistractionsProvider, public navParams: NavParams, public formProvider: FormProvider, public alertProvider: AlertProvider) {
+  constructor(public distractionsService: DistractionsService, public navParams: NavParams, public formService: FormService, public alertService: AlertService) {
   }
 
   ngOnInit() {
-    this.distractionsSubscription = this.distractionsProvider.distractionsList.subscribe(distractions => this.distractions = distractions);
-    this.selectedDistractionsSubscription = this.formProvider.selectedDistractions.subscribe(distractions => {
-      this.selectedDistractions = distractions;
+    this.distractionsSubscription = this.distractionsService.distractionsList.subscribe(distractions => this.distractions = distractions);
+    this.selectedDistractionsSubscription = this.formService.selectedDistractions.subscribe(distractions => {
+      this.selectedDistractions = {...distractions};
     });
   }
 
@@ -49,7 +49,7 @@ export class DistractionsListPage implements OnDestroy, OnInit {
   addNewDistraction({ distraction }) {
     if (distraction.length < 1) return;
 
-    this.formProvider.addNewDistraction(distraction)
+    this.formService.addNewDistraction(distraction)
     .then((data: any) => {
       this.selectedDistractions[data.id] = data.name;
     })
@@ -57,7 +57,7 @@ export class DistractionsListPage implements OnDestroy, OnInit {
   }
 
   triggerDistractionPrompt() {
-    this.alertProvider.presentPrompt({
+    this.alertService.presentPrompt({
       title: 'New Distraction',
       inputs: [{ name: 'distraction', placeholder: 'Distraction' }],
       submitHandler: this.addNewDistraction.bind(this),
@@ -70,8 +70,7 @@ export class DistractionsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    this.formProvider.updateDistractions(this.selectedDistractions);
-    this.navCtrl.pop();
+    this.formService.updateDistractions(this.selectedDistractions);
   }
 
 }

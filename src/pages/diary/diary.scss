@@ -1,0 +1,16 @@
+diary-page {
+
+  ion-note {
+    font-size: 14px;
+    align-self: flex-start;
+    margin-top: 14px !important;
+  }
+
+  ion-item-divider {
+    text-align: center;
+    padding-left: 8px !important;
+      .button-inner {
+        font-size: 1.65rem !important;
+      }
+  }
+}

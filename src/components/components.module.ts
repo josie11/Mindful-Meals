@@ -3,7 +3,6 @@ import { IonicModule } from 'ionic-angular';
 import { PipesModule } from '../pipes/pipes.module';
 import { ModalComponent } from './modal/modal';
 import { RangeComponent } from './form-inputs/range/range';
-import { AlertComponent } from './alert/alert';
 import { CheckboxListComponent } from './lists/checkbox-list/checkbox-list';
 import { DateTimeComponent } from './form-inputs/date-time/date-time';
 import { DetailTextareaComponent } from './form-inputs/detail-textarea/detail-textarea';
@@ -14,7 +13,6 @@ import { BeforeFormContentComponent } from './forms/before-form-content/before-f
 	declarations: [
     ModalComponent,
     RangeComponent,
-    AlertComponent,
     CheckboxListComponent,
     DateTimeComponent,
     DetailTextareaComponent,
@@ -28,7 +26,6 @@ import { BeforeFormContentComponent } from './forms/before-form-content/before-f
 	exports: [
     ModalComponent,
     RangeComponent,
-    AlertComponent,
     CheckboxListComponent,
     DateTimeComponent,
     DetailTextareaComponent,

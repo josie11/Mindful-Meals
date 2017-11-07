@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { EmotionsProvider } from './emotion';
-import { FoodsProvider } from './food';
-import { DistractionsProvider } from './distraction';
-import { MealsProvider } from './meals';
-import { CravingsProvider } from './craving';
+import { EmotionsService } from './emotion.service';
+import { FoodsService } from './food.service';
+import { DistractionsService } from './distraction.service';
+import { MealsService } from './meals.service';
+import { CravingsService } from './craving.service';
 
 import { BehaviorSubject } from "rxjs";
 
@@ -14,7 +14,7 @@ import 'rxjs/add/operator/map';
   And to submit form when complete
 */
 @Injectable()
-export class FormProvider {
+export class FormService {
 
   selectedBeforeEmotions: BehaviorSubject<object> = new BehaviorSubject({});
   selectedBeforeFoods: BehaviorSubject<object> = new BehaviorSubject({});
@@ -24,11 +24,11 @@ export class FormProvider {
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
 
   constructor(
-      private emotionsProvider: EmotionsProvider,
-      private foodsProvider: FoodsProvider,
-      private distractionsProvider: DistractionsProvider,
-      private mealsProvider: MealsProvider,
-      private cravingsProvider: CravingsProvider,
+      private emotionsService: EmotionsService,
+      private foodsService: FoodsService,
+      private distractionsService: DistractionsService,
+      private mealsService: MealsService,
+      private cravingsService: CravingsService,
     ) {
   }
 
@@ -41,9 +41,8 @@ export class FormProvider {
   }
 
   addNewEmotion(name) {
-    return this.emotionsProvider.addEmotion(name)
-    .then((data: any) => ({id : data.id, name}))
-    .catch(console.error)
+    return this.emotionsService.addEmotion(name)
+    .then((data: any) => ({id : data.id, name}));
   }
 
   updateBeforeFoods(foods) {
@@ -55,9 +54,8 @@ export class FormProvider {
   }
 
   addNewFood(name) {
-    return this.foodsProvider.addFood(name)
-    .then((data: any) => ({id : data.id, name}))
-    .catch(console.error)
+    return this.foodsService.addFood(name)
+    .then((data: any) => ({id : data.id, name}));
   }
 
   updateDistractions(distractions) {
@@ -65,20 +63,19 @@ export class FormProvider {
   }
 
   addNewDistraction(name) {
-    return this.distractionsProvider.addDistraction(name)
-    .then((data: any) => ({id : data.id, name}))
-    .catch(console.error)
+    return this.distractionsService.addDistraction(name)
+    .then((data: any) => ({id : data.id, name}));
   }
 
   submitBeforeMealForm(data) {
     const { cols, values } = this.formatDataforInsert(data);
 
-    return this.mealsProvider.addMeal(cols, values)
+    return this.mealsService.addMeal(cols, values)
     .then((data: any) => {
       return this.linkBeforeFormItemsWithMeal(data.id)
       .then((data: any) => {
         this.clearBeforeForm();
-        return this.mealsProvider.getMeal(data.id);
+        return this.mealsService.getMeal(data.id);
       });
     });
   }
@@ -86,20 +83,20 @@ export class FormProvider {
   linkBeforeFormItemsWithMeal(id) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
-    return this.mealsProvider.addMealEmotions(id, selectedBeforeEmotionIds, 'before')
-    .then(() => this.mealsProvider.addMealFoods(id, selectedBeforeFoodsIds, 'before'))
+    return this.mealsService.addMealEmotions(id, selectedBeforeEmotionIds, 'before')
+    .then(() => this.mealsService.addMealFoods(id, selectedBeforeFoodsIds, 'before'))
     .then(() => ({id: id}));
   }
 
   submitCravingForm(data) {
     const { cols, values } = this.formatDataforInsert(data);
 
-    return this.cravingsProvider.addCraving(cols, values)
+    return this.cravingsService.addCraving(cols, values)
     .then((data: any) => {
       this.linkCravingItemsWithCraving(data.id)
       .then(() => {
         this.clearBeforeForm();
-        return this.cravingsProvider.getCraving(data.id);
+        return this.cravingsService.getCraving(data.id);
       });
     });
   }
@@ -107,17 +104,17 @@ export class FormProvider {
   linkCravingItemsWithCraving(id) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
-    return this.cravingsProvider.addCravingEmotions(id, selectedBeforeEmotionIds)
-    .then(() => this.cravingsProvider.addCravingFoods(id, selectedBeforeFoodsIds))
+    return this.cravingsService.addCravingEmotions(id, selectedBeforeEmotionIds)
+    .then(() => this.cravingsService.addCravingFoods(id, selectedBeforeFoodsIds))
     .then(() => ({id: id}));
   }
 
   linkAfterItemsWithMeal(id) {
     const { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds } = this.getSelectedAfterItemsIds();
 
-    return this.mealsProvider.addMealEmotions(id, selectedAfterEmotionIds, 'after')
-    .then(() => this.mealsProvider.addMealFoods(id, selectedAfterFoodsIds, 'after'))
-    .then(() => this.mealsProvider.addMealDistractions(id, selectedDistractionsIds))
+    return this.mealsService.addMealEmotions(id, selectedAfterEmotionIds, 'after')
+    .then(() => this.mealsService.addMealFoods(id, selectedAfterFoodsIds, 'after'))
+    .then(() => this.mealsService.addMealDistractions(id, selectedDistractionsIds))
     .then(() => ({id: id}));
   }
 
@@ -126,8 +123,8 @@ export class FormProvider {
     const previousEmotionsIds = Object.keys(previousEmotions).map(val => Number(val));
     const previousFoodsIds = Object.keys(previousFoods).map(val => Number(val));
 
-    return this.mealsProvider.updateMealEmotions(id, 'before', previousEmotionsIds, selectedBeforeEmotionIds)
-    .then(() => this.mealsProvider.updateMealFoods(id, 'before', previousFoodsIds, selectedBeforeFoodsIds))
+    return this.mealsService.updateMealEmotions(id, 'before', previousEmotionsIds, selectedBeforeEmotionIds)
+    .then(() => this.mealsService.updateMealFoods(id, 'before', previousFoodsIds, selectedBeforeFoodsIds))
     .then(() => ({id: id}));
   }
 
@@ -136,18 +133,19 @@ export class FormProvider {
     .then((data: any) => this.linkAfterItemsWithMeal(data.id))
     .then((data: any) => {
       this.clearAfterForm();
-      return this.mealsProvider.getMeal(data.id);
+      return this.mealsService.getMeal(data.id);
     });
   }
 
-  submitExistingMealAfterForm(mealId, data, beforeEmotions, beforeFoods ) {
+  submitAttachedMealAfterForm(mealId, data, beforeEmotions, beforeFoods ) {
     const mealData = this.formatDataForUpdate(data);
 
-    return this.mealsProvider.updateMeal(mealId, mealData)
+    return this.mealsService.updateMeal(mealId, mealData)
     .then(() => this.updateBeforeMealItems(mealId, beforeEmotions, beforeEmotions))
+    .then(() => this.linkAfterItemsWithMeal(mealId))
     .then(() => {
       this.clearAfterForm();
-      return this.mealsProvider.getMeal(mealId)
+      return this.mealsService.getMeal(mealId)
     });
   }
 
@@ -194,6 +192,7 @@ export class FormProvider {
     for (let col in data) {
       values.push({col, value: data[col]});
     }
+
     return values;
   }
 

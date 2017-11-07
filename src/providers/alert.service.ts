@@ -3,13 +3,13 @@ import { AlertController } from 'ionic-angular';
 import 'rxjs/add/operator/map';
 
 /*
-  Generated class for the AlertProvider provider.
+  Generated class for the AlertService provider.
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
 @Injectable()
-export class AlertProvider {
+export class AlertService {
 
   constructor(public alertCtrl: AlertController) {
   }

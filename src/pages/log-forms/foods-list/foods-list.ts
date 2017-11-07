@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
-import { FoodsProvider } from '../../../providers/food';
-import { AlertProvider } from '../../../providers/alert';
-import { FormProvider } from '../../../providers/form';
+import { NavParams } from 'ionic-angular';
+import { FoodsService } from '../../../providers/food.service';
+import { AlertService } from '../../../providers/alert.service';
+import { FormService } from '../../../providers/form.service';
 
 
 @Component({
@@ -29,13 +29,13 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   selectedFoods = {};
   mealType: string;
 
-  constructor(public navCtrl: NavController, public foodsProvider: FoodsProvider, public navParams: NavParams, public formProvider: FormProvider, public alertProvider: AlertProvider) {
+  constructor(public foodsService: FoodsService, public navParams: NavParams, public formService: FormService, public alertService: AlertService) {
   }
 
   ngOnInit() {
     this.mealType = this.navParams.get('mealType');
-    this.foodsSubscription = this.foodsProvider.foodsList.subscribe(foods => this.foods = foods);
-    this.selectedFoodsSubscription = this.formProvider[`selected${this.mealType}Foods`].subscribe(foods => this.selectedFoods = foods);
+    this.foodsSubscription = this.foodsService.foodsList.subscribe(foods => this.foods = foods);
+    this.selectedFoodsSubscription = this.formService[`selected${this.mealType}Foods`].subscribe(foods => this.selectedFoods = {...foods});
   }
 
   toggleFood({ id, name }) {
@@ -49,7 +49,7 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   addNewFood({ food }) {
     if (food.length < 1) return;
 
-    this.formProvider.addNewFood(food)
+    this.formService.addNewFood(food)
     .then((data: any) => {
       this.selectedFoods[data.id] = data.name;
     })
@@ -57,7 +57,7 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   }
 
   triggerFoodPrompt() {
-    this.alertProvider.presentPrompt({
+    this.alertService.presentPrompt({
       title: 'New Food',
       inputs: [{ name: 'food', placeholder: 'Food' }],
       submitHandler: this.addNewFood.bind(this),
@@ -70,9 +70,8 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
   }
 
   dismiss() {
-    if (this.mealType === 'Before') this.formProvider.updateBeforeFoods(this.selectedFoods);
-    if (this.mealType === 'After') this.formProvider.updateAfterFoods(this.selectedFoods);
-    this.navCtrl.pop();
+    if (this.mealType === 'Before') this.formService.updateBeforeFoods(this.selectedFoods);
+    if (this.mealType === 'After') this.formService.updateAfterFoods(this.selectedFoods);
   }
 
 }

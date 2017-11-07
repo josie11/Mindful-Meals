@@ -9,7 +9,7 @@ import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { MyApp } from './app.component';
 import { ComponentsModule } from '../components/components.module';
 
-import { AboutPage } from '../pages/about/about';
+import { DiaryPage } from '../pages/diary/diary';
 import { ContactPage } from '../pages/contact/contact';
 import { LogHomePage } from '../pages/log-home/log-home';
 import { TabsPage } from '../pages/tabs/tabs';
@@ -160,7 +160,7 @@ class SQLiteMock {
 @NgModule({
   declarations: [
     MyApp,
-    AboutPage,
+    DiaryPage,
     BeforeFormPage,
     ContactPage,
     LogHomePage,
@@ -184,7 +184,7 @@ class SQLiteMock {
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    AboutPage,
+    DiaryPage,
     ContactPage,
     LogHomePage,
     TabsPage,

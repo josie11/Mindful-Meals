@@ -11,8 +11,8 @@
   <!-- content for ng-content -->
   <ion-content>
     <before-form-content
-      [emotionsBehaviorSubject]="formProvider.selectedBeforeEmotions"
-      [foodsBehaviorSubject]="formProvider.selectedBeforeFoods"
+      [emotionsBehaviorSubject]="formService.selectedBeforeEmotions"
+      [foodsBehaviorSubject]="formService.selectedBeforeFoods"
       [type]="log.type"
       [date]="log.date"
       [time]="log.time"

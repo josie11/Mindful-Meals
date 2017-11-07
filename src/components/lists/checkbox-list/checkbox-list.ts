@@ -1,4 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { NavController } from 'ionic-angular';
 
 @Component({
   selector: 'checkbox-list',
@@ -13,15 +14,20 @@ export class CheckboxListComponent {
   @Output() dismiss: EventEmitter<object> = new EventEmitter();
   @Output() triggerPrompt: EventEmitter<object> = new EventEmitter();
 
-  constructor() {
+  constructor(public navCtrl: NavController) {
   }
 
   toggle(id, name) {
     this.toggleCheckbox.emit({id, name});
   }
 
-  done() {
+  submit() {
     this.dismiss.emit();
+    this.close();
+  }
+
+  close() {
+    this.navCtrl.pop();
   }
 
   openPrompt() {

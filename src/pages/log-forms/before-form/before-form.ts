@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { ModalProvider } from '../../../providers/modal';
-import { FormProvider } from '../../../providers/form';
+import { ModalService } from '../../../providers/modal.service';
+import { FormService } from '../../../providers/form.service';
 
 /**
  * Generated class for the BeforeFormPage page.
@@ -26,7 +26,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   formType: string = 'craving';
   showMealType: boolean = this.formType === 'meal';
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider, public formProvider: FormProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalService: ModalService, public formService: FormService) {
   }
 
   ngOnInit() {
@@ -59,7 +59,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
       triggerDescription,
     } = this;
 
-    return this.formProvider.submitBeforeMealForm({
+    return this.formService.submitBeforeMealForm({
       intensityLevel,
       hungerLevelBefore: hungerLevel,
       mealType: type,
@@ -80,7 +80,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
       triggerDescription,
     } = this;
 
-    return this.formProvider.submitCravingForm({
+    return this.formService.submitCravingForm({
       intensityLevel,
       hungerLevel,
       cravingDate: date,
@@ -92,6 +92,6 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.formProvider.clearBeforeForm();
+    this.formService.clearBeforeForm();
   }
 }

@@ -1,27 +1,27 @@
 import { Injectable } from '@angular/core';
-import { DatabaseProvider } from './database';
+import { DatabaseService } from './database.service';
 import difference from 'lodash.difference';
 
 import 'rxjs/add/operator/map';
 
 /*
-  Generated class for the MealsProvider provider.
+  Generated class for the MealsService provider.
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
 @Injectable()
-export class MealsProvider {
+export class MealsService {
 
   dbName: string = 'meal';
 
-  constructor(private databaseProvider: DatabaseProvider) {
+  constructor(private databaseService: DatabaseService) {
   }
 
   getMeal(mealId: number) {
     let meal;
 
-    return this.databaseProvider.select({
+    return this.databaseService.select({
       selection: '*',
       dbName: `${this.dbName}s`,
       extraStatement: `WHERE id = ${mealId}`
@@ -34,15 +34,24 @@ export class MealsProvider {
   }
 
   getMealsForDate(date: string) {
-    return this.databaseProvider.select({
+    return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
-      extraStatement: `WHERE mealDate = ${date}`
+      extraStatement: `WHERE mealDate = '${date}'`
+    });
+  }
+
+  getMealsForMonth(month: string | number, year: string | number) {
+    return this.databaseService.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      //regex like expression --> finds by month and year, non day specific
+      extraStatement: `WHERE mealDate LIKE '${year}_${month}___'`
     });
   }
 
   getIncompleteMeals() {
-    return this.databaseProvider.select({
+    return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
       extraStatement: `WHERE completed = 0`
@@ -50,7 +59,7 @@ export class MealsProvider {
   }
 
   addMeal(cols: Array<string>, values: Array<string>) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}s`,
       cols,
       values
@@ -89,11 +98,11 @@ export class MealsProvider {
 
     if (mealStage) parameters.extraStatement += ` AND mealStage = '${mealStage}'`;
 
-    return this.databaseProvider.select(parameters);
+    return this.databaseService.select(parameters);
   }
 
   addMealEmotion(mealId: number, emotionId: number, mealStage: string) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}Emotions`,
       cols: ['mealId', 'emotionId', 'mealStage'],
       values: [mealId, emotionId, mealStage]
@@ -103,7 +112,7 @@ export class MealsProvider {
   updateMeal(mealId: number, values: Array<object>) {
     if(values.length < 1) return Promise.resolve({id : mealId });
 
-    return this.databaseProvider.update({
+    return this.databaseService.update({
       dbName: `${this.dbName}s`,
       values,
       id: mealId
@@ -117,7 +126,7 @@ export class MealsProvider {
       cols: ['mealId', 'emotionId', 'mealStage'],
       values: [mealId, emotionId, mealStage]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
+    return this.databaseService.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
   }
 
   updateMealEmotions(mealId: number, mealStage: string, beforeEmotions: Array<number>, afterEmotions: Array<number>) {
@@ -130,9 +139,9 @@ export class MealsProvider {
   deleteMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
     if (emotionIds.length < 1) return Promise.resolve({id : mealId });
 
-    const extraStatements = emotionIds.map(emotionId => `WHERE emotionId = ${emotionId} AND mealId = ${mealId} AND mealStage = ${mealStage}`);
+    const extraStatements = emotionIds.map(emotionId => `WHERE emotionId = ${emotionId} AND mealId = ${mealId} AND mealStage = '${mealStage}'`);
 
-    return this.databaseProvider.bulkDelete({ dbName: `${this.dbName}Emotions`, extraStatements });
+    return this.databaseService.bulkDelete({ dbName: `${this.dbName}Emotions`, extraStatements });
   }
 
   getMealFoods(mealId: number, mealStage: string = '') {
@@ -144,11 +153,11 @@ export class MealsProvider {
 
     if (mealStage) parameters.extraStatement += ` AND mealStage = '${mealStage}'`;
 
-    return this.databaseProvider.select(parameters);
+    return this.databaseService.select(parameters);
   }
 
   addMealFood(mealId: number, foodId: number, mealStage: string) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}Foods`,
       cols: ['mealId', 'foodId', 'mealStage'],
       values: [mealId, foodId, mealStage]
@@ -162,7 +171,7 @@ export class MealsProvider {
       cols: ['mealId', 'foodId', 'mealStage'],
       values: [mealId, foodId, mealStage]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Foods`, items })
+    return this.databaseService.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
 
   updateMealFoods(mealId: number, mealStage: string, beforeFoods: Array<number>, afterFoods: Array<number>) {
@@ -175,9 +184,9 @@ export class MealsProvider {
   deleteMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
     if (foodIds.length < 1) return Promise.resolve({id : mealId });
 
-    const extraStatements = foodIds.map(foodId => `WHERE foodId = ${foodId} AND mealId = ${mealId} AND mealStage = ${mealStage}`);
+    const extraStatements = foodIds.map(foodId => `WHERE foodId = ${foodId} AND mealId = ${mealId} AND mealStage = '${mealStage}'`);
 
-    return this.databaseProvider.bulkDelete({ dbName: `${this.dbName}Foods`, extraStatements });
+    return this.databaseService.bulkDelete({ dbName: `${this.dbName}Foods`, extraStatements });
   }
 
   getMealDistractions(mealId: number) {
@@ -187,11 +196,11 @@ export class MealsProvider {
       extraStatement: `INNER JOIN distractions on distractions.id = ${this.dbName}Distractions.distractionId WHERE ${this.dbName}Distractions.mealId = ${mealId}`
     };
 
-    return this.databaseProvider.select(parameters);
+    return this.databaseService.select(parameters);
   }
 
   addMealDistraction(mealId: number, distractionId: number) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}Distractions`,
       cols: ['mealId', 'distractionId'],
       values: [mealId, distractionId]
@@ -205,7 +214,7 @@ export class MealsProvider {
       cols: ['mealId', 'distractionId'],
       values: [mealId, distractionId]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Distractions`, items })
+    return this.databaseService.bulkInsert({ dbName: `${this.dbName}Distractions`, items })
   }
 
   formatMealItemsToCheckboxObject(items: Array<object>) {
@@ -217,7 +226,6 @@ export class MealsProvider {
 
   // => returns { add: [], delete: [] }
   findChangesToMealItems(beforeIds: Array<number>, afterIds: Array<number>) {
-
     const deleteIds = difference(beforeIds, afterIds);
     const addIds = difference(afterIds, beforeIds);
 

@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>Diary</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only>
+        <ion-icon ios="ios-share" md="md-share"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+  <ion-toolbar color="primary">
+    <ion-segment [(ngModel)]="listingType" color="white" (ionChange)="isMeal = !isMeal">
+      <ion-segment-button value="craving">Cravings</ion-segment-button>
+      <ion-segment-button value="meal">Meals</ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item-divider>
+      <!-- <button ion-button item-end color="secondary">Filter</button> -->
+      <button ion-button clear icon-right>
+        {{(currentYear + '-' + currentMonth + '-' + '01') | date: 'MMMM, yyyy'}}
+      <ion-icon ios="ios-funnel" md="md-funnel"></ion-icon>
+      </button>
+      <button ion-button icon-only item-start clear (click)="selectPreviousMonth()">
+        <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
+      </button>
+      <button ion-button icon-only item-end clear (click)="selectNextMonth()">
+        <ion-icon ios="ios-arrow-forward" md="md-arrow-forward"></ion-icon>
+      </button>
+    </ion-item-divider>
+    <ng-container *ngIf="isMeal">
+      <ion-item-group *ngFor="let entries of meals" >
+        <ion-list-header>
+        {{(entries[0].mealDate + 'T' + entries[0].mealTime) | date:'EEEE, MMM d'}}
+        </ion-list-header>
+        <ion-item detail-push *ngFor="let meal of entries | sortArrayDateStrings">
+          <h2>{{(meal.mealDate + 'T' + meal.mealTime) | date:'h:mm a'}}</h2>
+          <p *ngIf="meal.mealType">{{meal.mealType}}</p>
+        </ion-item>
+      </ion-item-group>
+    </ng-container>
+    <ng-container *ngIf="!isMeal">
+      <ion-item-group *ngFor="let entries of cravings" >
+        <ion-list-header>
+        {{(entries[0].cravingDate + 'T' + entries[0].cravingTime) | date:'EEEE, MMM d'}}
+        </ion-list-header>
+        <ion-item detail-push *ngFor="let craving of entries | sortArrayDateStrings">
+          <h2>{{(craving.cravingDate + 'T' + craving.cravingTime) | date:'h:mm a'}}</h2>
+          <p>Craving Intensity: {{craving.intensityLevel | cravingsRange}}</p>
+        </ion-item>
+      </ion-item-group>
+    </ng-container>
+  </ion-list>
+</ion-content>

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { ModalProvider } from '../../../providers/modal';
+import { ModalService } from '../../../providers/modal.service';
 import { EmotionsListPage } from '../../../pages/log-forms/emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../../../pages/log-forms/foods-list/foods-list';
 
@@ -34,7 +34,7 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   emotionsSubscription;
   foodsSubscription;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalProvider: ModalProvider) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalService: ModalService) {
   }
 
   ngOnInit() {
@@ -59,11 +59,11 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   }
 
   openEmotionsList() {
-    this.modalProvider.presentModal(EmotionsListPage, { mealType: 'Before'});
+    this.modalService.presentModal(EmotionsListPage, { mealType: 'Before'});
   }
 
   openFoodsList() {
-    this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'Before'});
+    this.modalService.presentModal(FoodCravingsListPage, { mealType: 'Before'});
   }
 
   ngOnDestroy() {

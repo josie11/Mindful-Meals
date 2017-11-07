@@ -6,6 +6,9 @@ import { GetKeysPipe } from './get-keys/get-keys';
 import { GetValuesPipe } from './get-values/get-values';
 import { SortStringsPipe } from './sort-strings/sort-strings';
 import { SatisfactionRangePipe } from './satisfaction-range/satisfaction-range';
+import { OrganizeDiaryEntriesByDatePipe } from './organize-diary-entries-by-date/organize-diary-entries-by-date';
+import { SortArrayDateStringsPipe } from './sort-array-date-strings/sort-array-date-strings';
+import { SortArrayEntriesByTimePipe } from './sort-array-entries-by-time/sort-array-entries-by-time';
 @NgModule({
 	declarations: [CravingsRangePipe,
     HungerRangePipe,
@@ -13,7 +16,10 @@ import { SatisfactionRangePipe } from './satisfaction-range/satisfaction-range';
     GetKeysPipe,
     GetValuesPipe,
     SortStringsPipe,
-    SatisfactionRangePipe],
+    SatisfactionRangePipe,
+    OrganizeDiaryEntriesByDatePipe,
+    SortArrayDateStringsPipe,
+    SortArrayEntriesByTimePipe],
 	imports: [],
 	exports: [CravingsRangePipe,
     HungerRangePipe,
@@ -21,6 +27,9 @@ import { SatisfactionRangePipe } from './satisfaction-range/satisfaction-range';
     GetKeysPipe,
     GetValuesPipe,
     SortStringsPipe,
-    SatisfactionRangePipe]
+    SatisfactionRangePipe,
+    OrganizeDiaryEntriesByDatePipe,
+    SortArrayDateStringsPipe,
+    SortArrayEntriesByTimePipe]
 })
 export class PipesModule {}

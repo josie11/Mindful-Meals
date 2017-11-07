@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Platform } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-import { DatabaseProvider } from '../providers/database';
+import { DatabaseService } from '../providers/database.service';
 
 import { TabsPage } from '../pages/tabs/tabs';
 
@@ -12,11 +12,9 @@ import { TabsPage } from '../pages/tabs/tabs';
 export class MyApp {
   rootPage:any = TabsPage;
 
-  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, databaseProvider: DatabaseProvider) {
+  constructor(platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen, databaseService: DatabaseService) {
 
     platform.ready().then(() => {
-      //initialize our database via our service
-      databaseProvider.initializeDatabase();
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();

@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
-import { DatabaseProvider } from './database';
+import { DatabaseService } from './database.service';
 import 'rxjs/add/operator/map';
 
 /*
-  Generated class for the CravingsProvider provider.
+  Generated class for the CravingsService provider.
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
 @Injectable()
-export class CravingsProvider {
+export class CravingsService {
 
   dbName: string = 'craving';
 
-  constructor(private databaseProvider: DatabaseProvider) {
+  constructor(private databaseService: DatabaseService) {
   }
 
   getCraving(cravingId: number) {
     let craving;
 
-    return this.databaseProvider.select({
+    return this.databaseService.select({
       selection: '*',
       dbName: `${this.dbName}s`,
       extraStatement: `WHERE id = ${cravingId}`
@@ -38,16 +38,25 @@ export class CravingsProvider {
     });
   }
 
-  getCravingsForDate(date: string) {
-    return this.databaseProvider.select({
+  getCravingsForMonth(month: string | number, year: string | number) {
+    return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
-      extraStatement: `WHERE cravingDate = ${date}`
+      //regex like expression --> finds by month and year, non day specific
+      extraStatement: `WHERE cravingDate LIKE '${year}_${month}___'`
+    });
+  }
+
+  getCravingsForDate(date: string) {
+    return this.databaseService.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      extraStatement: `WHERE cravingDate = '${date}'`
     });
   }
 
   addCraving(cols: Array<string>, values: Array<string>) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}s`,
       cols,
       values
@@ -55,7 +64,7 @@ export class CravingsProvider {
   }
 
   getCravingEmotions(cravingId: number) {
-    return this.databaseProvider.select({
+    return this.databaseService.select({
       dbName: `${this.dbName}Emotions`,
       selection: '*',
       extraStatement: `WHERE cravingId = ${cravingId}`
@@ -63,7 +72,7 @@ export class CravingsProvider {
   }
 
   addCravingEmotion(cravingId: number, emotionId: number) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}Emotions`,
       cols: ['cravingId', 'emotionId'],
       values: [cravingId, emotionId]
@@ -77,11 +86,11 @@ export class CravingsProvider {
       cols: ['cravingId', 'emotionId'],
       values: [cravingId, emotionId]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
+    return this.databaseService.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
   }
 
   getCravingFoods(cravingId: number) {
-    return this.databaseProvider.select({
+    return this.databaseService.select({
       dbName: `${this.dbName}Foods`,
       selection: '*',
       extraStatement: `WHERE cravingId = ${cravingId}`
@@ -89,7 +98,7 @@ export class CravingsProvider {
   }
 
   addCravingFood(cravingId: number, foodId: number) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: `${this.dbName}Foods`,
       cols: ['cravingId', 'foodId'],
       values: [cravingId, foodId]
@@ -103,6 +112,6 @@ export class CravingsProvider {
       cols: ['cravingId', 'foodId'],
       values: [cravingId, foodId]
     }));
-    return this.databaseProvider.bulkInsert({ dbName: `${this.dbName}Foods`, items })
+    return this.databaseService.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
 }

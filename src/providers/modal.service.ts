@@ -3,13 +3,13 @@ import { ModalController } from 'ionic-angular';
 import 'rxjs/add/operator/map';
 
 /*
-  Generated class for the ModalProvider provider.
+  Generated class for the ModalService provider.
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
 @Injectable()
-export class ModalProvider {
+export class ModalService {
 
   constructor(public modalCtrl: ModalController) {
 

@@ -1,33 +1,32 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from "rxjs";
-import { DatabaseProvider } from './database';
+import { DatabaseService } from './database.service';
 import 'rxjs/add/operator/map';
 
 /*
-  Generated class for the DistractionsProvider provider.
+  Generated class for the DistractionsService provider.
 
   See https://angular.io/guide/dependency-injection for more info on providers
   and Angular DI.
 */
 @Injectable()
-export class DistractionsProvider {
+export class DistractionsService {
   distractionsList = new BehaviorSubject([]);
 
-  constructor(private databaseProvider: DatabaseProvider) {
+  constructor(private databaseService: DatabaseService) {
     this.getDistractions();
   }
 
   getDistractions() {
-    return this.databaseProvider.select({ dbName: 'distractions', selection: '*' })
+    return this.databaseService.select({ dbName: 'distractions', selection: '*' })
     .then((data: any) => {
       this.distractionsList.next(data);
       return data;
     })
-    .catch(console.error);
   }
 
   addDistraction(name) {
-    return this.databaseProvider.insert({
+    return this.databaseService.insert({
       dbName: 'distractions',
       cols: ['name'],
       values: [name]
@@ -37,21 +36,19 @@ export class DistractionsProvider {
       this.distractionsList.next(distractions);
       return id;
     })
-    .catch(console.error);
   }
 
   deleteDistraction(id) {
-    return this.databaseProvider.executeSql(`DELETE from distractions WHERE id = ${id};`)
+    return this.databaseService.executeSql(`DELETE from distractions WHERE id = ${id};`)
     .then((data) => {
       const distractions = this.distractionsList.getValue().filter(distraction => distraction.id != id);
       this.distractionsList.next(distractions);
       return data;
     })
-    .catch(console.error);
   }
 
   editDistraction(id, name) {
-    return this.databaseProvider.executeSql(`UPDATE distractions SET name = ${name} WHERE id = ${id};`)
+    return this.databaseService.executeSql(`UPDATE distractions SET name = ${name} WHERE id = ${id};`)
     .then((data) => {
       const distractions = this.distractionsList.getValue();
       for (let distraction of distractions) {
@@ -61,7 +58,6 @@ export class DistractionsProvider {
       this.distractionsList.next(distractions);
       return data;
     })
-    .catch(console.error);
   }
 
 }

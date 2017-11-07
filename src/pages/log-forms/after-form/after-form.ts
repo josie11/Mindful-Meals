@@ -1,10 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { DatePipe } from '@angular/common';
-import { AlertProvider } from '../../../providers/alert';
-import { ModalProvider } from '../../../providers/modal';
-import { FormProvider } from '../../../providers/form';
-import { MealsProvider } from '../../../providers/meals';
+import { AlertService } from '../../../providers/alert.service';
+import { ModalService } from '../../../providers/modal.service';
+import { FormService } from '../../../providers/form.service';
+import { MealsService } from '../../../providers/meals.service';
 import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
 import { DistractionsListPage } from '../distractions-list/distractions-list';
@@ -36,8 +36,8 @@ export class AfterFormPage implements OnDestroy, OnInit {
 
   //represents before meal data
   logEdits: any = {
-    intensityLevel: '',
-    hungerLevel:  '',
+    intensityLevel: 1,
+    hungerLevel:  1,
     date:'',
     time: '',
     type: '',
@@ -52,14 +52,14 @@ export class AfterFormPage implements OnDestroy, OnInit {
   foodsSubscription;
   distractionsSubscription;
 
-  constructor(private navCtrl: NavController, private modalProvider: ModalProvider, private alertProvider: AlertProvider, private formProvider: FormProvider, private mealsProvider: MealsProvider, private datePipe: DatePipe) {
+  constructor(private navCtrl: NavController, private modalService: ModalService, private alertService: AlertService, private formService: FormService, private mealsService: MealsService, private datePipe: DatePipe) {
   }
 
   ngOnInit() {
-    this.emotionsSubscription = this.formProvider.selectedAfterEmotions.subscribe(emotions => this.emotions = emotions);
-    this.foodsSubscription = this.formProvider.selectedAfterFoods.subscribe(foods => this.foods = foods);
-    this.distractionsSubscription = this.formProvider.selectedDistractions.subscribe(distractions => this.distractions = distractions);
-    this.mealsProvider.getIncompleteMeals().then(meals => this.incompleteMeals = meals);
+    this.emotionsSubscription = this.formService.selectedAfterEmotions.subscribe(emotions => this.emotions = emotions);
+    this.foodsSubscription = this.formService.selectedAfterFoods.subscribe(foods => this.foods = foods);
+    this.distractionsSubscription = this.formService.selectedDistractions.subscribe(distractions => this.distractions = distractions);
+    this.mealsService.getIncompleteMeals().then(meals => this.incompleteMeals = meals);
   }
 
   onRangeChange({ name, number }) {
@@ -79,15 +79,15 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   openEmotionsList() {
-    this.modalProvider.presentModal(EmotionsListPage, { mealType: 'After' });
+    this.modalService.presentModal(EmotionsListPage, { mealType: 'After' });
   }
 
   openFoodsList() {
-    this.modalProvider.presentModal(FoodCravingsListPage, { mealType: 'After' });
+    this.modalService.presentModal(FoodCravingsListPage, { mealType: 'After' });
   }
 
   openDistractionsList() {
-    this.modalProvider.presentModal(DistractionsListPage);
+    this.modalService.presentModal(DistractionsListPage);
   }
 
   beforeFormToggle(e) {
@@ -108,7 +108,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
       checked: false,
       type: 'radio'
     }))
-    this.alertProvider.presentRadio({
+    this.alertService.presentRadio({
       title: 'Incomplete Meal Logs',
       inputs: options,
       submitHandler: this.linkWithExistingMeal.bind(this)
@@ -117,12 +117,12 @@ export class AfterFormPage implements OnDestroy, OnInit {
 
   linkWithExistingMeal(id) {
     if (id == this.attachedMeal['id']) return;
-    return this.mealsProvider.getMeal(id).then((meal: any) => {
-      const formattedEmotions = this.mealsProvider.formatMealItemsToCheckboxObject(meal.beforeEmotions);
-      const formattedFoods = this.mealsProvider.formatMealItemsToCheckboxObject(meal.beforeFoods);
+    return this.mealsService.getMeal(id).then((meal: any) => {
+      const formattedEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
+      const formattedFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
 
-      if (meal.beforeEmotions.length > 0) this.formProvider.updateBeforeEmotions(formattedEmotions);
-      if (meal.beforeFoods.length > 0) this.formProvider.updateBeforeFoods(formattedFoods);
+      if (meal.beforeEmotions.length > 0) this.formService.updateBeforeEmotions(formattedEmotions);
+      if (meal.beforeFoods.length > 0) this.formService.updateBeforeFoods(formattedFoods);
 
       this.attachedMeal = meal
       this.isMealAttached = true;
@@ -132,7 +132,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   openBeforeLogAddOrEdit() {
-    this.modalProvider.presentModal(
+    this.modalService.presentModal(
       AddAdjustBeforeFormPage,
       {
         log: this.logEdits,
@@ -174,8 +174,8 @@ export class AfterFormPage implements OnDestroy, OnInit {
     const time = this.datePipe.transform(newDate, 'HH:mm');
 
     this.logEdits = {
-      intensityLevel: '',
-      hungerLevel:  '',
+      intensityLevel: 1,
+      hungerLevel:  1,
       date: date,
       time: time,
       type: '',
@@ -184,7 +184,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
       foods: {}
     };
 
-    this.formProvider.clearBeforeForm();
+    this.formService.clearBeforeForm();
   }
 
   submitForm() {
@@ -192,7 +192,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
     else this.submitNewForm();
   }
 
-  submitNewForm() {
+  returnFormData() {
     const {
       intensityLevel,
       hungerLevel,
@@ -209,7 +209,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
 
     const hungerLevelAfter = this.hungerLevel;
 
-    return this.formProvider.submitNewAfterMealForm({
+    return {
       intensityLevel,
       hungerLevelBefore: hungerLevel,
       mealType: type,
@@ -220,20 +220,33 @@ export class AfterFormPage implements OnDestroy, OnInit {
       hungerLevelAfter,
       mealDescription,
       satisfactionLevel
-    })
+    }
+  }
+
+  submitNewForm() {
+    const formData = this.returnFormData();
+
+    return this.formService.submitNewAfterMealForm(formData)
     .then(() => this.dismissForm())
     .catch(console.error);
 
   }
 
   submitUpdateForm() {
+    const formData = this.returnFormData();
+    const { id } = this.attachedMeal;
+    const beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(this.attachedMeal.beforeEmotions);
+    const beforeFoods = this.mealsService.formatMealItemsToCheckboxObject(this.attachedMeal.beforeFoods);
 
+    return this.formService.submitAttachedMealAfterForm(id, formData, beforeEmotions, beforeFoods)
+    .then(() => this.dismissForm())
+    .catch(console.error);
   }
 
   ngOnDestroy() {
     this.emotionsSubscription.unsubscribe();
     this.foodsSubscription.unsubscribe();
     this.distractionsSubscription.unsubscribe();
-    this.formProvider.clearAfterForm();
+    this.formService.clearAfterForm();
   }
 }

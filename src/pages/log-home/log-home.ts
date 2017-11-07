@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { ModalProvider } from '../../providers/modal';
+import { ModalService } from '../../providers/modal.service';
 import { BeforeFormPage } from '../log-forms/before-form/before-form';
 import { AfterFormPage } from '../log-forms/after-form/after-form';
 
@@ -11,15 +11,15 @@ import { AfterFormPage } from '../log-forms/after-form/after-form';
 })
 export class LogHomePage {
 
-  constructor(public navCtrl: NavController, private modalProvider: ModalProvider) {
+  constructor(public navCtrl: NavController, private modalService: ModalService) {
   }
 
   presentBeforeFormModal() {
-    this.modalProvider.presentModal(BeforeFormPage);
+    this.modalService.presentModal(BeforeFormPage);
   }
 
   presentAfterFormModal() {
-    this.modalProvider.presentModal(AfterFormPage);
+    this.modalService.presentModal(AfterFormPage);
   }
 
 }

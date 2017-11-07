@@ -75,21 +75,21 @@
         ios="ios-happy"
         md="md-happy"
         title="Emotions"
-        [behaviorSubject]="formProvider.selectedAfterEmotions">
+        [behaviorSubject]="formService.selectedAfterEmotions">
       </checkbox-trigger>
       <checkbox-trigger
         (onClick)="openFoodsList($event)"
         ios="ios-nutrition"
         md="md-nutrition"
         title="Foods Consumed"
-        [behaviorSubject]="formProvider.selectedAfterFoods">
+        [behaviorSubject]="formService.selectedAfterFoods">
       </checkbox-trigger>
       <checkbox-trigger
         (onClick)="openDistractionsList($event)"
         ios="ios-laptop"
         md="md-laptop"
         title="Distractions"
-        [behaviorSubject]="formProvider.selectedDistractions">>
+        [behaviorSubject]="formService.selectedDistractions">>
       </checkbox-trigger>
       <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)" [description]="mealDescription"></detail-textarea>
     </ion-list>
