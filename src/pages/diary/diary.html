@@ -1,17 +1,22 @@
 <ion-header>
   <ion-navbar color="primary">
     <ion-title>Diary</ion-title>
-    <ion-buttons end>
-      <button ion-button icon-only>
-        <ion-icon ios="ios-share" md="md-share"></ion-icon>
-      </button>
-    </ion-buttons>
   </ion-navbar>
   <ion-toolbar color="primary">
     <ion-segment [(ngModel)]="listingType" color="white" (ionChange)="isMeal = !isMeal">
       <ion-segment-button value="craving">Cravings</ion-segment-button>
       <ion-segment-button value="meal">Meals</ion-segment-button>
     </ion-segment>
+    <ion-buttons start>
+      <button ion-button icon-only>
+        <ion-icon ios="ios-funnel" md="md-funnel"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-buttons end>
+      <button ion-button icon-only>
+        <ion-icon ios="ios-share" md="md-share"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -19,10 +24,7 @@
   <ion-list>
     <ion-item-divider>
       <!-- <button ion-button item-end color="secondary">Filter</button> -->
-      <button ion-button clear icon-right>
-        {{(currentYear + '-' + currentMonth + '-' + '01') | date: 'MMMM, yyyy'}}
-      <ion-icon ios="ios-funnel" md="md-funnel"></ion-icon>
-      </button>
+      <h2>{{(currentYear + '-' + currentMonth + '-' + '01') | date: 'MMMM, yyyy'}}</h2>
       <button ion-button icon-only item-start clear (click)="selectPreviousMonth()">
         <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
       </button>
@@ -35,7 +37,7 @@
         <ion-list-header>
         {{(entries[0].mealDate + 'T' + entries[0].mealTime) | date:'EEEE, MMM d'}}
         </ion-list-header>
-        <ion-item detail-push *ngFor="let meal of entries | sortArrayDateStrings">
+        <ion-item detail-push (click)="openMealLog(meal.id)" *ngFor="let meal of entries | sortArrayDateStrings">
           <h2>{{(meal.mealDate + 'T' + meal.mealTime) | date:'h:mm a'}}</h2>
           <p *ngIf="meal.mealType">{{meal.mealType}}</p>
         </ion-item>

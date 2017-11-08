@@ -9,3 +9,4 @@ An Ios app built with Ionic and AngularJs that helps a user practice mindfulness
 ## Preview:
 ![Mindful Meals](https://s3.amazonaws.com/mindful-eating/Screen+Shot+2017-11-03+at+5.00.45+PM.png "Mindful Meals")
 ![Mindful Meals](https://s3.amazonaws.com/mindful-eating/Screen+Shot+2017-11-03+at+5.00.11+PM.png "Mindful Meals")
+![Mindful Meals](https://s3.amazonaws.com/mindful-eating/Screen+Shot+2017-11-08+at+11.36.01+AM.png "Mindful Meals")

@@ -1,0 +1,145 @@
+<modal>
+  <!-- header for ng-content -->
+  <ion-header>
+    <ion-navbar color="primary">
+      <ion-buttons start>
+        <button ion-button icon-only>
+          <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-title>
+        Meal
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
+
+  <!-- content for ng-content -->
+  <ion-content>
+    <ion-list>
+      <ion-list-header>
+        Meal Time
+        <button ion-button icon-only clear color="accent" item-end><ion-icon ios="ios-settings" md="md-settings"></ion-icon></button>
+      </ion-list-header>
+      <ion-item>
+        <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
+        <div>October 12, 2017</div>
+        <p>2:45 PM</p>
+        <p>Lunch</p>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        Before Meal
+        <button ion-button icon-only clear color="accent" item-end><ion-icon ios="ios-settings" md="md-settings"></ion-icon></button>
+      </ion-list-header>
+      <ion-item>
+        <div class="progress-container">
+          <div class="progress-wrapper">
+            <h4>Craving Intensity</h4>
+            <p>Mild</p>
+            <div class="progress-bar">
+              <p class="current">1/5</p>
+              <round-progress
+                current="1"
+                max="5"
+                [color]="'#45ccce'"
+                [background]="'#eaeaea'"
+                [radius]="45"
+                [stroke]="15"
+                [rounded]="false"
+                [clockwise]="false"
+                [duration]="800"
+                [animation]="'easeInOutQuart'"
+                [animationDelay]="0"
+                [responsive]="true"
+                ></round-progress>
+              </div>
+            </div>
+            <div class="progress-wrapper">
+              <h4>Hunger Level</h4>
+              <p>Full</p>
+              <div class="progress-bar">
+                <p class="current">3/5</p>
+                <round-progress
+                current="4"
+                max="5"
+                [color]="'#45ccce'"
+                [background]="'#eaeaea'"
+                [radius]="45"
+                [stroke]="15"
+                [rounded]="false"
+                [clockwise]="false"
+                [duration]="800"
+                [animation]="'easeInOutQuart'"
+                [animationDelay]="0"
+                [responsive]="true"
+                ></round-progress>
+              </div>
+            </div>
+          </div>
+      </ion-item>
+    </ion-list>
+    <ion-list>
+      <ion-list-header>
+        After Meal
+        <button ion-button icon-only clear color="accent" item-end><ion-icon ios="ios-settings" md="md-settings"></ion-icon></button>
+      </ion-list-header>
+      <ion-item>
+        <div class="progress-container">
+          <div class="progress-wrapper">
+            <h4>Hunger Level</h4>
+            <p>Stuffed</p>
+            <div class="progress-bar">
+              <p class="current">5/5</p>
+              <round-progress
+                current="5"
+                max="5"
+                [color]="'#45ccce'"
+                [background]="'#eaeaea'"
+                [radius]="45"
+                [stroke]="15"
+                [rounded]="false"
+                [clockwise]="false"
+                [duration]="800"
+                [animation]="'easeInOutQuart'"
+                [animationDelay]="0"
+                [responsive]="true"
+                ></round-progress>
+              </div>
+            </div>
+            <div class="progress-wrapper">
+              <h4>Satisfaction Level</h4>
+              <p>Satisfied</p>
+              <div class="progress-bar">
+                <p class="current">4/5</p>
+                <round-progress
+                current="4"
+                max="5"
+                [color]="'#45ccce'"
+                [background]="'#eaeaea'"
+                [radius]="45"
+                [stroke]="15"
+                [rounded]="false"
+                [clockwise]="false"
+                [duration]="800"
+                [animation]="'easeInOutQuart'"
+                [animationDelay]="0"
+                [responsive]="true"
+                ></round-progress>
+              </div>
+            </div>
+          </div>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+
+  <ion-footer>
+    <ion-toolbar color="primary">
+      <ion-buttons end>
+        <button ion-button icon-only>
+          <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer>
+</modal>

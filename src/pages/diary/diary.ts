@@ -1,8 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController } from 'ionic-angular';
+import { ModalService } from '../../providers/modal.service';
 import { MealsService} from '../../providers/meals.service';
 import { CravingsService} from '../../providers/craving.service';
 import { DiaryService } from '../../providers/diary.service';
+import { MealLogPage } from '../meal-log/meal-log';
 
 @Component({
   selector: 'diary-page',
@@ -22,7 +24,7 @@ export class DiaryPage implements OnInit, OnDestroy {
   mealEntriesSubscription;
   cravingEntriesSubscription;
 
-  constructor(public navCtrl: NavController, public mealsService: MealsService, public cravingsService: CravingsService, private diaryService: DiaryService) {
+  constructor(public navCtrl: NavController, private modalService: ModalService, public mealsService: MealsService, public cravingsService: CravingsService, private diaryService: DiaryService) {
   }
 
   ngOnInit() {
@@ -39,10 +41,13 @@ export class DiaryPage implements OnInit, OnDestroy {
     this.getEntries().catch(console.error);
   }
 
-
   getEntries() {
     return this.diaryService.getCravingsForMonth(this.currentMonth, this.currentYear)
     .then(() => this.diaryService.getMealsForMonth(this.currentMonth, this.currentYear))
+  }
+
+  openMealLog(id) {
+    this.modalService.presentModal(MealLogPage, { id });
   }
 
   selectPreviousMonth() {
@@ -73,6 +78,10 @@ export class DiaryPage implements OnInit, OnDestroy {
     } else {
       this.currentMonth += 1;
     }
+  }
+
+  onDateChange() {
+    this.diaryService.updateMonthYear(this.currentMonth, this.currentYear)
   }
 
   ngOnDestroy() {

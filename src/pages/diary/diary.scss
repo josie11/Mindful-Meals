@@ -6,11 +6,16 @@ diary-page {
     margin-top: 14px !important;
   }
 
+  h2 {
+    color: color($colors, 'secondary') !important;
+  }
+
+
   ion-item-divider {
     text-align: center;
     padding-left: 8px !important;
-      .button-inner {
-        font-size: 1.65rem !important;
-      }
+    h2, span {
+      color: color($colors, 'primary') !important;
+    }
   }
 }

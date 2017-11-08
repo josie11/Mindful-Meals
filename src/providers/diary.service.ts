@@ -19,6 +19,8 @@ export class DiaryService {
 
   meals: BehaviorSubject<object[]> = new BehaviorSubject([]);
   cravings: BehaviorSubject<object[]> = new BehaviorSubject([]);
+  month: number;
+  year: number;
 
   constructor(private mealsService: MealsService, private cravingsService: CravingsService) {
   }
@@ -31,10 +33,16 @@ export class DiaryService {
 
   }
 
+  updateMonthYear(month, year) {
+    this.month = month;
+    this.year = year;
+  }
+
   getMealsForMonth(month: number, year: number) {
     const adjustedMonth = (month < 10) ? `0${month}` : month;
     return this.mealsService.getMealsForMonth(adjustedMonth, year)
     .then((meals) => {
+      this.updateMonthYear(month, year);
       const mealsData = this.groupEntryResultsByDate('mealDate', meals);
       this.meals.next(mealsData);
     });
@@ -44,6 +52,7 @@ export class DiaryService {
     const adjustedMonth = (month < 10) ? `0${month}` : month;
     return this.cravingsService.getCravingsForMonth(adjustedMonth, year)
     .then((cravings) => {
+      this.updateMonthYear(month, year);
       const cravingsData = this.groupEntryResultsByDate('cravingDate', cravings);
       this.cravings.next(cravingsData);
     });

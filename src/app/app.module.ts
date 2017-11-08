@@ -5,7 +5,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { SQLite, SQLiteDatabaseConfig, /*SQLiteObject*/ } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
-
+import { RoundProgressModule } from '../components/round-progress/index';
 import { MyApp } from './app.component';
 import { ComponentsModule } from '../components/components.module';
 
@@ -19,7 +19,7 @@ import { EmotionsListPage } from '../pages/log-forms/emotions-list/emotions-list
 import { FoodCravingsListPage } from '../pages/log-forms/foods-list/foods-list';
 import { DistractionsListPage } from '../pages/log-forms/distractions-list/distractions-list';
 import { AddAdjustBeforeFormPage } from '../pages/log-forms/add-adjust-before-form/add-adjust-before-form';
-
+import { MealLogPage } from '../pages/meal-log/meal-log';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { HttpModule } from '@angular/http';
@@ -169,7 +169,8 @@ class SQLiteMock {
     FoodCravingsListPage,
     AfterFormPage,
     DistractionsListPage,
-    AddAdjustBeforeFormPage
+    AddAdjustBeforeFormPage,
+    MealLogPage
   ],
   imports: [
     BrowserModule,
@@ -178,6 +179,7 @@ class SQLiteMock {
     HttpModule,
     PipesModule,
     ProvidersModule,
+    RoundProgressModule,
     IonicModule.forRoot(MyApp),
     IonicStorageModule.forRoot()
   ],
@@ -193,7 +195,8 @@ class SQLiteMock {
     FoodCravingsListPage,
     AfterFormPage,
     DistractionsListPage,
-    AddAdjustBeforeFormPage
+    AddAdjustBeforeFormPage,
+    MealLogPage
   ],
   providers: [
     StatusBar,

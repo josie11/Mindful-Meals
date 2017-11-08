@@ -21,7 +21,7 @@ import { BeforeFormContentComponent } from './forms/before-form-content/before-f
   ],
 	imports: [
     IonicModule,
-    PipesModule
+    PipesModule,
   ],
 	exports: [
     ModalComponent,
