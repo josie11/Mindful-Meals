@@ -17,9 +17,9 @@
 <ion-list>
   <ion-list-header>
     Physical Hunger
-    <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
+    <ion-note item-end color="secondary">{{hungerLevelBefore | hungerRange}}</ion-note>
   </ion-list-header>
-  <range name="hungerLevel" min="1" max="5" [initialValue]="hungerLevel" (onRangeChange)="onRangeChange($event)"></range>
+  <range name="hungerLevelBefore" min="1" max="5" [initialValue]="hungerLevelBefore" (onRangeChange)="onRangeChange($event)"></range>
 </ion-list>
 <ion-list>
   <ion-list-header>

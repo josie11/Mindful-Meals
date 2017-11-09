@@ -32,15 +32,15 @@
           Switch
         </button>
         <ion-icon item-start ios="ios-attach" md="md-attach" color="white"></ion-icon>
-        <p>{{logEdits.date | date:'mediumDate'}}</p>
-        <p>{{logEdits.date + 'T' + logEdits.time | date:'shortTime'}}</p>
-        <p *ngIf="logEdits.type">{{logEdits.type}}</p>
+        <p *ngIf="form.date">{{form.date | date:'mediumDate'}}</p>
+        <p *ngIf="form.date && form.time">{{form.date + 'T' + form.time | date:'shortTime'}}</p>
+        <p *ngIf="form.type">{{form.type}}</p>
       </ion-item>
-      <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)" [time]="logEdits.time" [date]="logEdits.date"></date-time>
+      <date-time *ngIf="!isMealAttached" (onTimeDateChange)="onTimeDateChange($event)" [time]="form.time" [date]="form.date"></date-time>
       <ion-item *ngIf="!isMealAttached">
         <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
         <ion-label>Meal</ion-label>
-        <ion-select [(ngModel)]="logEdits.type" interface="action-sheet">
+        <ion-select [(ngModel)]="form.mealType" interface="action-sheet">
           <ion-option value="Breakfast">Breakfast</ion-option>
           <ion-option value="Lunch">Lunch</ion-option>
           <ion-option value="Dinner">Dinner</ion-option>
@@ -55,14 +55,14 @@
     <ion-list>
       <ion-list-header>
         Physical Hunger
-        <ion-note item-end color="secondary">{{hungerLevel | hungerRange}}</ion-note>
+        <ion-note item-end color="secondary">{{form.hungerLevelAfter | hungerRange}}</ion-note>
       </ion-list-header>
-      <range name="hungerLevel" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
+      <range name="hungerLevelAfter" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)"></range>
     </ion-list>
     <ion-list>
       <ion-list-header>
         Satisfaction Level
-        <ion-note item-end color="secondary">{{satisfactionLevel | satisfactionRange }}</ion-note>
+        <ion-note item-end color="secondary">{{form.satisfactionLevel | satisfactionRange }}</ion-note>
       </ion-list-header>
       <range name="satisfactionLevel" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)"></range>
     </ion-list>
@@ -91,7 +91,7 @@
         title="Distractions"
         [behaviorSubject]="formService.selectedDistractions">>
       </checkbox-trigger>
-      <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)" [description]="mealDescription"></detail-textarea>
+      <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)" [description]="form.mealDescription"></detail-textarea>
     </ion-list>
   </ion-content>
 

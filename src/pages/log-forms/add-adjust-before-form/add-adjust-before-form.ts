@@ -30,9 +30,11 @@ export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
   ngOnInit() {
     //prevent mutations!
     const log: any = {...this.navParams.get('log')};
+    const emotions: any = {...this.navParams.get('emotions')};
+    const foods: any = {...this.navParams.get('foods')};
 
-    log.emotions = {...log.emotions}
-    log.foods = {...log.foods}
+    log.emotions = emotions
+    log.foods = foods
 
     this.log = log;
     this.formType = this.navParams.get('formType');

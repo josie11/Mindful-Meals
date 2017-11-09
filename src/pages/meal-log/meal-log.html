@@ -3,7 +3,7 @@
   <ion-header>
     <ion-navbar color="primary">
       <ion-buttons start>
-        <button ion-button icon-only>
+        <button ion-button icon-only (click)="dismiss()">
           <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
         </button>
       </ion-buttons>
@@ -16,13 +16,17 @@
   <!-- content for ng-content -->
   <ion-content>
     <ion-list>
+      <date-switch-divider
+      date="October 12, 2017"
+      (onDateDecrement)="selectPreviousMonth($event)"
+      (onDateIncrement)="selectNextMonth($event)"
+      ></date-switch-divider>
       <ion-list-header>
         Meal Time
-        <button ion-button icon-only clear color="accent" item-end><ion-icon ios="ios-settings" md="md-settings"></ion-icon></button>
       </ion-list-header>
       <ion-item>
         <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
-        <div>October 12, 2017</div>
+        <h4>October 12, 2017</h4>
         <p>2:45 PM</p>
         <p>Lunch</p>
       </ion-item>
@@ -30,105 +34,63 @@
     <ion-list>
       <ion-list-header>
         Before Meal
-        <button ion-button icon-only clear color="accent" item-end><ion-icon ios="ios-settings" md="md-settings"></ion-icon></button>
       </ion-list-header>
       <ion-item>
-        <div class="progress-container">
-          <div class="progress-wrapper">
-            <h4>Craving Intensity</h4>
-            <p>Mild</p>
-            <div class="progress-bar">
-              <p class="current">1/5</p>
-              <round-progress
-                current="1"
-                max="5"
-                [color]="'#45ccce'"
-                [background]="'#eaeaea'"
-                [radius]="45"
-                [stroke]="15"
-                [rounded]="false"
-                [clockwise]="false"
-                [duration]="800"
-                [animation]="'easeInOutQuart'"
-                [animationDelay]="0"
-                [responsive]="true"
-                ></round-progress>
-              </div>
-            </div>
-            <div class="progress-wrapper">
-              <h4>Hunger Level</h4>
-              <p>Full</p>
-              <div class="progress-bar">
-                <p class="current">3/5</p>
-                <round-progress
-                current="4"
-                max="5"
-                [color]="'#45ccce'"
-                [background]="'#eaeaea'"
-                [radius]="45"
-                [stroke]="15"
-                [rounded]="false"
-                [clockwise]="false"
-                [duration]="800"
-                [animation]="'easeInOutQuart'"
-                [animationDelay]="0"
-                [responsive]="true"
-                ></round-progress>
-              </div>
-            </div>
-          </div>
+        <progress-circles
+          [progressData1]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
+          [progressData2]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
+        ></progress-circles>
+      </ion-item>
+      <ion-item text-wrap>
+        <ion-icon ios="ios-happy" md="md-happy" color="secondary" item-start></ion-icon>
+        <h4>Emotions</h4>
+        <p>
+          Depressed, Sad, Happy.
+        </p>
+      </ion-item>
+      <ion-item text-wrap>
+        <ion-icon ios="ios-nutrition" md="md-nutrition" color="secondary" item-start></ion-icon>
+        <h4>Foods Craved</h4>
+        <p>
+          Pizza, cookies, cake.
+        </p>
+      </ion-item>
+      <ion-item text-wrap>
+        <h4>Trigger Description</h4>
+        <p>
+          Joan Didion (born December 5, 1934) is an American journalist and writer of novels, plays, screenplays, and autobiographical works. Didion is best known for her literary journalism and memoirs. In her novels and essays, Didion explores the disintegration of American morals and cultural chaos; the overriding theme of her work is individual and social fragmentation.[2] At the peak of her career, her writing was recognized for its significance in defining and observing American subcultures for mainstream audiences. In 1968, The New York Times referred to her early work as containing "grace,
+        </p>
       </ion-item>
     </ion-list>
     <ion-list>
       <ion-list-header>
         After Meal
-        <button ion-button icon-only clear color="accent" item-end><ion-icon ios="ios-settings" md="md-settings"></ion-icon></button>
       </ion-list-header>
       <ion-item>
-        <div class="progress-container">
-          <div class="progress-wrapper">
-            <h4>Hunger Level</h4>
-            <p>Stuffed</p>
-            <div class="progress-bar">
-              <p class="current">5/5</p>
-              <round-progress
-                current="5"
-                max="5"
-                [color]="'#45ccce'"
-                [background]="'#eaeaea'"
-                [radius]="45"
-                [stroke]="15"
-                [rounded]="false"
-                [clockwise]="false"
-                [duration]="800"
-                [animation]="'easeInOutQuart'"
-                [animationDelay]="0"
-                [responsive]="true"
-                ></round-progress>
-              </div>
-            </div>
-            <div class="progress-wrapper">
-              <h4>Satisfaction Level</h4>
-              <p>Satisfied</p>
-              <div class="progress-bar">
-                <p class="current">4/5</p>
-                <round-progress
-                current="4"
-                max="5"
-                [color]="'#45ccce'"
-                [background]="'#eaeaea'"
-                [radius]="45"
-                [stroke]="15"
-                [rounded]="false"
-                [clockwise]="false"
-                [duration]="800"
-                [animation]="'easeInOutQuart'"
-                [animationDelay]="0"
-                [responsive]="true"
-                ></round-progress>
-              </div>
-            </div>
-          </div>
+        <progress-circles
+          [progressData1]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
+          [progressData2]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
+        ></progress-circles>
+      </ion-item>
+      <ion-item text-wrap>
+        <ion-icon ios="ios-happy" md="md-happy" color="secondary" item-start></ion-icon>
+        <h4>Emotions</h4>
+        <p>
+          Depressed, Sad, Happy.
+        </p>
+      </ion-item>
+      <ion-item text-wrap>
+        <ion-icon ios="ios-nutrition" md="md-nutrition" color="secondary" item-start></ion-icon>
+        <h4>Foods Craved</h4>
+        <p>
+          Pizza, cookies, cake.
+        </p>
+      </ion-item>
+      <ion-item text-wrap>
+        <h4>Meal Description</h4>
+        <p>
+          Joan Didion (born December 5, 1934) is an American journalist and writer of novels, plays, screenplays, and autobiographical works. Didion is best known for her literary journalism and memoirs. In her novels and essays, Didion explores the disintegration of American morals and cultural chaos; the overriding theme of her work is individual and social fragmentation.[2] At the peak of her career, her writing was recognized for its significance in defining and observing American subcultures for mainstream audiences. In 1968, The New York Times referred to her early work as containing "grace,
+        </p>
       </ion-item>
     </ion-list>
   </ion-content>
@@ -136,7 +98,7 @@
   <ion-footer>
     <ion-toolbar color="primary">
       <ion-buttons end>
-        <button ion-button icon-only>
+        <button ion-button icon-only (click)="dismiss()">
           <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
         </button>
       </ion-buttons>

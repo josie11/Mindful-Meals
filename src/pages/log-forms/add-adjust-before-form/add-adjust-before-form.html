@@ -13,11 +13,11 @@
     <before-form-content
       [emotionsBehaviorSubject]="formService.selectedBeforeEmotions"
       [foodsBehaviorSubject]="formService.selectedBeforeFoods"
-      [type]="log.type"
+      [type]="log.mealType"
       [date]="log.date"
       [time]="log.time"
       [intensityLevel]="log.intensityLevel"
-      [hungerLevel]="log.hungerLevel"
+      [hungerLevelBefore]="log.hungerLevelBefore"
       [triggerDescription]="log.triggerDescription"
       showMealType="{{true}}"
       (onFormItemChange)="onFormItemChange($event)"

@@ -16,20 +16,18 @@ import { FormService } from '../../../providers/form.service';
 })
 export class BeforeFormPage implements OnDestroy, OnInit {
 
-  intensityLevel: number = 1;
-  hungerLevel: number = 1;
-  type: string = '';
-  date: string = '';
-  time: string = '';
-  triggerDescription: string = '';
+  form: object = {};
 
   formType: string = 'craving';
   showMealType: boolean = this.formType === 'meal';
+  formSubscription;
 
   constructor(public navCtrl: NavController, public navParams: NavParams, public modalService: ModalService, public formService: FormService) {
   }
 
   ngOnInit() {
+    this.formSubscription = this.formService.form.subscribe((form) => this.form = form)
+    this.formService.refreshForm();
   }
 
   onFormTypeChange() {
@@ -37,6 +35,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   onFormItemChange({ item, value }) {
+    this.formService.updateFormItem(item, value);
     this[item] = value;
   }
 
@@ -50,48 +49,19 @@ export class BeforeFormPage implements OnDestroy, OnInit {
   }
 
   submitMealForm() {
-    const {
-      intensityLevel,
-      hungerLevel,
-      type,
-      date,
-      time,
-      triggerDescription,
-    } = this;
-
-    return this.formService.submitBeforeMealForm({
-      intensityLevel,
-      hungerLevelBefore: hungerLevel,
-      mealType: type,
-      mealDate: date,
-      mealTime: time,
-      triggerDescription,
-    })
+    this.formService.submitBeforeMealForm()
     .then(() => this.dismissForm())
     .catch(console.error);
   }
 
   submitCravingForm() {
-    const {
-      intensityLevel,
-      hungerLevel,
-      date,
-      time,
-      triggerDescription,
-    } = this;
-
-    return this.formService.submitCravingForm({
-      intensityLevel,
-      hungerLevel,
-      cravingDate: date,
-      cravingTime: time,
-      triggerDescription,
-    })
+    return this.formService.submitCravingForm()
     .then(() => this.dismissForm())
     .catch(console.error);
   }
 
   ngOnDestroy() {
     this.formService.clearBeforeForm();
+    this.formSubscription.unsubscribe();
   }
 }

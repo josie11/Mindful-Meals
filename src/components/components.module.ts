@@ -8,6 +8,9 @@ import { DateTimeComponent } from './form-inputs/date-time/date-time';
 import { DetailTextareaComponent } from './form-inputs/detail-textarea/detail-textarea';
 import { CheckboxTriggerComponent } from './form-inputs/checkbox-trigger/checkbox-trigger';
 import { BeforeFormContentComponent } from './forms/before-form-content/before-form-content';
+import { ProgressCirclesComponent } from './log-view/progress-circles/progress-circles';
+import { RoundProgressModule } from './round-progress/index';
+import { DateSwitchDividerComponent } from './log-view/date-switch-divider/date-switch-divider';
 
 @NgModule({
 	declarations: [
@@ -17,11 +20,14 @@ import { BeforeFormContentComponent } from './forms/before-form-content/before-f
     DateTimeComponent,
     DetailTextareaComponent,
     CheckboxTriggerComponent,
-    BeforeFormContentComponent
+    BeforeFormContentComponent,
+    ProgressCirclesComponent,
+    DateSwitchDividerComponent
   ],
 	imports: [
     IonicModule,
     PipesModule,
+    RoundProgressModule
   ],
 	exports: [
     ModalComponent,
@@ -30,7 +36,11 @@ import { BeforeFormContentComponent } from './forms/before-form-content/before-f
     DateTimeComponent,
     DetailTextareaComponent,
     CheckboxTriggerComponent,
-    BeforeFormContentComponent
+    BeforeFormContentComponent,
+    ProgressCirclesComponent,
+    DateSwitchDividerComponent
+  ],
+  providers: [
   ]
 })
 export class ComponentsModule {}

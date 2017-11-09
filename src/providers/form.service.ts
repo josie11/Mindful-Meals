@@ -13,6 +13,20 @@ import 'rxjs/add/operator/map';
   To assist with the emotions/distractions modal communication
   And to submit form when complete
 */
+
+interface formObject {
+  time: string;
+  date: string;
+  hungerLevelBefore: number;
+  intensityLevel: number;
+  triggerDescription?: string;
+  mealType: string;
+  completed: number;
+  satisfactionLevel?: number;
+  hungerLevelAfter?: number;
+  mealDescription?: string;
+}
+
 @Injectable()
 export class FormService {
 
@@ -23,6 +37,19 @@ export class FormService {
   selectedAfterEmotions: BehaviorSubject<object> = new BehaviorSubject({});
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
 
+  form: BehaviorSubject<object> = new BehaviorSubject({
+    time: '',
+    date: '',
+    hungerLevelBefore: 1,
+    intensityLevel: 1,
+    triggerDescription: '',
+    mealType: '',
+    completed: 0,
+    satisfactionLevel: undefined,
+    hungerLevelAfter: undefined,
+    mealDescription: ''
+  });
+
   constructor(
       private emotionsService: EmotionsService,
       private foodsService: FoodsService,
@@ -32,55 +59,90 @@ export class FormService {
     ) {
   }
 
-  updateBeforeEmotions(emotions) {
+  refreshForm() {
+    const beforeForm: formObject = {
+      time: '',
+      date: '',
+      hungerLevelBefore: 1,
+      intensityLevel: 1,
+      triggerDescription: '',
+      mealType: '',
+      completed: 0,
+      satisfactionLevel: undefined,
+      hungerLevelAfter: undefined,
+      mealDescription: ''
+    };
+
+    this.form.next(beforeForm)
+  }
+
+  setForAfterForm() {
+    const beforeForm: formObject = {
+      time: '',
+      date: '',
+      hungerLevelBefore: 1,
+      intensityLevel: 1,
+      triggerDescription: '',
+      mealType: '',
+      completed: 1,
+      satisfactionLevel: 1,
+      hungerLevelAfter: 1,
+      mealDescription: ''
+    };
+
+    this.form.next(beforeForm)
+  }
+
+  updateFormItem(item: string, value: any) {
+    const form = {...this.form.getValue()};
+    form[item] = value;
+
+    this.form.next({...form});
+  }
+
+  updateFormItems(items: object) {
+    const form = {...this.form.getValue()};
+    const updatedForm = {...form, ...items};
+
+    this.form.next(updatedForm);
+  }
+
+  updateBeforeEmotions(emotions: object) {
     this.selectedBeforeEmotions.next({...emotions});
   }
 
-  updateAfterEmotions(emotions) {
+  updateAfterEmotions(emotions: object) {
     this.selectedAfterEmotions.next({...emotions});
   }
 
-  addNewEmotion(name) {
+  addNewEmotion(name: string) {
     return this.emotionsService.addEmotion(name)
     .then((data: any) => ({id : data.id, name}));
   }
 
-  updateBeforeFoods(foods) {
+  updateBeforeFoods(foods: object) {
     this.selectedBeforeFoods.next({...foods});
   }
 
-  updateAfterFoods(foods) {
+  updateAfterFoods(foods: object) {
     this.selectedAfterFoods.next({...foods});
   }
 
-  addNewFood(name) {
+  addNewFood(name: string) {
     return this.foodsService.addFood(name)
     .then((data: any) => ({id : data.id, name}));
   }
 
-  updateDistractions(distractions) {
+  updateDistractions(distractions: object) {
     this.selectedDistractions.next({...distractions});
   }
 
-  addNewDistraction(name) {
+  addNewDistraction(name: string) {
     return this.distractionsService.addDistraction(name)
     .then((data: any) => ({id : data.id, name}));
   }
 
-  submitBeforeMealForm(data) {
-    const { cols, values } = this.formatDataforInsert(data);
-
-    return this.mealsService.addMeal(cols, values)
-    .then((data: any) => {
-      return this.linkBeforeFormItemsWithMeal(data.id)
-      .then((data: any) => {
-        this.clearBeforeForm();
-        return this.mealsService.getMeal(data.id);
-      });
-    });
-  }
-
-  linkBeforeFormItemsWithMeal(id) {
+  linkBeforeFormItemsWithMeal(id: number) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
     return this.mealsService.addMealEmotions(id, selectedBeforeEmotionIds, 'before')
@@ -88,8 +150,18 @@ export class FormService {
     .then(() => ({id: id}));
   }
 
-  submitCravingForm(data) {
-    const { cols, values } = this.formatDataforInsert(data);
+  submitCravingForm() {
+    const form: any = this.form.getValue();
+
+    const formData = {
+      cravingTime: form.time,
+      cravingDate: form.date,
+      hungerLevel: form.hungerLevelBefore,
+      intensityLevel: form.intensityLevel,
+      triggerDescription: form.triggerDescription,
+    }
+
+    const { cols, values } = this.formatDataforInsert(formData);
 
     return this.cravingsService.addCraving(cols, values)
     .then((data: any) => {
@@ -101,7 +173,7 @@ export class FormService {
     });
   }
 
-  linkCravingItemsWithCraving(id) {
+  linkCravingItemsWithCraving(id: number) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
     return this.cravingsService.addCravingEmotions(id, selectedBeforeEmotionIds)
@@ -118,7 +190,24 @@ export class FormService {
     .then(() => ({id: id}));
   }
 
-  updateBeforeMealItems(id, previousEmotions, previousFoods) {
+  submitBeforeMealForm() {
+    const form: any = this.form.getValue();
+
+    const formData = this.getBeforeFormData();
+    //format for database insert method
+    const { cols, values } = this.formatDataforInsert(formData);
+
+    return this.mealsService.addMeal(cols, values)
+    .then((data: any) => {
+      return this.linkBeforeFormItemsWithMeal(data.id)
+      .then((data: any) => {
+        this.clearBeforeForm();
+        return this.mealsService.getMeal(data.id);
+      });
+    });
+  }
+
+  updateBeforeMealItems(id: number, previousEmotions, previousFoods) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
     const previousEmotionsIds = Object.keys(previousEmotions).map(val => Number(val));
     const previousFoodsIds = Object.keys(previousFoods).map(val => Number(val));
@@ -128,8 +217,13 @@ export class FormService {
     .then(() => ({id: id}));
   }
 
-  submitNewAfterMealForm(data) {
-    return this.submitBeforeMealForm(data)
+  submitNewAfterMealForm() {
+    const formData = this.getAfterFormData()
+    //format for database insert method
+    const { cols, values } = this.formatDataforInsert(formData);
+
+    return this.mealsService.addMeal(cols, values)
+    .then((data: any) => this.linkBeforeFormItemsWithMeal(data.id))
     .then((data: any) => this.linkAfterItemsWithMeal(data.id))
     .then((data: any) => {
       this.clearAfterForm();
@@ -137,8 +231,9 @@ export class FormService {
     });
   }
 
-  submitAttachedMealAfterForm(mealId, data, beforeEmotions, beforeFoods ) {
-    const mealData = this.formatDataForUpdate(data);
+  submitAttachedMealAfterForm(mealId: number, beforeEmotions, beforeFoods ) {
+    const formData = this.getAfterFormData()
+    const mealData = this.formatDataForUpdate(formData);
 
     return this.mealsService.updateMeal(mealId, mealData)
     .then(() => this.updateBeforeMealItems(mealId, beforeEmotions, beforeEmotions))
@@ -152,6 +247,7 @@ export class FormService {
   clearBeforeForm() {
     this.selectedBeforeEmotions.next({});
     this.selectedBeforeFoods.next({});
+    this.refreshForm();
   }
 
   clearAfterForm() {
@@ -174,6 +270,37 @@ export class FormService {
     const selectedDistractionsIds = Object.keys(this.selectedDistractions.getValue()).map(val => Number(val));
 
     return { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds };
+  }
+
+  getBeforeFormData() {
+    const form: any = this.form.getValue();
+
+    return {
+      mealTime: form.time,
+      mealDate: form.date,
+      hungerLevelBefore: form.hungerLevelBefore,
+      intensityLevel: form.intensityLevel,
+      triggerDescription: form.triggerDescription,
+      mealType: form.mealType,
+      completed: form.completed,
+    }
+  }
+
+  getAfterFormData() {
+    const form: any = this.form.getValue();
+
+    return {
+      mealTime: form.time,
+      mealDate: form.date,
+      hungerLevelBefore: form.hungerLevelBefore,
+      hungerLevelAfter: form.hungerLevelAfter,
+      intensityLevel: form.intensityLevel,
+      satisfactionLevel: form.satisfactionLevel,
+      triggerDescription: form.triggerDescription,
+      mealDescription: form.mealDescription,
+      mealType: form.mealType,
+      completed: 1,
+    }
   }
 
   formatDataforInsert(data) {

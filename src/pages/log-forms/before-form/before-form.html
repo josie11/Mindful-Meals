@@ -19,12 +19,12 @@
     <before-form-content
       [emotionsBehaviorSubject]="formService.selectedBeforeEmotions"
       [foodsBehaviorSubject]="formService.selectedBeforeFoods"
-      [type]="type"
-      [date]="date"
-      [time]="time"
-      [intensityLevel]="intensityLevel"
-      [hungerLevel]="hungerLevel"
-      [triggerDescription]="triggerDescription"
+      [type]="form.type"
+      [date]="form.date"
+      [time]="form.time"
+      [intensityLevel]="form.intensityLevel"
+      [hungerLevelBefore]="form.hungerLevelBefore"
+      [triggerDescription]="form.triggerDescription"
       [showMealType]="showMealType"
       (onFormItemChange)="onFormItemChange($event)"
     ></before-form-content>

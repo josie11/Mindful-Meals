@@ -20,7 +20,7 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   emotions: object;
   foods: object;
   @Input() intensityLevel: number;
-  @Input() hungerLevel: number;
+  @Input() hungerLevelBefore: number;
   @Input() type: string;
   @Input() date: string;
   @Input() time: string;
@@ -55,7 +55,7 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   }
 
   onMealTypeChange(value) {
-    this.onFormItemChange.emit({ item: 'type', value });
+    this.onFormItemChange.emit({ item: 'mealType', value });
   }
 
   openEmotionsList() {

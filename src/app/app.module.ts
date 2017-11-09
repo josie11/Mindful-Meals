@@ -5,7 +5,6 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 import { SQLite, SQLiteDatabaseConfig, /*SQLiteObject*/ } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
-import { RoundProgressModule } from '../components/round-progress/index';
 import { MyApp } from './app.component';
 import { ComponentsModule } from '../components/components.module';
 
@@ -170,7 +169,7 @@ class SQLiteMock {
     AfterFormPage,
     DistractionsListPage,
     AddAdjustBeforeFormPage,
-    MealLogPage
+    MealLogPage,
   ],
   imports: [
     BrowserModule,
@@ -179,7 +178,6 @@ class SQLiteMock {
     HttpModule,
     PipesModule,
     ProvidersModule,
-    RoundProgressModule,
     IonicModule.forRoot(MyApp),
     IonicStorageModule.forRoot()
   ],
@@ -196,7 +194,7 @@ class SQLiteMock {
     AfterFormPage,
     DistractionsListPage,
     AddAdjustBeforeFormPage,
-    MealLogPage
+    MealLogPage,
   ],
   providers: [
     StatusBar,

@@ -26,31 +26,22 @@ export class AfterFormPage implements OnDestroy, OnInit {
   distractions: object = {};
   emotions: object = {};
   foods: object = {};
-  hungerLevel: number = 1;
-  mealDescription: string = '';
-  satisfactionLevel: number = 1;
+
+  adjustedBeforeEmotions: object = {};
+  adjustedBeforeFoods: object = {}
+
+  form: any = {};
 
   incompleteMeals: Array<object> = [];
   attachedMeal: any = {};
   isMealAttached: boolean = false;
-
-  //represents before meal data
-  logEdits: any = {
-    intensityLevel: 1,
-    hungerLevel:  1,
-    date:'',
-    time: '',
-    type: '',
-    triggerDescription: '',
-    emotions: {},
-    foods: {}
-  };
 
   toggle: boolean = false;
 
   emotionsSubscription;
   foodsSubscription;
   distractionsSubscription;
+  formSubscription;
 
   constructor(private navCtrl: NavController, private modalService: ModalService, private alertService: AlertService, private formService: FormService, private mealsService: MealsService, private datePipe: DatePipe) {
   }
@@ -60,18 +51,21 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.foodsSubscription = this.formService.selectedAfterFoods.subscribe(foods => this.foods = foods);
     this.distractionsSubscription = this.formService.selectedDistractions.subscribe(distractions => this.distractions = distractions);
     this.mealsService.getIncompleteMeals().then(meals => this.incompleteMeals = meals);
+    this.formSubscription = this.formService.form.subscribe((form) => this.form = form);
+    this.formService.setForAfterForm();
   }
 
   onRangeChange({ name, number }) {
+    this.formService.updateFormItem(name, number);
     this[name] = number;
   }
 
   onTimeDateChange({ type, value }) {
-    this.logEdits[type] = value;
+    this.formService.updateFormItem(type, value);
   }
 
   onDescriptionChange({ value }) {
-    this.mealDescription = value;
+    this.formService.updateFormItem('mealDescription', value);
   }
 
   dismissForm() {
@@ -127,7 +121,9 @@ export class AfterFormPage implements OnDestroy, OnInit {
       this.attachedMeal = meal
       this.isMealAttached = true;
 
-      this.setLogToAttachedMeal({...formattedEmotions}, {...formattedFoods});
+      this.adjustedBeforeEmotions = {...formattedEmotions};
+      this.adjustedBeforeFoods = {...formattedFoods};
+      this.setFormToAttachedMeal({...formattedEmotions}, {...formattedFoods});
     }).catch(console.error);
   }
 
@@ -135,13 +131,15 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.modalService.presentModal(
       AddAdjustBeforeFormPage,
       {
-        log: this.logEdits,
+        log: this.form,
+        emotions: this.adjustedBeforeEmotions,
+        foods: this.adjustedBeforeFoods,
         formType: 'meal',
         submit: this.submitLogEdits.bind(this)
       });
   }
 
-  setLogToAttachedMeal(emotions, foods) {
+  setFormToAttachedMeal(emotions, foods) {
     const {
       mealTime,
       mealDate,
@@ -151,20 +149,39 @@ export class AfterFormPage implements OnDestroy, OnInit {
       triggerDescription
     } = this.attachedMeal;
 
-    this.logEdits = {
+    this.formService.updateFormItems({
       intensityLevel,
-      hungerLevel:  hungerLevelBefore,
+      hungerLevelBefore,
       date: mealDate,
       time: mealTime,
-      type: mealType,
-      triggerDescription: triggerDescription,
-      emotions,
-      foods
-    };
+      mealType,
+      triggerDescription,
+    });
   }
 
   submitLogEdits(log) {
-    this.logEdits = log;
+    const {
+      intensityLevel,
+      hungerLevelBefore,
+      date,
+      time,
+      mealType,
+      triggerDescription,
+      emotions,
+      foods
+    } = log;
+
+    this.adjustedBeforeEmotions = emotions;
+    this.adjustedBeforeFoods = foods;
+
+    this.formService.updateFormItems({
+      intensityLevel,
+      hungerLevelBefore,
+      date,
+      time,
+      mealType,
+      triggerDescription,
+    });
   }
 
   clearLogEdits() {
@@ -173,17 +190,17 @@ export class AfterFormPage implements OnDestroy, OnInit {
     const date = this.datePipe.transform(newDate, 'yyyy-MM-dd');
     const time = this.datePipe.transform(newDate, 'HH:mm');
 
-    this.logEdits = {
+    this.formService.updateFormItems({
       intensityLevel: 1,
-      hungerLevel:  1,
+      hungerLevelBefore:  1,
       date: date,
       time: time,
-      type: '',
+      mealType: '',
       triggerDescription: '',
-      emotions: {},
-      foods: {}
-    };
+    });
 
+    this.adjustedBeforeFoods = {};
+    this.adjustedBeforeEmotions = {};
     this.formService.clearBeforeForm();
   }
 
@@ -192,53 +209,19 @@ export class AfterFormPage implements OnDestroy, OnInit {
     else this.submitNewForm();
   }
 
-  returnFormData() {
-    const {
-      intensityLevel,
-      hungerLevel,
-      type,
-      date,
-      time,
-      triggerDescription,
-    } = this.logEdits;
-
-    const {
-      mealDescription,
-      satisfactionLevel,
-    } = this;
-
-    const hungerLevelAfter = this.hungerLevel;
-
-    return {
-      intensityLevel,
-      hungerLevelBefore: hungerLevel,
-      mealType: type,
-      mealDate: date,
-      mealTime: time,
-      triggerDescription,
-      completed: 1,
-      hungerLevelAfter,
-      mealDescription,
-      satisfactionLevel
-    }
-  }
-
   submitNewForm() {
-    const formData = this.returnFormData();
-
-    return this.formService.submitNewAfterMealForm(formData)
+    return this.formService.submitNewAfterMealForm()
     .then(() => this.dismissForm())
     .catch(console.error);
 
   }
 
   submitUpdateForm() {
-    const formData = this.returnFormData();
     const { id } = this.attachedMeal;
     const beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(this.attachedMeal.beforeEmotions);
     const beforeFoods = this.mealsService.formatMealItemsToCheckboxObject(this.attachedMeal.beforeFoods);
 
-    return this.formService.submitAttachedMealAfterForm(id, formData, beforeEmotions, beforeFoods)
+    return this.formService.submitAttachedMealAfterForm(id, beforeEmotions, beforeFoods)
     .then(() => this.dismissForm())
     .catch(console.error);
   }
@@ -247,6 +230,8 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.emotionsSubscription.unsubscribe();
     this.foodsSubscription.unsubscribe();
     this.distractionsSubscription.unsubscribe();
+    this.formSubscription.unsubscribe();
+
     this.formService.clearAfterForm();
   }
 }

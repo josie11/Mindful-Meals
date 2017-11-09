@@ -1,0 +1,9 @@
+date-switch-divider {
+  ion-item-divider {
+    text-align: center;
+    padding-left: 8px !important;
+    h2, span {
+      color: color($colors, 'primary') !important;
+    }
+  }
+}

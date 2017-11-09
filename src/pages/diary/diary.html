@@ -22,16 +22,11 @@
 
 <ion-content>
   <ion-list>
-    <ion-item-divider>
-      <!-- <button ion-button item-end color="secondary">Filter</button> -->
-      <h2>{{(currentYear + '-' + currentMonth + '-' + '01') | date: 'MMMM, yyyy'}}</h2>
-      <button ion-button icon-only item-start clear (click)="selectPreviousMonth()">
-        <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
-      </button>
-      <button ion-button icon-only item-end clear (click)="selectNextMonth()">
-        <ion-icon ios="ios-arrow-forward" md="md-arrow-forward"></ion-icon>
-      </button>
-    </ion-item-divider>
+    <date-switch-divider
+      [date]="(currentYear + '-' + currentMonth + '-' + '01') | date: 'MMMM, yyyy'"
+      (onDateDecrement)="selectPreviousMonth($event)"
+      (onDateIncrement)="selectNextMonth($event)"
+    ></date-switch-divider>
     <ng-container *ngIf="isMeal">
       <ion-item-group *ngFor="let entries of meals" >
         <ion-list-header>
