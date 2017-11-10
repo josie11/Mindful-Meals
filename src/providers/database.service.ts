@@ -89,35 +89,46 @@ export class DatabaseService {
     .then(data => data);
   }
 
-  select({ selection, dbName, extraStatement = ''}) {
+  select({ dbName, selection, extraStatement = ''}) {
     const sql = this.createSqlSelectStatement(selection, dbName, extraStatement);
     return this.executeSql(sql)
     .then(data => this.processSqlResults(data));
   }
 
-  //E.G. items = [{ cols =[mealId, name, foodId], values = [1, 'pizza', 2] }]
-  bulkInsert({ dbName, items}) {
-    const sqlStatements = items.map(({ cols, values }) => this.createSqlInsertStatement(cols, values, dbName));
-    return this.batchSql(sqlStatements);
-  }
-
-  insert({ cols, values, dbName }) {
+  //E.G. item = {mealId: 1, foodId: 2}
+  insert({ dbName, item }) {
+    const { cols, values} = this.formatDataforInsert(item);
     const sql = this.createSqlInsertStatement(cols, values, dbName);
     return this.executeSql(sql)
     .then(data => this.select({ dbName, selection: 'MAX(id)' }))
     .then(data => ({ id: data[0]['MAX(id)'] }));
   }
 
-  // values = [{ col, value }]
+  //E.G. items = [{ mealId: 1, foodId: 2}, ...]
+  bulkInsert({ dbName, items}) {
+    const sqlStatements = items.map((item) => {
+      const { cols, values } = this.formatDataforInsert(item);
+      return this.createSqlInsertStatement(cols, values, dbName)
+    });
+    return this.batchSql(sqlStatements);
+  }
+
+  // E.G. values = [{ col: 'name', value: 'Johanna' }, { col: 'age', value: 28}]
   update({ dbName, values, id }) {
-    const updateSql = values.map(val => `${val.col} = ${this.formatSqlValue(val.value)}`).join(', ');
-    const sql = `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
+    if(values.length < 1) return Promise.resolve({ id });
+
+    const formattedValues = this.formatDataForUpdate(values);
+
+    const sql = this.createSqlUpdateStatement(formattedValues, id, dbName);
     return this.executeSql(sql)
   }
 
-  //E.G. items = [{ cols =[mealId, name, foodId], values = [1, 'pizza', 2] }]
+  //E.G. items = [{ id, values: []}, ...]
   bulkUpdate({ dbName, items}) {
-    const sqlStatements = items.map(({ cols, values }) => this.createSqlInsertStatement(cols, values, dbName));
+    const sqlStatements = items.map(({ id, values }) => {
+      const formattedValues = this.formatDataForUpdate(values);
+      return this.createSqlUpdateStatement(formattedValues, id, dbName)
+    });
     return this.batchSql(sqlStatements);
   }
 
@@ -151,6 +162,26 @@ export class DatabaseService {
       }
     }
     return results;
+  }
+
+  formatDataForUpdate(data: object) {
+    const values = [];
+    for (let col in data) {
+      values.push({col, value: data[col]});
+    }
+
+    return values;
+  }
+
+  formatDataforInsert(data) {
+    const cols = [], values = [];
+
+    for (let prop in data) {
+      cols.push(prop);
+      values.push(data[prop]);
+    }
+
+    return { cols, values };
   }
 
 }

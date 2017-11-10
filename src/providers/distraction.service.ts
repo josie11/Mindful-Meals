@@ -28,8 +28,7 @@ export class DistractionsService {
   addDistraction(name) {
     return this.databaseService.insert({
       dbName: 'distractions',
-      cols: ['name'],
-      values: [name]
+      item: { name }
     })
     .then(id => {
       const distractions = [...this.distractionsList.getValue(), {...id, name }];

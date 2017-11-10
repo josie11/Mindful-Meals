@@ -55,11 +55,10 @@ export class CravingsService {
     });
   }
 
-  addCraving(cols: Array<string>, values: Array<string>) {
+  addCraving(form: object) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
-      cols,
-      values
+      item: form
     });
   }
 
@@ -74,18 +73,14 @@ export class CravingsService {
   addCravingEmotion(cravingId: number, emotionId: number) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Emotions`,
-      cols: ['cravingId', 'emotionId'],
-      values: [cravingId, emotionId]
+      item: { cravingId, emotionId }
     });
   }
 
   addCravingEmotions(cravingId: number, emotionIds: Array<number>) {
     if (emotionIds.length < 1) return Promise.resolve({ id: cravingId });
 
-    const items = emotionIds.map(emotionId => ({
-      cols: ['cravingId', 'emotionId'],
-      values: [cravingId, emotionId]
-    }));
+    const items = emotionIds.map(emotionId => ({ cravingId, emotionId }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
   }
 
@@ -100,18 +95,14 @@ export class CravingsService {
   addCravingFood(cravingId: number, foodId: number) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Foods`,
-      cols: ['cravingId', 'foodId'],
-      values: [cravingId, foodId]
+      item: { cravingId, foodId }
     });
   }
 
   addCravingFoods(cravingId: number, foodIds: Array<number>) {
     if (foodIds.length < 1) return Promise.resolve({ id: cravingId });
 
-    const items = foodIds.map(foodId => ({
-      cols: ['cravingId', 'foodId'],
-      values: [cravingId, foodId]
-    }));
+    const items = foodIds.map(foodId => ({ cravingId, foodId }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
 }

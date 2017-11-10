@@ -28,8 +28,7 @@ export class FoodsService {
   addFood(name) {
     return this.databaseService.insert({
       dbName: 'foods',
-      cols: ['name'],
-      values: [name]
+      item: { name }
     })
     .then(id => {
       const foods = [...this.foodsList.getValue(), {...id, name }];

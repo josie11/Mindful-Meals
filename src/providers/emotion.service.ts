@@ -22,8 +22,7 @@ export class EmotionsService {
   addEmotion(name) {
     return this.databaseService.insert({
       dbName: 'emotions',
-      cols: ['name'],
-      values: [name]
+      item: { name }
     })
     .then(id => {
       const emotions = [...this.emotionsList.getValue(), {...id, name }]

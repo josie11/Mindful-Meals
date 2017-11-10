@@ -58,11 +58,10 @@ export class MealsService {
     });
   }
 
-  addMeal(cols: Array<string>, values: Array<string>) {
+  addMeal(form) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
-      cols,
-      values
+      item: form
     });
   }
 
@@ -104,14 +103,11 @@ export class MealsService {
   addMealEmotion(mealId: number, emotionId: number, mealStage: string) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Emotions`,
-      cols: ['mealId', 'emotionId', 'mealStage'],
-      values: [mealId, emotionId, mealStage]
+      item: { mealId, emotionId, mealStage }
     });
   }
 
-  updateMeal(mealId: number, values: Array<object>) {
-    if(values.length < 1) return Promise.resolve({id : mealId });
-
+  updateMeal(mealId: number, values: object) {
     return this.databaseService.update({
       dbName: `${this.dbName}s`,
       values,
@@ -120,13 +116,11 @@ export class MealsService {
   }
 
   addMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
-    if (emotionIds.length < 1) return Promise.resolve({id : mealId });
+    if (emotionIds.length < 1) return Promise.resolve({ id : mealId });
 
-    const items = emotionIds.map(emotionId => ({
-      cols: ['mealId', 'emotionId', 'mealStage'],
-      values: [mealId, emotionId, mealStage]
-    }));
+    const items = emotionIds.map(emotionId => ({ mealId, emotionId, mealStage }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
+    .then(() => ({ id : mealId }));
   }
 
   updateMealEmotions(mealId: number, mealStage: string, beforeEmotions: Array<number>, afterEmotions: Array<number>) {
@@ -159,18 +153,14 @@ export class MealsService {
   addMealFood(mealId: number, foodId: number, mealStage: string) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Foods`,
-      cols: ['mealId', 'foodId', 'mealStage'],
-      values: [mealId, foodId, mealStage]
+      item: { mealId, foodId, mealStage }
     });
   }
 
   addMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
     if (foodIds.length < 1) return Promise.resolve({id : mealId });
 
-    const items = foodIds.map(foodId => ({
-      cols: ['mealId', 'foodId', 'mealStage'],
-      values: [mealId, foodId, mealStage]
-    }));
+    const items = foodIds.map(foodId => ({ mealId, foodId, mealStage }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
 
@@ -202,18 +192,14 @@ export class MealsService {
   addMealDistraction(mealId: number, distractionId: number) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Distractions`,
-      cols: ['mealId', 'distractionId'],
-      values: [mealId, distractionId]
+      item: { mealId, distractionId }
     });
   }
 
   addMealDistractions(mealId: number, distractionIds: Array<number>) {
     if (distractionIds.length < 1) return Promise.resolve({id : mealId });
 
-    const items = distractionIds.map(distractionId => ({
-      cols: ['mealId', 'distractionId'],
-      values: [mealId, distractionId]
-    }));
+    const items = distractionIds.map(distractionId => ({ mealId, distractionId }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Distractions`, items })
   }
 

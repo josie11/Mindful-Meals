@@ -161,9 +161,7 @@ export class FormService {
       triggerDescription: form.triggerDescription,
     }
 
-    const { cols, values } = this.formatDataforInsert(formData);
-
-    return this.cravingsService.addCraving(cols, values)
+    return this.cravingsService.addCraving(formData)
     .then((data: any) => {
       this.linkCravingItemsWithCraving(data.id)
       .then(() => {
@@ -191,13 +189,9 @@ export class FormService {
   }
 
   submitBeforeMealForm() {
-    const form: any = this.form.getValue();
-
     const formData = this.getBeforeFormData();
-    //format for database insert method
-    const { cols, values } = this.formatDataforInsert(formData);
 
-    return this.mealsService.addMeal(cols, values)
+    return this.mealsService.addMeal(formData)
     .then((data: any) => {
       return this.linkBeforeFormItemsWithMeal(data.id)
       .then((data: any) => {
@@ -220,9 +214,8 @@ export class FormService {
   submitNewAfterMealForm() {
     const formData = this.getAfterFormData()
     //format for database insert method
-    const { cols, values } = this.formatDataforInsert(formData);
 
-    return this.mealsService.addMeal(cols, values)
+    return this.mealsService.addMeal(formData)
     .then((data: any) => this.linkBeforeFormItemsWithMeal(data.id))
     .then((data: any) => this.linkAfterItemsWithMeal(data.id))
     .then((data: any) => {
@@ -233,9 +226,8 @@ export class FormService {
 
   submitAttachedMealAfterForm(mealId: number, beforeEmotions, beforeFoods ) {
     const formData = this.getAfterFormData()
-    const mealData = this.formatDataForUpdate(formData);
 
-    return this.mealsService.updateMeal(mealId, mealData)
+    return this.mealsService.updateMeal(mealId, formData)
     .then(() => this.updateBeforeMealItems(mealId, beforeEmotions, beforeEmotions))
     .then(() => this.linkAfterItemsWithMeal(mealId))
     .then(() => {
@@ -302,25 +294,4 @@ export class FormService {
       completed: 1,
     }
   }
-
-  formatDataforInsert(data) {
-    const cols = [], values = [];
-
-    for (let prop in data) {
-      cols.push(prop);
-      values.push(data[prop]);
-    }
-
-    return { cols, values };
-  }
-
-  formatDataForUpdate(data) {
-    const values = [];
-    for (let col in data) {
-      values.push({col, value: data[col]});
-    }
-
-    return values;
-  }
-
 }
