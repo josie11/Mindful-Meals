@@ -21,8 +21,8 @@ export class LogService {
 
   constructor(private mealsService: MealsService, private cravingsService: CravingsService, private formService: FormService) {
     this.formService.mealUpdated.subscribe((meal: any) => {
-      const currentMealId = this.meal.getValue()['id'];
-      if (currentMealId.id === meal.id) this.meal.next(meal);
+      const currentMeal: any = this.meal.getValue();
+      if (currentMeal.id === meal.id) this.meal.next(meal);
     })
   }
 

@@ -18,9 +18,6 @@ export class CheckboxTriggerComponent {
   @Input() items: object;
   @Output() onClick = new EventEmitter();
 
-  // items: object = {};
-  itemsSubscription;
-
   constructor() {
   }
 

@@ -11,6 +11,7 @@ import { BeforeFormContentComponent } from './forms/before-form-content/before-f
 import { ProgressCirclesComponent } from './log-view/progress-circles/progress-circles';
 import { RoundProgressModule } from './round-progress/index';
 import { DateSwitchDividerComponent } from './log-view/date-switch-divider/date-switch-divider';
+import { LogViewSectionComponent } from './log-view/log-view-section/log-view-section';
 
 @NgModule({
 	declarations: [
@@ -22,7 +23,8 @@ import { DateSwitchDividerComponent } from './log-view/date-switch-divider/date-
     CheckboxTriggerComponent,
     BeforeFormContentComponent,
     ProgressCirclesComponent,
-    DateSwitchDividerComponent
+    DateSwitchDividerComponent,
+    LogViewSectionComponent
   ],
 	imports: [
     IonicModule,
@@ -38,7 +40,8 @@ import { DateSwitchDividerComponent } from './log-view/date-switch-divider/date-
     CheckboxTriggerComponent,
     BeforeFormContentComponent,
     ProgressCirclesComponent,
-    DateSwitchDividerComponent
+    DateSwitchDividerComponent,
+    LogViewSectionComponent
   ],
   providers: [
   ]
