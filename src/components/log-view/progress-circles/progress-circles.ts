@@ -8,7 +8,7 @@ import { Component, Input } from '@angular/core';
       <h4>{{progressData1.title}}</h4>
       <p>{{progressData1.description}}</p>
         <div class="progress-bar">
-          <p class="current">{{progressData1.current}}/{{progressData1.current}}</p>
+          <p class="current">{{progressData1.current}}/{{progressData1.max}}</p>
           <round-progress
             [current]="progressData1.current"
             [max]="progressData1.max"
@@ -29,7 +29,7 @@ import { Component, Input } from '@angular/core';
       <h4>{{progressData2.title}}</h4>
       <p>{{progressData2.description}}</p>
       <div class="progress-bar">
-        <p class="current">{{progressData2.current}}/{{progressData2.current}}</p>
+        <p class="current">{{progressData2.current}}/{{progressData2.max}}</p>
         <round-progress
           [current]="progressData2.current"
           [max]="progressData2.max"
@@ -56,7 +56,6 @@ export class ProgressCirclesComponent {
 
 
   constructor() {
-    console.log(this)
   }
 
 }

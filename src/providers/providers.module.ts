@@ -9,6 +9,7 @@ import { FoodsService } from './food.service';
 import { DistractionsService } from './distraction.service';
 import { CravingsService } from './craving.service';
 import { DiaryService } from './diary.service';
+import { LogService } from './log.service';
 
 @NgModule({
   imports: [],
@@ -22,7 +23,8 @@ import { DiaryService } from './diary.service';
     FoodsService,
     DistractionsService,
     CravingsService,
-    DiaryService
+    DiaryService,
+    LogService
    ],
   exports: []
 })

@@ -12,38 +12,26 @@ import { MealLogPage } from '../meal-log/meal-log';
 })
 export class DiaryPage implements OnInit, OnDestroy {
 
-  meals: object = [];
-  cravings: object = [];
-  year: number;
-  month: number;
-  currentMonth: number;
-  currentYear: number;
+  meals = [];
+  cravings = [];
+  date: Date = new Date();
   listingType: string = 'craving';
   isMeal: boolean = false;
 
   mealEntriesSubscription;
   cravingEntriesSubscription;
+  dateSubscription;
 
   constructor(public navCtrl: NavController, private modalService: ModalService, public mealsService: MealsService, public cravingsService: CravingsService, private diaryService: DiaryService) {
   }
 
   ngOnInit() {
-    const date = new Date();
-    //months start at 0 for date object
-    this.currentMonth = date.getMonth() + 1;
-    this.currentYear = date.getFullYear();
-    this.month = this.currentMonth;
-    this.year = this.currentYear;
-
     this.mealEntriesSubscription = this.diaryService.meals.subscribe((meals) => this.meals = meals);
     this.cravingEntriesSubscription = this.diaryService.cravings.subscribe((cravings) => this.cravings = cravings);
+    this.dateSubscription = this.diaryService.date.subscribe((date) => this.date = date);
 
-    this.getEntries().catch(console.error);
-  }
-
-  getEntries() {
-    return this.diaryService.getCravingsForMonth(this.currentMonth, this.currentYear)
-    .then(() => this.diaryService.getMealsForMonth(this.currentMonth, this.currentYear))
+    const date = new Date();
+    this.diaryService.setDateAndUpdateEntries(date.getMonth() + 1, date.getFullYear());
   }
 
   openMealLog(id) {
@@ -51,41 +39,16 @@ export class DiaryPage implements OnInit, OnDestroy {
   }
 
   selectPreviousMonth() {
-    this.decreaseCurrentMonth();
-    return this.getEntries()
-    .catch(console.error);
+    this.diaryService.decreaseCurrentMonth();
   }
 
   selectNextMonth() {
-    this.increaseCurrentMonth();
-    return this.getEntries()
-    .catch(console.error);
-  }
-
-  decreaseCurrentMonth() {
-    if (this.currentMonth === 1) {
-      this.currentMonth = 12;
-      this.currentYear -= 1;
-    } else {
-      this.currentMonth -= 1;
-    }
-  }
-
-  increaseCurrentMonth() {
-    if (this.currentMonth === 12) {
-      this.currentMonth = 1;
-      this.currentYear += 1;
-    } else {
-      this.currentMonth += 1;
-    }
-  }
-
-  onDateChange() {
-    this.diaryService.updateMonthYear(this.currentMonth, this.currentYear)
+    this.diaryService.increaseCurrentMonth();
   }
 
   ngOnDestroy() {
     this.mealEntriesSubscription.unsubscribe();
     this.cravingEntriesSubscription.unsubscribe();
+    this.dateSubscription.unsubscribe();
   }
 }

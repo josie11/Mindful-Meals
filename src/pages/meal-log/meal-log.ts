@@ -1,8 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { NavController } from 'ionic-angular';
-import { MealsService} from '../../providers/meals.service';
-import { CravingsService} from '../../providers/craving.service';
-import { DiaryService } from '../../providers/diary.service';
+import { NavController, NavParams } from 'ionic-angular';
+import { LogService } from '../../providers/log.service';
+
 
 @Component({
   selector: 'meal-log-page',
@@ -10,18 +9,26 @@ import { DiaryService } from '../../providers/diary.service';
 })
 export class MealLogPage implements OnInit, OnDestroy {
 
-  constructor(public navCtrl: NavController, public mealsService: MealsService, public cravingsService: CravingsService, private diaryService: DiaryService) {
+  meal: object = {};
+  mealId: number;
+
+  mealSubscription;
+
+  constructor(public navCtrl: NavController, private navParams: NavParams, private logService: LogService) {
+  }
+
+  ngOnInit() {
+    this.mealId = this.navParams.get('id');
+    this.mealSubscription = this.logService.meal.subscribe((meal) => this.meal = meal);
+    this.logService.getMeal(this.mealId).catch(console.error);
   }
 
   dismiss() {
     this.navCtrl.pop();
   }
 
-  ngOnInit() {
-
-  }
-
   ngOnDestroy() {
-
+    this.mealSubscription.unsubscribe();
+    this.logService.clearMeal();
   }
 }

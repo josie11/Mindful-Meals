@@ -50,8 +50,9 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.emotionsSubscription = this.formService.selectedAfterEmotions.subscribe(emotions => this.emotions = emotions);
     this.foodsSubscription = this.formService.selectedAfterFoods.subscribe(foods => this.foods = foods);
     this.distractionsSubscription = this.formService.selectedDistractions.subscribe(distractions => this.distractions = distractions);
+    this.formSubscription = this.formService.form.subscribe((form) => this.form = {...form});
+
     this.mealsService.getIncompleteMeals().then(meals => this.incompleteMeals = meals);
-    this.formSubscription = this.formService.form.subscribe((form) => this.form = form);
     this.formService.setForAfterForm();
   }
 
@@ -195,7 +196,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
       hungerLevelBefore:  1,
       date: date,
       time: time,
-      mealType: '',
+      mealType: 'Breakfast',
       triggerDescription: '',
     });
 

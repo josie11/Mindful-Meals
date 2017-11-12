@@ -34,6 +34,7 @@
   </ion-list-header>
   <checkbox-trigger
     (onClick)="openEmotionsList($event)"
+    [items]="emotions"
     ios="ios-happy"
     md="md-happy"
     title="Emotions"
@@ -41,6 +42,7 @@
   </checkbox-trigger>
   <checkbox-trigger
     (onClick)="openFoodsList($event)"
+    [items]="foods"
     ios="ios-nutrition"
     md="md-nutrition"
     title="Food Cravings"

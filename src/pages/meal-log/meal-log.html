@@ -16,19 +16,14 @@
   <!-- content for ng-content -->
   <ion-content>
     <ion-list>
-      <date-switch-divider
-      date="October 12, 2017"
-      (onDateDecrement)="selectPreviousMonth($event)"
-      (onDateIncrement)="selectNextMonth($event)"
-      ></date-switch-divider>
       <ion-list-header>
         Meal Time
       </ion-list-header>
       <ion-item>
         <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
-        <h4>October 12, 2017</h4>
-        <p>2:45 PM</p>
-        <p>Lunch</p>
+        <h4 *ngIf="meal.mealDate">{{meal.mealDate | date:'EEEE, MMM d'}}</h4>
+        <p *ngIf="meal.mealDate && meal.mealTime">{{(meal.mealDate + 'T' + meal.mealTime) | date:'shortTime'}}</p>
+        <p>{{meal.mealType}}</p>
       </ion-item>
     </ion-list>
     <ion-list>
@@ -37,65 +32,66 @@
       </ion-list-header>
       <ion-item>
         <progress-circles
-          [progressData1]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
-          [progressData2]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
+          *ngIf="meal.id"
+          [progressData1]="{ title: 'Physical Hunger', description: meal.hungerLevelBefore | hungerRange, max: 5, current: meal.hungerLevelBefore}"
+          [progressData2]="{ title: 'Mental Hunger', description: meal.intensityLevel | cravingsRange, max: 4, current: meal.intensityLevel}"
         ></progress-circles>
       </ion-item>
       <ion-item text-wrap>
         <ion-icon ios="ios-happy" md="md-happy" color="secondary" item-start></ion-icon>
         <h4>Emotions</h4>
         <p>
-          Depressed, Sad, Happy.
+          {{(meal.beforeEmotions | getValues | sortStrings).join(', ')}}
         </p>
       </ion-item>
       <ion-item text-wrap>
         <ion-icon ios="ios-nutrition" md="md-nutrition" color="secondary" item-start></ion-icon>
         <h4>Foods Craved</h4>
         <p>
-          Pizza, cookies, cake.
+          {{(meal.beforeFoods | getValues | sortStrings).join(', ')}}
         </p>
       </ion-item>
       <ion-item text-wrap>
         <h4>Trigger Description</h4>
         <p>
-          Joan Didion (born December 5, 1934) is an American journalist and writer of novels, plays, screenplays, and autobiographical works. Didion is best known for her literary journalism and memoirs. In her novels and essays, Didion explores the disintegration of American morals and cultural chaos; the overriding theme of her work is individual and social fragmentation.[2] At the peak of her career, her writing was recognized for its significance in defining and observing American subcultures for mainstream audiences. In 1968, The New York Times referred to her early work as containing "grace,
+          {{meal.triggerDescription}}
         </p>
       </ion-item>
     </ion-list>
-    <ion-list>
+    <ion-list *ngIf="meal.completed === 1">
       <ion-list-header>
         After Meal
       </ion-list-header>
       <ion-item>
         <progress-circles
-          [progressData1]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
-          [progressData2]="{ title: 'Hunger Level', description: 'Stuffed', max: 5, current: 5}"
+          [progressData1]="{ title: 'Hunger Level', description: meal.hungerLevelAfter | hungerRange, max: 5, current: meal.hungerLevelAfter }"
+          [progressData2]="{ title: 'Satisfaction Level', description: meal.satisfactionLevel | satisfactionRange, max: 4, current: meal.satisfactionLevel }"
         ></progress-circles>
       </ion-item>
       <ion-item text-wrap>
         <ion-icon ios="ios-happy" md="md-happy" color="secondary" item-start></ion-icon>
         <h4>Emotions</h4>
         <p>
-          Depressed, Sad, Happy.
+          {{(meal.afterEmotions | getValues | sortStrings).join(', ')}}
         </p>
       </ion-item>
       <ion-item text-wrap>
         <ion-icon ios="ios-nutrition" md="md-nutrition" color="secondary" item-start></ion-icon>
-        <h4>Foods Craved</h4>
+        <h4>Foods Consumed</h4>
         <p>
-          Pizza, cookies, cake.
+          {{(meal.afterFoods | getValues | sortStrings).join(', ')}}
         </p>
       </ion-item>
       <ion-item text-wrap>
         <h4>Meal Description</h4>
         <p>
-          Joan Didion (born December 5, 1934) is an American journalist and writer of novels, plays, screenplays, and autobiographical works. Didion is best known for her literary journalism and memoirs. In her novels and essays, Didion explores the disintegration of American morals and cultural chaos; the overriding theme of her work is individual and social fragmentation.[2] At the peak of her career, her writing was recognized for its significance in defining and observing American subcultures for mainstream audiences. In 1968, The New York Times referred to her early work as containing "grace,
+          {{meal.mealDescription}}
         </p>
       </ion-item>
     </ion-list>
   </ion-content>
 
-  <ion-footer>
+  <!-- <ion-footer>
     <ion-toolbar color="primary">
       <ion-buttons end>
         <button ion-button icon-only (click)="dismiss()">
@@ -103,5 +99,5 @@
         </button>
       </ion-buttons>
     </ion-toolbar>
-  </ion-footer>
+  </ion-footer> -->
 </modal>

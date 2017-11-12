@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 @Component({
   selector: 'checkbox-trigger',
@@ -10,30 +10,22 @@ import { Component, EventEmitter, Input, Output, OnDestroy, OnInit } from '@angu
     </ion-item>
   `,
 })
-export class CheckboxTriggerComponent implements OnDestroy, OnInit {
+export class CheckboxTriggerComponent {
   @Input() ios: string;
   @Input() md: string;
   @Input() title: string;
   @Input() behaviorSubject;
-
+  @Input() items: object;
   @Output() onClick = new EventEmitter();
 
-  items: object = {};
+  // items: object = {};
   itemsSubscription;
 
   constructor() {
   }
 
-  ngOnInit() {
-    this.itemsSubscription = this.behaviorSubject.subscribe(items => this.items = items);
-  }
-
   click() {
     this.onClick.emit();
-  }
-
-  ngOnDestroy() {
-    this.itemsSubscription.unsubscribe();
   }
 
 }

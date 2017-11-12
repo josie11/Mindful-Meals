@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { MealsService } from './meals.service';
 import { CravingsService } from './craving.service';
+import { FormService } from './form.service';
 
 import { BehaviorSubject } from "rxjs";
 import groupBy from 'lodash.groupby';
@@ -19,43 +20,108 @@ export class DiaryService {
 
   meals: BehaviorSubject<object[]> = new BehaviorSubject([]);
   cravings: BehaviorSubject<object[]> = new BehaviorSubject([]);
+
+  allMeals: object = {};
+  allCravings: object = {};
   month: number;
   year: number;
+  date: BehaviorSubject<Date>;
 
-  constructor(private mealsService: MealsService, private cravingsService: CravingsService) {
+  constructor(private mealsService: MealsService, private cravingsService: CravingsService, private formService: FormService) {
+    const date = new Date();
+    //months start at 0 for date object
+    this.month = date.getMonth() + 1;
+    this.year = date.getFullYear();
+    this.date = new BehaviorSubject(new Date());
+
+    formService.cravingUpdated.subscribe((craving: any) => this.checkIfShouldRefreshCravings(craving));
+    formService.mealUpdated.subscribe((meal: any) => this.checkIfShouldRefreshMeals(meal));
+    formService.cravingAdded.subscribe((craving: any) => this.checkIfShouldRefreshCravings(craving));
+    formService.mealAdded.subscribe((meal: any) => this.checkIfShouldRefreshMeals(meal));
   }
 
-  updateMealEntries(month, year) {
-
+  decreaseCurrentMonth() {
+    if (this.month === 1) {
+      this.month = 12;
+      this.year -= 1;
+    } else {
+      this.month -= 1;
+    }
+    this.updateDateToMonthAndYear();
+    this.updateEntries();
   }
 
-  updateCravingEntries(month, year) {
-
+  increaseCurrentMonth() {
+    if (this.month === 12) {
+      this.month = 1;
+      this.year += 1;
+    } else {
+      this.month += 1;
+    }
+    this.updateDateToMonthAndYear();
+    this.updateEntries();
   }
 
-  updateMonthYear(month, year) {
+  updateDateToMonthAndYear() {
+    this.date.next(new Date(this.year, this.month - 1));
+  }
+
+  setDateAndUpdateEntries(month: number, year: number) {
     this.month = month;
     this.year = year;
+    this.updateDateToMonthAndYear();
+    this.updateEntries();
   }
 
-  getMealsForMonth(month: number, year: number) {
+  updateEntries() {
+    return this.getMealsForMonth(this.month, this.year, true)
+    .then(() => this.getCravingsForMonth(this.month, this.year, true))
+  }
+
+  checkIfShouldRefreshCravings(craving: any) {
+    const cravingDate = new Date(craving.cravingDate);
+    const year = cravingDate.getFullYear();
+    const month = cravingDate.getMonth() + 1;
+
+    if (this.allCravings[`${year}-${month}`]) return this.getCravingsForMonth(month, year);
+
+    return Promise.resolve();
+  }
+
+  checkIfShouldRefreshMeals(meal: any) {
+    const mealDate = new Date(meal.mealDate);
+    const year = mealDate.getFullYear();
+    const month = mealDate.getMonth() + 1;
+
+    if (this.allMeals[`${year}-${month}`]) return this.getMealsForMonth(month, year)
+
+    return Promise.resolve();
+  }
+
+  getMealsForMonth(month: number, year: number, checkIfAlreadyRequested = false) {
+    if (checkIfAlreadyRequested && this.allMeals[`${year}-${month}`]) return Promise.resolve(this.meals.next(this.allMeals[`${year}-${month}`]));
     const adjustedMonth = (month < 10) ? `0${month}` : month;
     return this.mealsService.getMealsForMonth(adjustedMonth, year)
-    .then((meals) => {
-      this.updateMonthYear(month, year);
-      const mealsData = this.groupEntryResultsByDate('mealDate', meals);
-      this.meals.next(mealsData);
-    });
+    .then((meals: any) => this.handleNewMealsResults(month, year, meals));
   }
 
-  getCravingsForMonth(month: number, year: number) {
+  getCravingsForMonth(month: number, year: number, checkIfAlreadyRequested = false) {
+    if (checkIfAlreadyRequested && this.allCravings[`${year}-${month}`]) return Promise.resolve(this.cravings.next(this.allCravings[`${year}-${month}`]));
     const adjustedMonth = (month < 10) ? `0${month}` : month;
     return this.cravingsService.getCravingsForMonth(adjustedMonth, year)
-    .then((cravings) => {
-      this.updateMonthYear(month, year);
-      const cravingsData = this.groupEntryResultsByDate('cravingDate', cravings);
-      this.cravings.next(cravingsData);
-    });
+    .then((cravings) => this.handleNewCravingsResults(month, year, cravings));
+  }
+
+  handleNewMealsResults(month: number, year: number, meals: object[]) {
+    const mealsData = this.groupEntryResultsByDate('mealDate', meals);
+    this.allMeals[`${year}-${month}`] = mealsData;
+    if(this.year === year && this.month === month) this.meals.next(mealsData);
+  }
+
+  handleNewCravingsResults(month: number, year: number, cravings: object[]) {
+    const cravingsData = this.groupEntryResultsByDate('cravingDate', cravings);
+    this.allCravings[`${year}-${month}`] = cravingsData;
+    if(this.year === year && this.month === month) this.cravings.next(cravingsData);
   }
 
   groupEntryResultsByDate(dateName: string, entries: object[]) {
