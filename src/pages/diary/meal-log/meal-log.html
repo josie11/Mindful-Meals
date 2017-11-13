@@ -16,6 +16,12 @@
   <!-- content for ng-content -->
   <ion-content>
     <ion-list>
+      <date-switch-divider
+        *ngIf="meal.id"
+        [date]="(meal.mealDate + 'T' + meal.mealTime) | date: 'MMM d, y, h:mm a'"
+        (onDateDecrement)="previousMeal($event)"
+        (onDateIncrement)="nextMeal($event)"
+      ></date-switch-divider>
       <ion-list-header>
         Meal Timing
       </ion-list-header>

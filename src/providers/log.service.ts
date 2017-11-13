@@ -26,15 +26,18 @@ export class LogService {
     })
   }
 
-  getMeal(mealId: number) {
-    return this.mealsService.getMeal(mealId).then((meal) => {
-      meal.distractions = this.mealsService.formatMealItemsToCheckboxObject(meal.distractions);
-      meal.beforeFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
-      meal.afterFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.afterFoods);
-      meal.beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
-      meal.afterEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.afterEmotions);
-      this.meal.next({...meal});
-    });
+  getMealById(mealId: number) {
+    return this.mealsService.getMeal(mealId).then((meal) => this.formatAndUpdateMeal(meal));
+  }
+
+  getNextMeal() {
+    const meal: any = this.meal.getValue();
+    return this.mealsService.getNextMeal(meal.id, meal.mealDate, meal.mealTime).then((meal) => this.formatAndUpdateMeal(meal));
+  }
+
+  getPreviousMeal() {
+    const meal: any = this.meal.getValue();
+    return this.mealsService.getPreviousMeal(meal.id, meal.mealDate, meal.mealTime).then((meal) => this.formatAndUpdateMeal(meal));
   }
 
   getCraving(cravingId: number) {
@@ -44,6 +47,17 @@ export class LogService {
 
       this.craving.next({...craving});
     });
+  }
+
+  formatAndUpdateMeal(meal) {
+    if (!meal) return;
+
+    meal.distractions = this.mealsService.formatMealItemsToCheckboxObject(meal.distractions);
+    meal.beforeFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
+    meal.afterFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.afterFoods);
+    meal.beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
+    meal.afterEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.afterEmotions);
+    this.meal.next({...meal});
   }
 
   clearMeal() {

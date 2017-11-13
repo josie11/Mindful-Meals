@@ -28,9 +28,8 @@ export class MealsService {
     })
     .then((data: any) => {
       meal = data[0];
-      return this.getMealDetails(mealId);
-    })
-    .then(details => ({ ...meal, ...details }));
+      return this.getMealDetails(meal);
+    });
   }
 
   getMealsForDate(date: string) {
@@ -50,6 +49,42 @@ export class MealsService {
     });
   }
 
+  getPreviousMeal(mealId: number, date: string, time: string) {
+    return this.databaseService.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      extraStatement: `WHERE id != ${mealId}
+        AND (date(mealDate) <= date('${date}') AND time(mealTime) <= time('${time}'))
+        OR date(mealDate) < date('${date}')
+        ORDER BY date(mealDate) DESC, time(mealTime) DESC LIMIT 1`
+    })
+    .then((data: any) => {
+      const meal = data[0];
+
+      if (!meal) return;
+
+      return this.getMealDetails(meal);
+    });
+  }
+
+  getNextMeal(mealId: number, date: string, time: string) {
+    return this.databaseService.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      extraStatement: `WHERE id != ${mealId}
+      AND (date(mealDate) >= date('${date}') AND time(mealTime) >= time('${time}'))
+      OR date(mealDate) > date('${date}')
+      ORDER BY date(mealDate) ASC, time(mealTime) ASC LIMIT 1`
+    })
+    .then((data: any) => {
+      const meal = data[0];
+
+      if (!meal) return;
+
+      return this.getMealDetails(meal);
+    });
+  }
+
   getIncompleteMeals() {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -58,33 +93,33 @@ export class MealsService {
     });
   }
 
+  getMealDetails(meal) {
+    const details: any = {};
+
+    return this.getMealFoods(meal.id)
+    .then((data: any) => {
+      const { after, before } = this.seperateBeforeAfterItems(data);
+      details.beforeFoods = before;
+      details.afterFoods = after;
+
+      return this.getMealEmotions(meal.id);
+    })
+    .then((data: any) => {
+      const { after, before } = this.seperateBeforeAfterItems(data);
+      details.beforeEmotions = before;
+      details.afterEmotions = after;
+      return this.getMealDistractions(meal.id);
+    })
+    .then((data: any) => {
+      details.distractions = data;
+      return {...details, ...meal};
+    });
+  }
+
   addMeal(form) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
       item: form
-    });
-  }
-
-  getMealDetails(mealId: number) {
-    const meal: any = {};
-
-    return this.getMealFoods(mealId)
-    .then((data: any) => {
-      const { after, before } = this.seperateBeforeAfterItems(data);
-      meal.beforeFoods = before;
-      meal.afterFoods = after;
-
-      return this.getMealEmotions(mealId);
-    })
-    .then((data: any) => {
-      const { after, before } = this.seperateBeforeAfterItems(data);
-      meal.beforeEmotions = before;
-      meal.afterEmotions = after;
-      return this.getMealDistractions(mealId);
-    })
-    .then((data: any) => {
-      meal.distractions = data;
-      return meal;
     });
   }
 

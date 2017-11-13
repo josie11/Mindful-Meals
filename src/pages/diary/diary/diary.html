@@ -32,7 +32,7 @@
         <ion-list-header>
         {{(entries[0].mealDate + 'T' + entries[0].mealTime) | date:'EEEE, MMM d'}}
         </ion-list-header>
-        <ion-item detail-push (click)="openMealLog(meal.id)" *ngFor="let meal of entries | sortArrayDateStrings">
+        <ion-item detail-push (click)="openMealLog(meal.id)" *ngFor="let meal of entries | sortArrayEntriesByTime:'mealTime'">
           <h2>{{(meal.mealDate + 'T' + meal.mealTime) | date:'h:mm a'}}</h2>
           <p *ngIf="meal.mealType">{{meal.mealType}}</p>
           <ion-note *ngIf="meal.completed === 0">Before Log Only</ion-note>
@@ -45,7 +45,7 @@
         <ion-list-header>
         {{(entries[0].cravingDate + 'T' + entries[0].cravingTime) | date:'EEEE, MMM d'}}
         </ion-list-header>
-        <ion-item detail-push *ngFor="let craving of entries | sortArrayDateStrings" (click)="openCravingLog(craving.id)">
+        <ion-item detail-push *ngFor="let craving of entries | sortArrayEntriesByTime:'cravingTime'" (click)="openCravingLog(craving.id)">
           <h2>{{(craving.cravingDate + 'T' + craving.cravingTime) | date:'h:mm a'}}</h2>
           <p>Craving Intensity: {{craving.intensityLevel | cravingsRange}}</p>
         </ion-item>

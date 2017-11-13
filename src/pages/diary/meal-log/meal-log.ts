@@ -20,11 +20,19 @@ export class MealLogPage implements OnInit, OnDestroy {
   ngOnInit() {
     this.mealId = this.navParams.get('id');
     this.mealSubscription = this.logService.meal.subscribe((meal) => this.meal = meal);
-    this.logService.getMeal(this.mealId).catch(console.error);
+    this.logService.getMealById(this.mealId).catch(console.error);
   }
 
   dismiss() {
     this.navCtrl.pop();
+  }
+
+  nextMeal() {
+    this.logService.getNextMeal();
+  }
+
+  previousMeal() {
+    this.logService.getPreviousMeal();
   }
 
   ngOnDestroy() {

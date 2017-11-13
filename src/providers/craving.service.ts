@@ -29,7 +29,6 @@ export class CravingsService {
       return this.getCravingFoods(cravingId);
     })
     .then((data: any) => {
-      console.log(data)
       craving['foods'] = data;
       return this.getCravingEmotions(cravingId);
     })

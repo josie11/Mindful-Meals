@@ -189,7 +189,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
     //have to do this here or triggers on change check error
     const newDate = new Date();
     const date = this.datePipe.transform(newDate, 'yyyy-MM-dd');
-    const time = this.datePipe.transform(newDate, 'HH:mm');
+    const time = this.datePipe.transform(newDate, 'HH:mm:ss');
 
     this.formService.updateFormItems({
       intensityLevel: 1,
