@@ -27,7 +27,8 @@ export class LogService {
   }
 
   /**
-   * Gets a meal by Id, formats items (meal foods, emotions, distractions), and updates meal behavior subject with results.
+   * Gets a meal by Id, formats items (meal foods, emotions, distractions),
+   * and updates meal behavior subject with results.
    * @param {mealId} mealId - the id of the meal to get
   */
   getMealById(mealId: number) {
@@ -70,7 +71,30 @@ export class LogService {
   }
 
   /**
-   * Takes meal and formats results and updates behavior subject. Does nothing if no meal is passed.
+   * Gets the next CLOSEST craving in date/time, or undefined as may not exist.
+   * Updates craving behavior subject with results if any.
+   * Gets all craving foods, emotions.
+   *
+   * @return {(object|undefined)} returns a craving object with items formatted into object if exists in database, or undefined. There may be no next date.
+  */
+  getNextCraving() {
+    const craving: any = this.craving.getValue();
+    return this.cravingsService.getNextCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving) => this.formatAndUpdateCraving(craving));
+  }
+
+  /**
+   * Gets the previous CLOSEST craving in date/time, or undefined as may not exist.
+   * Updates craving behavior subject with results if any.
+   * Gets all craving foods, emotions.
+  */
+  getPreviousCraving() {
+    const craving: any = this.craving.getValue();
+    return this.cravingsService.getPreviousCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving) => this.formatAndUpdateCraving(craving));
+  }
+
+  /**
+   * Takes meal and formats results and updates behavior subject. Does nothing
+   * if no meal is passed.
    * @param {meal} takes meal object and formats items and updates meal behavior subject.
   */
   formatAndUpdateMeal(meal) {
@@ -86,7 +110,8 @@ export class LogService {
   }
 
   /**
-   * Takes craving and formats results and updates behavior subject. Does nothing if no craving is passed.
+   * Takes craving and formats results and updates behavior subject.
+   * Does nothing if no craving is passed.
    * @param {craving} takes craving object and formats items and updates craving behavior subject.
   */
   formatAndUpdateCraving(craving) {
@@ -95,7 +120,7 @@ export class LogService {
     craving.foods = this.mealsService.formatMealItemsToCheckboxObject(craving.foods);
     craving.emotions = this.mealsService.formatMealItemsToCheckboxObject(craving.emotions);
 
-    this.meal.next({...craving});
+    this.craving.next({...craving});
   }
 
   /**

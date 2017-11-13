@@ -26,16 +26,14 @@ export class MealsService {
    * @return {object} return meal object
  */
   getMeal(mealId: number) {
-    let meal;
-
     return this.databaseService.select({
       selection: '*',
       dbName: `${this.dbName}s`,
       extraStatement: `WHERE id = ${mealId}`
     })
     .then((data: any) => {
-      meal = data[0];
-      return this.getMealDetails(meal);
+      const meal = data[0];
+      return this.returnMealWithItems(meal);
     });
   }
 
@@ -96,7 +94,7 @@ export class MealsService {
 
       if (!meal) return;
 
-      return this.getMealDetails(meal);
+      return this.returnMealWithItems(meal);
     });
   }
 
@@ -125,7 +123,7 @@ export class MealsService {
 
       if (!meal) return;
 
-      return this.getMealDetails(meal);
+      return this.returnMealWithItems(meal);
     });
   }
 
@@ -143,31 +141,31 @@ export class MealsService {
   }
 
   /**
-   * Takes a meal, gets its details, returns meal with details.
-   * @param {meal} meal to get and attach details to.
+   * Takes a meal, gets its associated emotions/foods/distractions, returns meal with items attached.
+   * @param {meal} meal to get and attach items to.
    *
    * @return {object} returns meal object.
   */
-  getMealDetails(meal) {
-    const details: any = {};
+  returnMealWithItems(meal) {
+    const items: any = {};
 
     return this.getMealFoods(meal.id)
     .then((data: any) => {
       const { after, before } = this.seperateBeforeAfterItems(data);
-      details.beforeFoods = before;
-      details.afterFoods = after;
+      items.beforeFoods = before;
+      items.afterFoods = after;
 
       return this.getMealEmotions(meal.id);
     })
     .then((data: any) => {
       const { after, before } = this.seperateBeforeAfterItems(data);
-      details.beforeEmotions = before;
-      details.afterEmotions = after;
+      items.beforeEmotions = before;
+      items.afterEmotions = after;
       return this.getMealDistractions(meal.id);
     })
     .then((data: any) => {
-      details.distractions = data;
-      return {...details, ...meal};
+      items.distractions = data;
+      return {...items, ...meal};
     });
   }
 
@@ -404,7 +402,8 @@ export class MealsService {
   }
 
   /**
-   * Formats meal items to an object where keys are ids and value are item name. For use in components like checkbox list and forms.
+   * Formats meal items to an object where keys are ids and value are item name.
+   * For use in components like checkbox list and forms.
    * @param {items} array of meal item objects.
    *
    * @return {object} returns formatted object --> { itemId: itemName, ... }
@@ -417,7 +416,8 @@ export class MealsService {
   }
 
   /**
-   * will compare two arrays of ids, and find which ids should be added/deleted based on what ids are in arrays.
+   * will compare two arrays of ids, and find which ids should be added/deleted
+   * based on what ids are in arrays.
    * @param {beforeIds} array of item ids associated with meal.
    *
    * @param {afterIds} array of item ids to be associated with meal.
@@ -432,7 +432,9 @@ export class MealsService {
   }
 
   /**
-   * A meal can have before/after emotions/foods. These item in join table have column called mealStage with 'before' or 'after' value. This will sort array of emotions/foods items and categorize them by stage.
+   * A meal can have before/after emotions/foods. These item in join table have
+   * column called mealStage with 'before' or 'after' value. This will sort array
+   * of emotions/foods items and categorize them by stage.
    * @param {items} array of item ids associated with meal.
    *
    * @return {object} returns object with array of items on after property and before property --> { after: [{item}, {item}], before: [{item}, {item}] }

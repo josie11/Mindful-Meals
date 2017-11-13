@@ -16,6 +16,12 @@
   <!-- content for ng-content -->
   <ion-content>
     <ion-list>
+       <date-switch-divider
+        *ngIf="craving.id"
+        [date]="(craving.cravingDate + 'T' + craving.cravingTime) | date: 'MMM d, y, h:mm a'"
+        (onDateDecrement)="previousCraving($event)"
+        (onDateIncrement)="nextCraving($event)"
+      ></date-switch-divider>
       <ion-list-header>
         Craving Timing
       </ion-list-header>

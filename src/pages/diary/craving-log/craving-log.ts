@@ -27,6 +27,14 @@ export class CravingLogPage implements OnInit, OnDestroy {
     this.navCtrl.pop();
   }
 
+  nextCraving() {
+    this.logService.getNextCraving();
+  }
+
+  previousCraving() {
+    this.logService.getPreviousCraving();
+  }
+
   ngOnDestroy() {
     this.cravingSubscription.unsubscribe();
     this.logService.clearCraving();

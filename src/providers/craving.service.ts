@@ -19,30 +19,20 @@ export class CravingsService {
  /**
    * Gets a craving by Id.
    * Gets all craving foods and emotions.
-   * @param {cravingId} cravingId - the id of the craving to get
+   * @param {cravingId} cravingId - the id of the craving.
    *
-   * @return {object} return craving object
+   * @return {object} return craving object.
  */
   getCraving(cravingId: number) {
-    let craving;
-
     return this.databaseService.select({
       selection: '*',
       dbName: `${this.dbName}s`,
       extraStatement: `WHERE id = ${cravingId}`
     })
     .then((data: any) => {
-      craving = data[0];
-      return this.getCravingFoods(cravingId);
+      const craving = data[0];
+      return this.returnCravingWithItems(craving);
     })
-    .then((data: any) => {
-      craving['foods'] = data;
-      return this.getCravingEmotions(cravingId);
-    })
-    .then((data: any) => {
-      craving['emotions'] = data
-      return craving;
-    });
   }
 
   /**
@@ -74,6 +64,84 @@ export class CravingsService {
       dbName: `${this.dbName}s`,
       selection: '*',
       extraStatement: `WHERE cravingDate = '${date}'`
+    });
+  }
+
+  /**
+   * Returns the previous CLOSEST craving in date/time.
+   * @param {cravingId} id of craving current craving. Need so can exclude it from possible results.
+   *
+   * @param {date} day, year, month of current craving.
+   *
+   * @param {time} time of day of current craving.
+   *
+   * @return {(object|undefined)} returns a craving object if exists in database, or undefined. There may be no previous date.
+  */
+  //BUG: if by chance 2 submissions on same day have exact same time, will loop back and forth between the entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
+  getPreviousCraving(cravingId: number, date: string, time: string) {
+    return this.databaseService.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      extraStatement: `WHERE id != ${cravingId}
+        AND (date(cravingDate) <= date('${date}') AND time(cravingTime) <= time('${time}'))
+        OR date(cravingDate) < date('${date}')
+        ORDER BY date(cravingDate) DESC, time(cravingTime) DESC LIMIT 1`
+    })
+    .then((data: any) => {
+      const craving = data[0];
+
+      if (!craving) return;
+
+      return this.returnCravingWithItems(craving);
+    });
+  }
+
+  /**
+   * Returns the next CLOSEST craving in date/time.
+   * @param {cravingId} id of craving current craving. Need so can exclude it from possible results.
+   *
+   * @param {date} day, year, month of current craving.
+   *
+   * @param {time} time of day of current craving.
+   *
+   * @return {(object|undefined)} returns a craving object if exists in database, or undefined. There may be no next date.
+  */
+  //BUG: if by chance 2 submissions on same day have exact same time, will loop through back and forth between these entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
+  getNextCraving(cravingId: number, date: string, time: string) {
+    return this.databaseService.select({
+      dbName: `${this.dbName}s`,
+      selection: '*',
+      extraStatement: `WHERE id != ${cravingId}
+      AND (date(cravingDate) >= date('${date}') AND time(cravingTime) >= time('${time}'))
+      OR date(cravingDate) > date('${date}')
+      ORDER BY date(cravingDate) ASC, time(cravingTime) ASC LIMIT 1`
+    })
+    .then((data: any) => {
+      const craving = data[0];
+
+      if (!craving) return;
+
+      return this.returnCravingWithItems(craving);
+    });
+  }
+
+  /**
+   * Takes a craving, gets its associated emotions/foods/distractions, returns craving with items attached.
+   * @param {craving} craving to get and attach items to.
+   *
+   * @return {object} returns craving object.
+  */
+  returnCravingWithItems(craving: any) {
+    const items: any = {};
+
+    return this.getCravingFoods(craving.id)
+    .then((data: any) => {
+      items.foods = data;
+      return this.getCravingEmotions(craving.id);
+    })
+    .then((data: any) => {
+      items.emotions = data;
+      return {...craving, ...items};
     });
   }
 

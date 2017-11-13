@@ -263,7 +263,10 @@ export class FormService {
   }
 
   /**
-   * Links beforeEmotions and beforeFoods with a craving. Cravings only have one type emotions/foods (not distinct before/after versions), but the before-form is used to create either craving or a meal, so when submitting a new craving we pull data from before versions.
+   * Links beforeEmotions and beforeFoods with a craving. Cravings only have on
+   * type emotions/foods (not distinct before/after versions), but the before-form
+   * is used to create either craving or a meal, so when submitting a new craving
+   * we pull data from before versions.
    *
    * @param {cravingId} The meal id to link items with.
    *
@@ -318,7 +321,12 @@ export class FormService {
   }
 
   /**
-   * Updates beforeEmotions and beforeFoods. Used primarily in the after form to edit an attached meal log. A User will log their pre-meal/post-meal experience all at once or seperately. If done seperately, they will have selected a existing log representing their before meal experience, to attach to their after log, and have the option to edit its properties. This will update any edits made on the before log items upon form submission.
+   * Updates beforeEmotions and beforeFoods. Used primarily in the after form to
+   * edit an attached meal log. A User will log their pre-meal/post-meal experience
+   * all at once or seperately. If done seperately, they will have selected a
+   * existing log representing their before meal experience, to attach to their after
+   * log, and have the option to edit its properties. This will update any edits
+   * made on the before log items upon form submission.
    *
    * @param {mealId} The meal id.
    *
@@ -339,7 +347,8 @@ export class FormService {
   }
 
   /**
-   * Creates a entirely new completed meal log. The user has not selected a before log in the after log form.
+   * Creates a entirely new completed meal log. The user has not selected a before
+   * log in the after log form.
    *
    * @return {object} returns meal object.
   */
@@ -366,7 +375,9 @@ export class FormService {
   }
 
   /**
-   * Updates a existing meal log (created from the before meal form) with form data, and marks it as completed. It will update and before meal items as well that may have been edited by user. Associates after items with updated meal.
+   * Updates a existing meal log (created from the before meal form) with form data,
+   * and marks it as completed. It will update and before meal items as well that
+   * may have been edited by user. Associates after items with updated meal.
    *
    * @param {mealId} The meal id to be updated.
    *
@@ -438,7 +449,8 @@ export class FormService {
   }
 
   /**
-   * returns formatted data from the form object to be submitted to database. Only specific columns are submitted with before form.
+   * returns formatted data from the form object to be submitted to database.
+   * Only specific columns are submitted with before form.
    *
    * @return {object} returns object with form data with correction column names that match database.
   */
