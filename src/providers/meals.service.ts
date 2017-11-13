@@ -18,6 +18,13 @@ export class MealsService {
   constructor(private databaseService: DatabaseService) {
   }
 
+  /**
+   * Gets a meal by Id.
+   * Gets all meal foods, emotions, distractions.
+   * @param {mealId} mealId - the id of the meal to get
+   *
+   * @return {object} return meal object
+ */
   getMeal(mealId: number) {
     let meal;
 
@@ -32,6 +39,12 @@ export class MealsService {
     });
   }
 
+  /**
+   * Returns an Array of all meals for a given date.
+   * @param {date} date string to get meals for.
+   *
+   * @return {array} returns array of meal objects
+  */
   getMealsForDate(date: string) {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -40,6 +53,15 @@ export class MealsService {
     });
   }
 
+  /**
+   * Returns an Array of all meals for a given month/year.
+   * @param {month} month to get meals for - can be string or number because
+     single digits have to be formatted for SQL to be a proper date string; 9 --> '09'
+   *
+   * @param {year} year of meal month.
+   *
+   * @return {array} returns array of meal objects
+  */
   getMealsForMonth(month: string | number, year: string | number) {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -49,6 +71,17 @@ export class MealsService {
     });
   }
 
+  /**
+   * Returns the previous CLOSEST meal in date/time.
+   * @param {mealId} id of meal current meal. Need so can exclude it from possible results.
+   *
+   * @param {date} day, year, month of current meal.
+   *
+   * @param {time} time of day of current meal.
+   *
+   * @return {(object|undefined)} returns a meal object if exists in database, or undefined. There may be no previous date.
+  */
+  //BUG: if by chance 2 submissions on same day have exact same time, will loop back and forth between the entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
   getPreviousMeal(mealId: number, date: string, time: string) {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -67,6 +100,17 @@ export class MealsService {
     });
   }
 
+  /**
+   * Returns the next CLOSEST meal in date/time.
+   * @param {mealId} id of meal current meal. Need so can exclude it from possible results.
+   *
+   * @param {date} day, year, month of current meal.
+   *
+   * @param {time} time of day of current meal.
+   *
+   * @return {(object|undefined)} returns a meal object if exists in database, or undefined. There may be no next date.
+  */
+  //BUG: if by chance 2 submissions on same day have exact same time, will loop through back and forth between these entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
   getNextMeal(mealId: number, date: string, time: string) {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -85,6 +129,11 @@ export class MealsService {
     });
   }
 
+  /**
+   * Returns all meals that have not had after meal details added.
+   *
+   * @return {array} returns array of meal objects.
+  */
   getIncompleteMeals() {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -93,6 +142,12 @@ export class MealsService {
     });
   }
 
+  /**
+   * Takes a meal, gets its details, returns meal with details.
+   * @param {meal} meal to get and attach details to.
+   *
+   * @return {object} returns meal object.
+  */
   getMealDetails(meal) {
     const details: any = {};
 
@@ -116,6 +171,12 @@ export class MealsService {
     });
   }
 
+  /**
+   * Will add a new meal to the database.
+   * @param {form} form object with details about new meal - passed from form service.
+   *
+   * @return {object} returns meal object.
+  */
   addMeal(form) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
@@ -123,6 +184,28 @@ export class MealsService {
     });
   }
 
+  /**
+   * Updates a meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {values} values to update meal, from form services. Object where key represents the column and value is update.
+  */
+  updateMeal(mealId: number, values: object) {
+    return this.databaseService.update({
+      dbName: `${this.dbName}s`,
+      values,
+      id: mealId
+    });
+  }
+
+  /**
+   * Get array emotions associated with a given meal
+   * @param {mealId} id of meal.
+   *
+   * @param {mealStage} stage of meal to get emotions for, before - or after meal.
+   *
+   * @return {array} returns array of meal emotions.
+  */
   getMealEmotions(mealId: number, mealStage: string = '') {
     const parameters = {
       dbName: `${this.dbName}Emotions`,
@@ -135,6 +218,12 @@ export class MealsService {
     return this.databaseService.select(parameters);
   }
 
+  /**
+   * Associate single emotion with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {emotionId} Id of emotion.
+  */
   addMealEmotion(mealId: number, emotionId: number, mealStage: string) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Emotions`,
@@ -142,14 +231,14 @@ export class MealsService {
     });
   }
 
-  updateMeal(mealId: number, values: object) {
-    return this.databaseService.update({
-      dbName: `${this.dbName}s`,
-      values,
-      id: mealId
-    });
-  }
-
+  /**
+   * Associates multiple emotions with a meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {emotionIds} and array of emotion Ids.
+   *
+   * @param {mealStage} stage of meal to add emotions for.
+  */
   addMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
     if (emotionIds.length < 1) return Promise.resolve({ id : mealId });
 
@@ -158,6 +247,16 @@ export class MealsService {
     .then(() => ({ id : mealId }));
   }
 
+  /**
+   * Updates emotions associated with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {mealStage} stage of meal to update for.
+   *
+   * @param {beforeEmotions} Array of emotion ids that are already associated with meal.
+   *
+   * @param {afterEmotions} Array of emotion ids that will be associated with meal.
+  */
   updateMealEmotions(mealId: number, mealStage: string, beforeEmotions: Array<number>, afterEmotions: Array<number>) {
     const { addIds, deleteIds } = this.findChangesToMealItems(beforeEmotions, afterEmotions);
 
@@ -165,6 +264,14 @@ export class MealsService {
     .then(() => this.deleteMealEmotions(mealId, deleteIds, mealStage));
   }
 
+  /**
+   * Deletes emotions associated with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {mealStage} stage of meal to update for.
+   *
+   * @param {emotionIds} Array of emotion ids that are associated with meal.
+  */
   deleteMealEmotions(mealId: number, emotionIds: Array<number>, mealStage: string) {
     if (emotionIds.length < 1) return Promise.resolve({id : mealId });
 
@@ -173,6 +280,14 @@ export class MealsService {
     return this.databaseService.bulkDelete({ dbName: `${this.dbName}Emotions`, extraStatements });
   }
 
+  /**
+   * Get array foods associated with a given meal
+   * @param {mealId} id of meal.
+   *
+   * @param {mealStage} stage of meal to get foods for, before - or after meal.
+   *
+   * @return {array} returns array of meal foods.
+  */
   getMealFoods(mealId: number, mealStage: string = '') {
     const parameters = {
       dbName: `${this.dbName}Foods`,
@@ -185,6 +300,12 @@ export class MealsService {
     return this.databaseService.select(parameters);
   }
 
+  /**
+   * Associate single food with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {foodId} Id of food.
+  */
   addMealFood(mealId: number, foodId: number, mealStage: string) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Foods`,
@@ -192,6 +313,14 @@ export class MealsService {
     });
   }
 
+  /**
+   * Associates multiple foods with a meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {foodIds} and array of food Ids.
+   *
+   * @param {mealStage} stage of meal to add foods for.
+  */
   addMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
     if (foodIds.length < 1) return Promise.resolve({id : mealId });
 
@@ -199,6 +328,16 @@ export class MealsService {
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
 
+  /**
+   * Updates foods associated with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {mealStage} stage of meal to update for.
+   *
+   * @param {beforeFoods} Array of food ids that are already associated with meal.
+   *
+   * @param {afterFoods} Array of food ids that will be associated with meal.
+  */
   updateMealFoods(mealId: number, mealStage: string, beforeFoods: Array<number>, afterFoods: Array<number>) {
     const { addIds, deleteIds } = this.findChangesToMealItems(beforeFoods, afterFoods);
 
@@ -206,6 +345,14 @@ export class MealsService {
     .then(() => this.deleteMealFoods(mealId, deleteIds, mealStage));
   }
 
+  /**
+   * Deletes foods associated with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {mealStage} stage of meal to update for.
+   *
+   * @param {foodIds} Array of food ids that are associated with meal.
+  */
   deleteMealFoods(mealId: number, foodIds: Array<number>, mealStage: string) {
     if (foodIds.length < 1) return Promise.resolve({id : mealId });
 
@@ -214,6 +361,12 @@ export class MealsService {
     return this.databaseService.bulkDelete({ dbName: `${this.dbName}Foods`, extraStatements });
   }
 
+  /**
+   * Get array distractions associated with a given meal
+   * @param {mealId} id of meal.
+   *
+   * @return {array} returns array of meal distractions.
+  */
   getMealDistractions(mealId: number) {
     const parameters = {
       dbName: `${this.dbName}Distractions`,
@@ -224,6 +377,12 @@ export class MealsService {
     return this.databaseService.select(parameters);
   }
 
+  /**
+   * Associate single distraction with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {distractionId} Id of distraction.
+  */
   addMealDistraction(mealId: number, distractionId: number) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Distractions`,
@@ -231,6 +390,12 @@ export class MealsService {
     });
   }
 
+  /**
+   * Associates multiple distractions with a meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {distractionIds} and array of distraction Ids.
+  */
   addMealDistractions(mealId: number, distractionIds: Array<number>) {
     if (distractionIds.length < 1) return Promise.resolve({id : mealId });
 
@@ -238,6 +403,12 @@ export class MealsService {
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Distractions`, items })
   }
 
+  /**
+   * Formats meal items to an object where keys are ids and value are item name. For use in components like checkbox list and forms.
+   * @param {items} array of meal item objects.
+   *
+   * @return {object} returns formatted object --> { itemId: itemName, ... }
+  */
   formatMealItemsToCheckboxObject(items: Array<object>) {
     return items.reduce((obj, item: any) => {
       obj[item.id] = item.name;
@@ -245,7 +416,14 @@ export class MealsService {
     }, {});
   }
 
-  // => returns { add: [], delete: [] }
+  /**
+   * will compare two arrays of ids, and find which ids should be added/deleted based on what ids are in arrays.
+   * @param {beforeIds} array of item ids associated with meal.
+   *
+   * @param {afterIds} array of item ids to be associated with meal.
+   *
+   * @return {object} returns object with array on add property and delete property --> { add: [], delete: [] }
+  */
   findChangesToMealItems(beforeIds: Array<number>, afterIds: Array<number>) {
     const deleteIds = difference(beforeIds, afterIds);
     const addIds = difference(afterIds, beforeIds);
@@ -253,6 +431,12 @@ export class MealsService {
     return { addIds, deleteIds };
   }
 
+  /**
+   * A meal can have before/after emotions/foods. These item in join table have column called mealStage with 'before' or 'after' value. This will sort array of emotions/foods items and categorize them by stage.
+   * @param {items} array of item ids associated with meal.
+   *
+   * @return {object} returns object with array of items on after property and before property --> { after: [{item}, {item}], before: [{item}, {item}] }
+  */
   seperateBeforeAfterItems(items: Array<object>) {
     const before = [];
     const after = [];

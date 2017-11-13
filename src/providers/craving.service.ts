@@ -16,6 +16,13 @@ export class CravingsService {
   constructor(private databaseService: DatabaseService) {
   }
 
+ /**
+   * Gets a craving by Id.
+   * Gets all craving foods and emotions.
+   * @param {cravingId} cravingId - the id of the craving to get
+   *
+   * @return {object} return craving object
+ */
   getCraving(cravingId: number) {
     let craving;
 
@@ -38,7 +45,16 @@ export class CravingsService {
     });
   }
 
-  getCravingsForMonth(month: string | number, year: string | number) {
+  /**
+   * Returns an Array of all cravings for a given month/year.
+   * @param {month} month to get cravings for - can be string or number because
+     single digits have to be formatted for SQL to be a proper date string; 9 --> '09'
+   *
+   * @param {year} year of craving month.
+   *
+   * @return {array} returns array of craving objects
+ */
+  getCravingsForMonth(month: string | number, year: number) {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -47,6 +63,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Returns an Array of all cravings for a given date.
+   * @param {date} date string to get cravings for.
+   *
+   * @return {array} returns array of craving object
+  */
   getCravingsForDate(date: string) {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -55,6 +77,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Will add a new craving to the database.
+   * @param {form} form object with details about new craving - passed from form service.
+   *
+   * @return {object} return craving object
+ */
   addCraving(form: object) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
@@ -62,6 +90,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Get array emotions associated with a given craving
+   * @param {cravingId} id of craving.
+   *
+   * @return {array} returns array of craving objects
+  */
   getCravingEmotions(cravingId: number) {
     return this.databaseService.select({
       dbName: `${this.dbName}Emotions`,
@@ -70,6 +104,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Associate single emotion with craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {emotionId} Id of emotion.
+  */
   addCravingEmotion(cravingId: number, emotionId: number) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Emotions`,
@@ -77,6 +117,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Associates multiple emotions with a craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {emotionIds} and array of emotion Ids.
+  */
   addCravingEmotions(cravingId: number, emotionIds: Array<number>) {
     if (emotionIds.length < 1) return Promise.resolve({ id: cravingId });
 
@@ -84,6 +130,12 @@ export class CravingsService {
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
   }
 
+  /**
+   * Get array of foods associated with a given craving
+   * @param {cravingId} id of craving.
+   *
+   * @return {array} returns array of craving object
+  */
   getCravingFoods(cravingId: number) {
     return this.databaseService.select({
       dbName: `${this.dbName}Foods`,
@@ -92,6 +144,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Associate single emotion with craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {foodId} Id of food.
+  */
   addCravingFood(cravingId: number, foodId: number) {
     return this.databaseService.insert({
       dbName: `${this.dbName}Foods`,
@@ -99,6 +157,12 @@ export class CravingsService {
     });
   }
 
+  /**
+   * Associates multiple foods with a craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {foodIds} and array of food Ids.
+  */
   addCravingFoods(cravingId: number, foodIds: Array<number>) {
     if (foodIds.length < 1) return Promise.resolve({ id: cravingId });
 

@@ -67,6 +67,9 @@ export class FormService {
     ) {
   }
 
+  /**
+   * refreshes form behavior subject to before form defaults.
+  */
   refreshForm() {
     const beforeForm: formObject = {
       time: '',
@@ -84,6 +87,9 @@ export class FormService {
     this.form.next(beforeForm)
   }
 
+  /**
+   * refreshes form behavior subject to be ready to after form defaults.
+  */
   setForAfterForm() {
     const beforeForm: formObject = {
       time: '',
@@ -101,6 +107,13 @@ export class FormService {
     this.form.next(beforeForm)
   }
 
+  /**
+   * updates a single property on the form.
+   *
+   * @param {item} form property to be updated.
+   *
+   * @param {value} value to update property to.
+  */
   updateFormItem(item: string, value: any) {
     const form = {...this.form.getValue()};
     form[item] = value;
@@ -108,6 +121,11 @@ export class FormService {
     this.form.next({...form});
   }
 
+  /**
+   * updates multiple properties on the form.
+   *
+   * @param {items} on object representing multiple form properties/values.
+  */
   updateFormItems(items: object) {
     const form = {...this.form.getValue()};
     const updatedForm = {...form, ...items};
@@ -115,49 +133,107 @@ export class FormService {
     this.form.next(updatedForm);
   }
 
+  /**
+   * updates beforeEmotions behavior subject.
+   *
+   * @param {emotions} an object of emotions {id: name}.
+  */
   updateBeforeEmotions(emotions: object) {
     this.selectedBeforeEmotions.next({...emotions});
   }
 
+  /**
+   * updates afterEmotions behavior subject.
+   *
+   * @param {emotions} an object of emotions {id: name}.
+  */
   updateAfterEmotions(emotions: object) {
     this.selectedAfterEmotions.next({...emotions});
   }
 
+  /**
+   * Creates a new emotion.
+   *
+   * @param {name} name of emotion to create.
+   *
+   * @return {object} returns object {id: name} of new emotion
+  */
   addNewEmotion(name: string) {
     return this.emotionsService.addEmotion(name)
     .then((data: any) => ({id : data.id, name}));
   }
 
+  /**
+   * updates beforeFoods behavior subject.
+   *
+   * @param {foods} an object of foods {id: name}.
+  */
   updateBeforeFoods(foods: object) {
     this.selectedBeforeFoods.next({...foods});
   }
 
+  /**
+   * updates AfterFoods behavior subject.
+   *
+   * @param {foods} an object of foods {id: name}.
+  */
   updateAfterFoods(foods: object) {
     this.selectedAfterFoods.next({...foods});
   }
 
+  /**
+   * Creates a new food.
+   *
+   * @param {name} name of food to create.
+   *
+   * @return {object} returns object {id: name} of new food
+  */
   addNewFood(name: string) {
     return this.foodsService.addFood(name)
     .then((data: any) => ({id : data.id, name}));
   }
 
+  /**
+   * updates distractions behavior subject.
+   *
+   * @param {distractions} an object of distractions {id: name}.
+  */
   updateDistractions(distractions: object) {
     this.selectedDistractions.next({...distractions});
   }
 
+  /**
+   * Creates a new distraction.
+   *
+   * @param {name} name of distraction to create.
+   *
+   * @return {object} returns object {id: name} of new distraction.
+  */
   addNewDistraction(name: string) {
     return this.distractionsService.addDistraction(name)
     .then((data: any) => ({id : data.id, name}));
   }
 
-  linkBeforeFormItemsWithMeal(id: number) {
+  /**
+   * Links beforeEmotions and beforeFoods with a meal.
+   *
+   * @param {mealId} The meal id to link items with.
+   *
+   * @return {object} returns object {id : mealId}.
+  */
+  linkBeforeFormItemsWithMeal(mealId: number) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
-    return this.mealsService.addMealEmotions(id, selectedBeforeEmotionIds, 'before')
-    .then(() => this.mealsService.addMealFoods(id, selectedBeforeFoodsIds, 'before'))
-    .then(() => ({id: id}));
+    return this.mealsService.addMealEmotions(mealId, selectedBeforeEmotionIds, 'before')
+    .then(() => this.mealsService.addMealFoods(mealId, selectedBeforeFoodsIds, 'before'))
+    .then(() => ({id: mealId}));
   }
 
+  /**
+   * Creates a new craving using.
+   *
+   * @return {object} returns newly created craving.
+  */
   submitCravingForm() {
     const form: any = this.form.getValue();
 
@@ -186,23 +262,42 @@ export class FormService {
     });
   }
 
-  linkCravingItemsWithCraving(id: number) {
+  /**
+   * Links beforeEmotions and beforeFoods with a craving. Cravings only have one type emotions/foods (not distinct before/after versions), but the before-form is used to create either craving or a meal, so when submitting a new craving we pull data from before versions.
+   *
+   * @param {cravingId} The meal id to link items with.
+   *
+   * @return {object} returns object {id : cravingId}.
+  */
+  linkCravingItemsWithCraving(cravingId: number) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
 
-    return this.cravingsService.addCravingEmotions(id, selectedBeforeEmotionIds)
-    .then(() => this.cravingsService.addCravingFoods(id, selectedBeforeFoodsIds))
-    .then(() => ({id: id}));
+    return this.cravingsService.addCravingEmotions(cravingId, selectedBeforeEmotionIds)
+    .then(() => this.cravingsService.addCravingFoods(cravingId, selectedBeforeFoodsIds))
+    .then(() => ({id: cravingId}));
   }
 
-  linkAfterItemsWithMeal(id) {
+  /**
+   * Links afterEmotions and afterFoods with a meal.
+   *
+   * @param {mealId} The meal id to link items with.
+   *
+   * @return {object} returns object {id : mealId}.
+  */
+  linkAfterItemsWithMeal(mealId) {
     const { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds } = this.getSelectedAfterItemsIds();
 
-    return this.mealsService.addMealEmotions(id, selectedAfterEmotionIds, 'after')
-    .then(() => this.mealsService.addMealFoods(id, selectedAfterFoodsIds, 'after'))
-    .then(() => this.mealsService.addMealDistractions(id, selectedDistractionsIds))
-    .then(() => ({id: id}));
+    return this.mealsService.addMealEmotions(mealId, selectedAfterEmotionIds, 'after')
+    .then(() => this.mealsService.addMealFoods(mealId, selectedAfterFoodsIds, 'after'))
+    .then(() => this.mealsService.addMealDistractions(mealId, selectedDistractionsIds))
+    .then(() => ({id: mealId}));
   }
 
+  /**
+   * Used by before form to submit a new meal log with only info relevant to before meal.
+   *
+   * @return {object} returns newly created meal.
+  */
   submitBeforeMealForm() {
     const formData = this.getBeforeFormData();
     let id;
@@ -222,16 +317,32 @@ export class FormService {
     });
   }
 
-  updateBeforeMealItems(id: number, previousEmotions: object, previousFoods: object) {
+  /**
+   * Updates beforeEmotions and beforeFoods. Used primarily in the after form to edit an attached meal log. A User will log their pre-meal/post-meal experience all at once or seperately. If done seperately, they will have selected a existing log representing their before meal experience, to attach to their after log, and have the option to edit its properties. This will update any edits made on the before log items upon form submission.
+   *
+   * @param {mealId} The meal id.
+   *
+   * @param {previousEmotions} The beforeEmotions already associated with the meal.
+   *
+   * @param {previousFoods} The beforeFoods already associated with the meal.
+   *
+   * @return {object} returns object {id : mealId}.
+  */
+  updateBeforeMealItems(mealId: number, previousEmotions: object, previousFoods: object) {
     const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
     const previousEmotionsIds = Object.keys(previousEmotions).map(val => Number(val));
     const previousFoodsIds = Object.keys(previousFoods).map(val => Number(val));
 
-    return this.mealsService.updateMealEmotions(id, 'before', previousEmotionsIds, selectedBeforeEmotionIds)
-    .then(() => this.mealsService.updateMealFoods(id, 'before', previousFoodsIds, selectedBeforeFoodsIds))
-    .then(() => ({id: id}));
+    return this.mealsService.updateMealEmotions(mealId, 'before', previousEmotionsIds, selectedBeforeEmotionIds)
+    .then(() => this.mealsService.updateMealFoods(mealId, 'before', previousFoodsIds, selectedBeforeFoodsIds))
+    .then(() => ({id: mealId}));
   }
 
+  /**
+   * Creates a entirely new completed meal log. The user has not selected a before log in the after log form.
+   *
+   * @return {object} returns meal object.
+  */
   submitNewAfterMealForm() {
     const formData = this.getAfterFormData()
     //format for database insert method
@@ -254,6 +365,17 @@ export class FormService {
     })
   }
 
+  /**
+   * Updates a existing meal log (created from the before meal form) with form data, and marks it as completed. It will update and before meal items as well that may have been edited by user. Associates after items with updated meal.
+   *
+   * @param {mealId} The meal id to be updated.
+   *
+   * @param {previousEmotions} The beforeEmotions already associated with the meal.
+   *
+   * @param {previousFoods} The beforeFoods already associated with the meal.
+   *
+   * @return {object} returns meal object.
+  */
   submitAttachedMealAfterForm(mealId: number, beforeEmotions, beforeFoods ) {
     const formData = this.getAfterFormData();
 
@@ -270,12 +392,19 @@ export class FormService {
     });
   }
 
+  /**
+   * clears all before form items and form itself.
+  */
   clearBeforeForm() {
     this.selectedBeforeEmotions.next({});
     this.selectedBeforeFoods.next({});
     this.refreshForm();
   }
 
+  /**
+   * clears all before form items and form itself.
+   * clears all after form items.
+  */
   clearAfterForm() {
     this.clearBeforeForm();
     this.selectedAfterEmotions.next({});
@@ -283,6 +412,11 @@ export class FormService {
     this.selectedDistractions.next({});
   }
 
+  /**
+   * maps before form items objects into an array of ids.
+   *
+   * @return {object} returns object with before emotion and foods ids in arrays.
+  */
   getSelectedBeforeItemsIds() {
     const selectedBeforeEmotionIds = Object.keys(this.selectedBeforeEmotions.getValue()).map(val => Number(val));
     const selectedBeforeFoodsIds = Object.keys(this.selectedBeforeFoods.getValue()).map(val => Number(val));
@@ -290,6 +424,11 @@ export class FormService {
     return { selectedBeforeEmotionIds, selectedBeforeFoodsIds };
   }
 
+  /**
+   * maps before form items objects into an array of ids.
+   *
+   * @return {object} returns object with before emotion and foods ids in arrays.
+  */
   getSelectedAfterItemsIds() {
     const selectedAfterEmotionIds = Object.keys(this.selectedAfterEmotions.getValue()).map(val => Number(val));
     const selectedAfterFoodsIds = Object.keys(this.selectedAfterFoods.getValue()).map(val => Number(val));
@@ -298,6 +437,11 @@ export class FormService {
     return { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds };
   }
 
+  /**
+   * returns formatted data from the form object to be submitted to database. Only specific columns are submitted with before form.
+   *
+   * @return {object} returns object with form data with correction column names that match database.
+  */
   getBeforeFormData() {
     const form: any = this.form.getValue();
 
@@ -312,6 +456,11 @@ export class FormService {
     }
   }
 
+  /**
+   * returns formatted data from the form object to be submitted to database.
+   *
+   * @return {object} returns object with form data with correction column names that match database.
+  */
   getAfterFormData() {
     const form: any = this.form.getValue();
 
