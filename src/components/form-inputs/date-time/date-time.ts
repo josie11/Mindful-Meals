@@ -12,7 +12,7 @@ import { DatePipe } from '@angular/common';
     <ion-item>
       <ion-icon ios="ios-time" md="md-time" item-start color="secondary"></ion-icon>
       <ion-label>Time</ion-label>
-      <ion-datetime displayFormat="h:mm A" pickerFormat="h:mm:ss A" [(ngModel)]="time" (ionChange)="onTimeChange()">
+      <ion-datetime displayFormat="h:mm A" pickerFormat="h:mm A" [(ngModel)]="time" (ionChange)="onTimeChange()">
       </ion-datetime>
     </ion-item>
   `,

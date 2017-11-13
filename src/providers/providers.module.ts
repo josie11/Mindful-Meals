@@ -10,6 +10,7 @@ import { DistractionsService } from './distraction.service';
 import { CravingsService } from './craving.service';
 import { DiaryService } from './diary.service';
 import { LogService } from './log.service';
+import { SharedService } from './shared.service';
 
 @NgModule({
   imports: [],
@@ -24,7 +25,8 @@ import { LogService } from './log.service';
     DistractionsService,
     CravingsService,
     DiaryService,
-    LogService
+    LogService,
+    SharedService
    ],
   exports: []
 })

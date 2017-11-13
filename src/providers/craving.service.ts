@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
+import { SharedService } from './shared.service';
+
 import 'rxjs/add/operator/map';
 
 /*
@@ -13,7 +15,7 @@ export class CravingsService {
 
   dbName: string = 'craving';
 
-  constructor(private databaseService: DatabaseService) {
+  constructor(private databaseService: DatabaseService, private sharedService: SharedService) {
   }
 
  /**
@@ -159,6 +161,22 @@ export class CravingsService {
   }
 
   /**
+   * Updates existing craving. Pass an object with keys representing column names
+   * and values representing what new values will be
+   *
+   * @param {cravingId} Id of craving.
+   *
+   * @param {values} form object to update craving with.
+  */
+  updateCraving(cravingId: number, values: object) {
+    return this.databaseService.update({
+      dbName: `${this.dbName}s`,
+      values,
+      id: cravingId
+    });
+  }
+
+  /**
    * Get array emotions associated with a given craving
    * @param {cravingId} id of craving.
    *
@@ -196,6 +214,35 @@ export class CravingsService {
 
     const items = emotionIds.map(emotionId => ({ cravingId, emotionId }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Emotions`, items })
+  }
+
+  /**
+   * Updates emotions associated with craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {beforeEmotions} Array of emotion ids that are already associated with craving.
+   *
+   * @param {afterEmotions} Array of emotion ids that will be associated with craving.
+  */
+  updateCravingEmotions(cravingId: number, beforeEmotions: Array<number>, afterEmotions: Array<number>) {
+    const { addIds, deleteIds } = this.findChangesToCravingItems(beforeEmotions, afterEmotions);
+
+    return this.addCravingEmotions(cravingId, addIds)
+    .then(() => this.deleteCravingEmotions(cravingId, deleteIds));
+  }
+
+  /**
+   * Deletes emotions associated with craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {emotionIds} Array of emotion ids that are associated with craving.
+  */
+  deleteCravingEmotions(cravingId: number, emotionIds: Array<number>) {
+    if (emotionIds.length < 1) return Promise.resolve({id : cravingId });
+
+    const extraStatements = emotionIds.map(emotionId => `WHERE emotionId = ${emotionId} AND cravingId = ${cravingId}`);
+
+    return this.databaseService.bulkDelete({ dbName: `${this.dbName}Emotions`, extraStatements });
   }
 
   /**
@@ -237,4 +284,58 @@ export class CravingsService {
     const items = foodIds.map(foodId => ({ cravingId, foodId }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Foods`, items })
   }
+
+  /**
+   * Updates foods associated with craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {beforeFoods} Array of food ids that are already associated with craving.
+   *
+   * @param {afterFoods} Array of food ids that will be associated with craving.
+  */
+  updateCravingFoods(cravingId: number, beforeFoods: Array<number>, afterFoods: Array<number>) {
+    const { addIds, deleteIds } = this.findChangesToCravingItems(beforeFoods, afterFoods);
+
+    return this.addCravingFoods(cravingId, addIds)
+    .then(() => this.deleteCravingFoods(cravingId, deleteIds));
+  }
+
+  /**
+   * Deletes foods associated with craving.
+   * @param {cravingId} Id of craving.
+   *
+   * @param {foodIds} Array of food ids that are associated with craving.
+  */
+  deleteCravingFoods(cravingId: number, foodIds: Array<number>) {
+    if (foodIds.length < 1) return Promise.resolve({id : cravingId });
+
+    const extraStatements = foodIds.map(foodId => `WHERE foodId = ${foodId} AND cravingId = ${cravingId}`);
+
+    return this.databaseService.bulkDelete({ dbName: `${this.dbName}Foods`, extraStatements });
+  }
+
+  /**
+   * Formats craving items to an object where keys are ids and value are item name.
+   * For use in components like checkbox list and forms.
+   * @param {items} array of craving item objects.
+   *
+   * @return {object} returns formatted object --> { itemId: itemName, ... }
+  */
+  formatCravingItemsToCheckboxObject(items: Array<object>) {
+    return this.sharedService.formatItemsArrayToObject(items);
+  }
+
+  /**
+   * will compare two arrays of ids, and find which ids should be added/deleted
+   * based on what ids are in arrays.
+   * @param {beforeIds} array of item ids associated with craving.
+   *
+   * @param {afterIds} array of item ids to be associated with craving.
+   *
+   * @return {object} returns object with array on add property and delete property --> { add: [], delete: [] }
+  */
+  findChangesToCravingItems(beforeIds: Array<number>, afterIds: Array<number>) {
+    return this.sharedService.findChangesToItems(beforeIds, afterIds);
+  }
+
 }

@@ -235,15 +235,7 @@ export class FormService {
    * @return {object} returns newly created craving.
   */
   submitCravingForm() {
-    const form: any = this.form.getValue();
-
-    const formData = {
-      cravingTime: form.time,
-      cravingDate: form.date,
-      hungerLevel: form.hungerLevelBefore,
-      intensityLevel: form.intensityLevel,
-      triggerDescription: form.triggerDescription,
-    }
+    const formData = this.getCravingFormData();
 
     let id;
 
@@ -347,6 +339,27 @@ export class FormService {
   }
 
   /**
+   * Similar to updateBeforeMealItems
+   *
+   * @param {cravingId} The craving id.
+   *
+   * @param {previousEmotions} The beforeEmotions already associated with the craving.
+   *
+   * @param {previousFoods} The beforeFoods already associated with the craving.
+   *
+   * @return {object} returns object {id : cravingId}.
+  */
+  updateCravingItems(cravingId: number, previousEmotions: object, previousFoods: object) {
+    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
+    const previousEmotionsIds = Object.keys(previousEmotions).map(val => Number(val));
+    const previousFoodsIds = Object.keys(previousFoods).map(val => Number(val));
+
+    return this.cravingsService.updateCravingEmotions(cravingId, previousEmotionsIds, selectedBeforeEmotionIds)
+    .then(() => this.cravingsService.updateCravingFoods(cravingId, previousFoodsIds, selectedBeforeFoodsIds))
+    .then(() => ({id: cravingId}));
+  }
+
+  /**
    * Creates a entirely new completed meal log. The user has not selected a before
    * log in the after log form.
    *
@@ -387,11 +400,11 @@ export class FormService {
    *
    * @return {object} returns meal object.
   */
-  submitAttachedMealAfterForm(mealId: number, beforeEmotions, beforeFoods ) {
+  submitAttachedMealAfterForm(mealId: number, previousEmotions, previousFoods ) {
     const formData = this.getAfterFormData();
 
     return this.mealsService.updateMeal(mealId, formData)
-    .then(() => this.updateBeforeMealItems(mealId, beforeEmotions, beforeEmotions))
+    .then(() => this.updateBeforeMealItems(mealId, previousEmotions, previousFoods))
     .then(() => this.linkAfterItemsWithMeal(mealId))
     .then(() => {
       this.clearAfterForm();
@@ -400,6 +413,32 @@ export class FormService {
     .then((meal) => {
       this.mealUpdated.next(meal);
       return meal;
+    });
+  }
+
+  /**
+   * Updates a existing craving log
+   *
+   * @param {cravingId} The meal id to be updated.
+   *
+   * @param {previousEmotions} The beforeEmotions already associated with the meal.
+   *
+   * @param {previousFoods} The beforeFoods already associated with the meal.
+   *
+   * @return {object} returns meal object.
+  */
+  submitCravingUpdates(cravingId: number, previousEmotions, previousFoods) {
+    const formData = this.getCravingFormData();
+
+    return this.cravingsService.updateCraving(cravingId, formData)
+    .then(() => this.updateCravingItems(cravingId, previousEmotions, previousFoods))
+    .then(() => {
+      this.clearAfterForm();
+      return this.cravingsService.getCraving(cravingId);
+    })
+    .then((craving) => {
+      this.cravingUpdated.next(craving);
+      return craving;
     });
   }
 
@@ -446,6 +485,87 @@ export class FormService {
     const selectedDistractionsIds = Object.keys(this.selectedDistractions.getValue()).map(val => Number(val));
 
     return { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds };
+  }
+
+  /**
+   * Updates form behavior subjects for selected before items (emotion/foods) on form service
+   * Updates form to with before log items to a given meal. Needed for editing log.
+   *
+   * @param {meal} object representing meal
+   *
+   * @param {emotions} object representing cravings associated emotions
+   *
+   * * @param {foods} object representing cravings associated foods
+  */
+  updateFormToBeforeMeal(meal, emotions, foods) {
+    const {
+      mealTime,
+      mealDate,
+      mealType,
+      hungerLevelBefore,
+      intensityLevel,
+      triggerDescription
+    } = meal;
+
+    this.updateFormItems({
+      intensityLevel,
+      hungerLevelBefore,
+      date: mealDate,
+      time: mealTime,
+      mealType,
+      triggerDescription,
+    });
+
+    this.updateBeforeEmotions(emotions);
+    this.updateBeforeFoods(foods);
+  }
+
+  /**
+   * Takes a craving and its emotions/foods and updates form with its values
+   *
+   * @param {craving} object representing craving
+   *
+   * @param {emotions} object representing cravings associated emotions
+   *
+   * * @param {foods} object representing cravings associated foods
+  */
+  updateFormToCraving(craving, emotions, foods) {
+    const {
+      cravingTime,
+      cravingDate,
+      hungerLevel,
+      intensityLevel,
+      triggerDescription,
+    } = craving;
+
+    this.updateFormItems({
+      intensityLevel,
+      hungerLevelBefore: hungerLevel,
+      date: cravingDate,
+      time: cravingTime,
+      triggerDescription,
+    });
+
+    this.updateBeforeEmotions(emotions);
+    this.updateBeforeFoods(foods);
+  }
+
+  /**
+   * returns formatted data from the form object to be submitted to database.
+   * Only specific columns are submitted with craving.
+   *
+   * @return {object} returns object with form data with correction column names that match database.
+  */
+  getCravingFormData() {
+    const form: any = this.form.getValue();
+
+    return {
+      cravingTime: form.time,
+      cravingDate: form.date,
+      hungerLevel: form.hungerLevelBefore,
+      intensityLevel: form.intensityLevel,
+      triggerDescription: form.triggerDescription,
+    }
   }
 
   /**

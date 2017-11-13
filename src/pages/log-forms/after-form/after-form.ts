@@ -116,9 +116,6 @@ export class AfterFormPage implements OnDestroy, OnInit {
       const formattedEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
       const formattedFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
 
-      if (meal.beforeEmotions.length > 0) this.formService.updateBeforeEmotions(formattedEmotions);
-      if (meal.beforeFoods.length > 0) this.formService.updateBeforeFoods(formattedFoods);
-
       this.attachedMeal = meal
       this.isMealAttached = true;
 
@@ -141,23 +138,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   setFormToAttachedMeal(emotions, foods) {
-    const {
-      mealTime,
-      mealDate,
-      mealType,
-      hungerLevelBefore,
-      intensityLevel,
-      triggerDescription
-    } = this.attachedMeal;
-
-    this.formService.updateFormItems({
-      intensityLevel,
-      hungerLevelBefore,
-      date: mealDate,
-      time: mealTime,
-      mealType,
-      triggerDescription,
-    });
+    this.formService.updateFormToBeforeMeal(this.attachedMeal, emotions, foods);
   }
 
   submitLogEdits(log) {

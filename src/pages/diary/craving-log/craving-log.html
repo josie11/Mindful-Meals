@@ -15,7 +15,7 @@
 
   <!-- content for ng-content -->
   <ion-content>
-    <ion-list>
+    <ion-list *ngIf="!editing">
        <date-switch-divider
         *ngIf="craving.id"
         [date]="(craving.cravingDate + 'T' + craving.cravingTime) | date: 'MMM d, y, h:mm a'"
@@ -32,6 +32,7 @@
       </ion-item>
     </ion-list>
     <log-view-section
+      *ngIf="!editing"
       title="Craving Log"
       [progressData1]="{ title: 'Mental Hunger', description: craving.intensityLevel | cravingsRange, max: 4, current: craving.intensityLevel}"
       [progressData2]="{ title: 'Physical Hunger', description: craving.hungerLevel | hungerRange, max: 5, current: craving.hungerLevel}"
@@ -40,15 +41,38 @@
       descriptionTitle="Trigger Description"
       [description]="craving.triggerDescription"
     ></log-view-section>
+    <before-form-content
+      *ngIf="editing"
+      [emotionsBehaviorSubject]="logService.getBeforeItemsBehaviorSubjects().selectedBeforeEmotions"
+      [foodsBehaviorSubject]="logService.getBeforeItemsBehaviorSubjects().selectedBeforeFoods"
+      [date]="form.date"
+      [time]="form.time"
+      [intensityLevel]="form.intensityLevel"
+      [hungerLevelBefore]="form.hungerLevelBefore"
+      [triggerDescription]="form.triggerDescription"
+      [showMealType]="false"
+      (onFormItemChange)="onCravingItemChange($event)"
+    ></before-form-content>
   </ion-content>
 
-  <!-- <ion-footer>
+  <ion-footer>
     <ion-toolbar color="primary">
       <ion-buttons end>
-        <button ion-button icon-only (click)="dismiss()">
+        <button ion-button icon-only (click)="submitCravingChanges()" *ngIf="editing">
           <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
+        </button>
+        <button ion-button (click)="toggleEditView()" *ngIf="!editing">
+          Edit
+        </button>
+      </ion-buttons>
+      <ion-buttons start>
+        <button ion-button icon-only (click)="dismiss()" *ngIf="!editing">
+          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
+        </button>
+        <button ion-button (click)="cancelCravingChanges()" *ngIf="editing">
+          Cancel
         </button>
       </ion-buttons>
     </ion-toolbar>
-  </ion-footer> -->
+  </ion-footer>
 </modal>

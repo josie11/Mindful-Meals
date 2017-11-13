@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
-import difference from 'lodash.difference';
+import { SharedService } from './shared.service';
 
 import 'rxjs/add/operator/map';
 
@@ -15,7 +15,7 @@ export class MealsService {
 
   dbName: string = 'meal';
 
-  constructor(private databaseService: DatabaseService) {
+  constructor(private databaseService: DatabaseService, private sharedService: SharedService) {
   }
 
   /**
@@ -409,10 +409,7 @@ export class MealsService {
    * @return {object} returns formatted object --> { itemId: itemName, ... }
   */
   formatMealItemsToCheckboxObject(items: Array<object>) {
-    return items.reduce((obj, item: any) => {
-      obj[item.id] = item.name;
-      return obj;
-    }, {});
+    return this.sharedService.formatItemsArrayToObject(items);
   }
 
   /**
@@ -425,10 +422,7 @@ export class MealsService {
    * @return {object} returns object with array on add property and delete property --> { add: [], delete: [] }
   */
   findChangesToMealItems(beforeIds: Array<number>, afterIds: Array<number>) {
-    const deleteIds = difference(beforeIds, afterIds);
-    const addIds = difference(afterIds, beforeIds);
-
-    return { addIds, deleteIds };
+    return this.sharedService.findChangesToItems(beforeIds, afterIds);
   }
 
   /**
@@ -450,4 +444,5 @@ export class MealsService {
 
     return { after, before };
   }
+
 }

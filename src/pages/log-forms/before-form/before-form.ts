@@ -36,7 +36,6 @@ export class BeforeFormPage implements OnDestroy, OnInit {
 
   onFormItemChange({ item, value }) {
     this.formService.updateFormItem(item, value);
-    this[item] = value;
   }
 
   dismissForm() {

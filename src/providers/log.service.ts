@@ -22,7 +22,12 @@ export class LogService {
   constructor(private mealsService: MealsService, private cravingsService: CravingsService, private formService: FormService) {
     this.formService.mealUpdated.subscribe((meal: any) => {
       const currentMeal: any = this.meal.getValue();
-      if (currentMeal.id === meal.id) this.meal.next(meal);
+      if (currentMeal.id === meal.id) this.formatAndUpdateMeal(meal);
+    })
+
+    this.formService.cravingUpdated.subscribe((craving: any) => {
+      const currentCraving: any = this.craving.getValue();
+      if (currentCraving.id === craving.id) this.formatAndUpdateCraving(craving);
     })
   }
 
@@ -63,8 +68,8 @@ export class LogService {
   */
   getCraving(cravingId: number) {
     return this.cravingsService.getCraving(cravingId).then((craving) => {
-      craving.foods = this.mealsService.formatMealItemsToCheckboxObject(craving.foods);
-      craving.emotions = this.mealsService.formatMealItemsToCheckboxObject(craving.emotions);
+      craving.foods = this.cravingsService.formatCravingItemsToCheckboxObject(craving.foods);
+      craving.emotions = this.cravingsService.formatCravingItemsToCheckboxObject(craving.emotions);
 
       this.craving.next({...craving});
     });
@@ -90,6 +95,15 @@ export class LogService {
   getPreviousCraving() {
     const craving: any = this.craving.getValue();
     return this.cravingsService.getPreviousCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving) => this.formatAndUpdateCraving(craving));
+  }
+
+  /**
+   * Gets the form subscription from form Service
+   *
+   * @return {BehaviorSubject} form behavior subject from form service.
+  */
+  getFormSubscription() {
+    return this.formService.form;
   }
 
   /**
@@ -124,16 +138,81 @@ export class LogService {
   }
 
   /**
-   * Clears the meal behavior subject.
+   * Returns before item behavior subjects from form service.
+   * Used for editing a log.
+   * @return {object} object with behavior subjects.
   */
-  clearMeal() {
-    this.meal.next({});
+  getBeforeItemsBehaviorSubjects() {
+    return {
+      selectedBeforeFoods: this.formService.selectedBeforeFoods,
+      selectedBeforeEmotions: this.formService.selectedBeforeEmotions
+    };
   }
 
   /**
-   * Clears the cravings behavior subject.
+   * Updates form behavior subjects for selected items (emotion/foods/distractions) on form service
+   * to that of current meal. Needed for editing log, form service is where all editing filters through.
+  */
+  updateFormToMeal() {
+    const meal: any = this.meal.getValue();
+    this.formService.updateBeforeFoods(meal.beforeFoods);
+    this.formService.updateBeforeEmotions(meal.beforeEmotions);
+    this.formService.updateAfterFoods(meal.afterFoods);
+    this.formService.updateAfterEmotions(meal.afterEmotions);
+    this.formService.updateDistractions(meal.distractions);
+  }
+
+  /**
+   * Updates form behavior subjects for selected before items (emotion/foods) on form service
+   * Updates form to craving on form service. to that of current craving. Needed for editing log,
+   * form service is where all editing filters through.
+  */
+  updateFormToCraving() {
+    const craving: any = this.craving.getValue();
+
+    this.formService.updateFormToCraving(craving, craving.emotions, craving.foods);
+  }
+
+  /**
+   * Can edit meal/craving log using form service within log view.
+   * @param {item} property on form to edit.
+   *
+   * @param {value} value to assign.
+  */
+  onFormItemChange(item, value) {
+    this.formService.updateFormItem(item, value);
+  }
+
+  /**
+   * Clear form on form service when a log is closed/edit mode canceld.
+  */
+  clearLogChanges() {
+    this.formService.clearAfterForm();
+  }
+
+  /**
+   * Submits any edits to the craving log via the form service.
+  */
+  submitcravingChanges() {
+    const craving: any = this.craving.getValue();
+
+    return this.formService.submitCravingUpdates(craving.id, craving.emotions, craving.foods)
+    .then(() => this.clearLogChanges())
+  }
+
+  /**
+   * Clears the meal behavior subject and any edits stored in form service.
+  */
+  clearMeal() {
+    this.meal.next({});
+    this.clearLogChanges();
+  }
+
+  /**
+   * Clears the cravings behavior subject and any edits stored in form service.
   */
   clearCraving() {
     this.craving.next({});
+    this.clearLogChanges();
   }
 }
