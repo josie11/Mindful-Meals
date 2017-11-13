@@ -1,4 +1,8 @@
 progress-circles {
+  path {
+    stroke: color($colors, secondary) !important;
+  }
+
   .progress-container {
     display: flex;
     flex-direction: row;

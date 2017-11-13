@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { LogService } from '../../providers/log.service';
+import { LogService } from '../../../providers/log.service';
 
 
 @Component({

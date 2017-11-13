@@ -1,10 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController } from 'ionic-angular';
-import { ModalService } from '../../providers/modal.service';
-import { MealsService} from '../../providers/meals.service';
-import { CravingsService} from '../../providers/craving.service';
-import { DiaryService } from '../../providers/diary.service';
+import { ModalService } from '../../../providers/modal.service';
+import { MealsService} from '../../../providers/meals.service';
+import { CravingsService} from '../../../providers/craving.service';
+import { DiaryService } from '../../../providers/diary.service';
 import { MealLogPage } from '../meal-log/meal-log';
+import { CravingLogPage } from '../craving-log/craving-log';
 
 @Component({
   selector: 'diary-page',
@@ -36,6 +37,10 @@ export class DiaryPage implements OnInit, OnDestroy {
 
   openMealLog(id) {
     this.modalService.presentModal(MealLogPage, { id });
+  }
+
+  openCravingLog(id) {
+    this.modalService.presentModal(CravingLogPage, { id });
   }
 
   selectPreviousMonth() {

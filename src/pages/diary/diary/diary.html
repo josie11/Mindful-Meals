@@ -45,7 +45,7 @@
         <ion-list-header>
         {{(entries[0].cravingDate + 'T' + entries[0].cravingTime) | date:'EEEE, MMM d'}}
         </ion-list-header>
-        <ion-item detail-push *ngFor="let craving of entries | sortArrayDateStrings">
+        <ion-item detail-push *ngFor="let craving of entries | sortArrayDateStrings" (click)="openCravingLog(craving.id)">
           <h2>{{(craving.cravingDate + 'T' + craving.cravingTime) | date:'h:mm a'}}</h2>
           <p>Craving Intensity: {{craving.intensityLevel | cravingsRange}}</p>
         </ion-item>

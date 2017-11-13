@@ -29,6 +29,7 @@ export class CravingsService {
       return this.getCravingFoods(cravingId);
     })
     .then((data: any) => {
+      console.log(data)
       craving['foods'] = data;
       return this.getCravingEmotions(cravingId);
     })
@@ -66,7 +67,7 @@ export class CravingsService {
     return this.databaseService.select({
       dbName: `${this.dbName}Emotions`,
       selection: '*',
-      extraStatement: `WHERE cravingId = ${cravingId}`
+      extraStatement: `INNER JOIN emotions on emotions.id = ${this.dbName}Emotions.emotionId WHERE ${this.dbName}Emotions.cravingId = ${cravingId}`
     });
   }
 
@@ -88,7 +89,7 @@ export class CravingsService {
     return this.databaseService.select({
       dbName: `${this.dbName}Foods`,
       selection: '*',
-      extraStatement: `WHERE cravingId = ${cravingId}`
+      extraStatement: `INNER JOIN foods on foods.id = ${this.dbName}Foods.foodId WHERE ${this.dbName}Foods.${this.dbName}Id = ${cravingId}`
     });
   }
 

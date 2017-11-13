@@ -8,7 +8,7 @@ import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { MyApp } from './app.component';
 import { ComponentsModule } from '../components/components.module';
 
-import { DiaryPage } from '../pages/diary/diary';
+import { DiaryPage } from '../pages/diary/diary/diary';
 import { ContactPage } from '../pages/contact/contact';
 import { LogHomePage } from '../pages/log-home/log-home';
 import { TabsPage } from '../pages/tabs/tabs';
@@ -18,7 +18,9 @@ import { EmotionsListPage } from '../pages/log-forms/emotions-list/emotions-list
 import { FoodCravingsListPage } from '../pages/log-forms/foods-list/foods-list';
 import { DistractionsListPage } from '../pages/log-forms/distractions-list/distractions-list';
 import { AddAdjustBeforeFormPage } from '../pages/log-forms/add-adjust-before-form/add-adjust-before-form';
-import { MealLogPage } from '../pages/meal-log/meal-log';
+import { MealLogPage } from '../pages/diary/meal-log/meal-log';
+import { CravingLogPage } from '../pages/diary/craving-log/craving-log';
+
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { HttpModule } from '@angular/http';
@@ -170,6 +172,7 @@ class SQLiteMock {
     DistractionsListPage,
     AddAdjustBeforeFormPage,
     MealLogPage,
+    CravingLogPage
   ],
   imports: [
     BrowserModule,
@@ -195,6 +198,7 @@ class SQLiteMock {
     DistractionsListPage,
     AddAdjustBeforeFormPage,
     MealLogPage,
+    CravingLogPage
   ],
   providers: [
     StatusBar,

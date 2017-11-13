@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { DiaryPage } from '../diary/diary';
+import { DiaryPage } from '../diary/diary/diary';
 import { ContactPage } from '../contact/contact';
 import { LogHomePage } from '../log-home/log-home';
 

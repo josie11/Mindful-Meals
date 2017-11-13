@@ -1,0 +1,48 @@
+<modal>
+  <!-- header for ng-content -->
+  <ion-header>
+    <ion-navbar color="primary">
+      <ion-buttons start>
+        <button ion-button icon-only (click)="dismiss()">
+          <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-title>
+        Craving
+      </ion-title>
+    </ion-navbar>
+  </ion-header>
+
+  <!-- content for ng-content -->
+  <ion-content>
+    <ion-list>
+      <ion-list-header>
+        Craving Timing
+      </ion-list-header>
+      <ion-item>
+        <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
+        <h4 *ngIf="craving.cravingDate">{{craving.cravingDate | date:'EEEE, MMM d'}}</h4>
+        <p *ngIf="craving.cravingDate && craving.cravingTime">{{(craving.cravingDate + 'T' + craving.cravingTime) | date:'shortTime'}}</p>
+      </ion-item>
+    </ion-list>
+    <log-view-section
+      title="Craving Log"
+      [progressData1]="{ title: 'Mental Hunger', description: craving.intensityLevel | cravingsRange, max: 4, current: craving.intensityLevel}"
+      [progressData2]="{ title: 'Physical Hunger', description: craving.hungerLevel | hungerRange, max: 5, current: craving.hungerLevel}"
+      [emotions]="craving.emotions"
+      [foods]="craving.foods"
+      descriptionTitle="Trigger Description"
+      [description]="craving.triggerDescription"
+    ></log-view-section>
+  </ion-content>
+
+  <!-- <ion-footer>
+    <ion-toolbar color="primary">
+      <ion-buttons end>
+        <button ion-button icon-only (click)="dismiss()">
+          <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
+        </button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-footer> -->
+</modal>

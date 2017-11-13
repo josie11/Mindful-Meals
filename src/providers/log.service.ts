@@ -37,7 +37,20 @@ export class LogService {
     });
   }
 
+  getCraving(cravingId: number) {
+    return this.cravingsService.getCraving(cravingId).then((craving) => {
+      craving.foods = this.mealsService.formatMealItemsToCheckboxObject(craving.foods);
+      craving.emotions = this.mealsService.formatMealItemsToCheckboxObject(craving.emotions);
+
+      this.craving.next({...craving});
+    });
+  }
+
   clearMeal() {
     this.meal.next({});
+  }
+
+  clearCraving() {
+    this.craving.next({});
   }
 }
