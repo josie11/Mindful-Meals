@@ -4,28 +4,24 @@ import { FoodsService } from './food.service';
 import { DistractionsService } from './distraction.service';
 import { MealsService } from './meals.service';
 import { CravingsService } from './craving.service';
-
 import { BehaviorSubject, Subject } from "rxjs";
-
 import 'rxjs/add/operator/map';
+
+import {
+    FormObject,
+    CravingForm,
+    CompleteMealForm,
+    BeforeMealForm,
+    Craving,
+    Meal,
+    LogMeal,
+    LogCraving
+  } from '../common/types';
 
 /*
   To assist with the emotions/distractions modal communication
   And to submit form when complete
 */
-
-interface formObject {
-  time: string;
-  date: string;
-  hungerLevelBefore: number;
-  intensityLevel: number;
-  triggerDescription?: string;
-  mealType: string;
-  completed: number;
-  satisfactionLevel?: number;
-  hungerLevelAfter?: number;
-  mealDescription?: string;
-}
 
 @Injectable()
 export class FormService {
@@ -38,14 +34,14 @@ export class FormService {
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
 
   //fired when we create a new meal/craving --> to trigger update in diary view
-  mealAdded: Subject<object> = new Subject();
-  cravingAdded: Subject<object> = new Subject();
+  mealAdded: Subject<Meal> = new Subject();
+  cravingAdded: Subject<Craving> = new Subject();
 
   //fired when we update a meal/craving --> to trigger update in diary view
-  mealUpdated: Subject<object> = new Subject();
-  cravingUpdated: Subject<object> = new Subject();
+  mealUpdated: Subject<Meal> = new Subject();
+  cravingUpdated: Subject<Craving> = new Subject();
 
-  form: BehaviorSubject<object> = new BehaviorSubject({
+  form: BehaviorSubject<FormObject> = new BehaviorSubject({
     time: '',
     date: '',
     hungerLevelBefore: 1,
@@ -71,7 +67,7 @@ export class FormService {
    * refreshes form behavior subject to before form defaults.
   */
   refreshForm() {
-    const beforeForm: formObject = {
+    const beforeForm: FormObject = {
       time: '',
       date: '',
       hungerLevelBefore: 1,
@@ -91,7 +87,7 @@ export class FormService {
    * refreshes form behavior subject to be ready to after form defaults.
   */
   setForAfterForm() {
-    const beforeForm: formObject = {
+    const beforeForm: FormObject = {
       time: '',
       date: '',
       hungerLevelBefore: 1,
@@ -105,6 +101,17 @@ export class FormService {
     };
 
     this.form.next(beforeForm)
+  }
+
+  refreshFormToBeforeFormDefaults(date: string = '', time: string = '') {
+    this.updateFormItems({
+      intensityLevel: 1,
+      hungerLevelBefore:  1,
+      date: date,
+      time: time,
+      mealType: 'Breakfast',
+      triggerDescription: '',
+    })
   }
 
   /**
@@ -126,8 +133,8 @@ export class FormService {
    *
    * @param {items} on object representing multiple form properties/values.
   */
-  updateFormItems(items: object) {
-    const form = {...this.form.getValue()};
+  updateFormItems(items: Partial<FormObject>) {
+    const form: FormObject = this.form.getValue();
     const updatedForm = {...form, ...items};
 
     this.form.next(updatedForm);
@@ -234,8 +241,8 @@ export class FormService {
    *
    * @return {object} returns newly created craving.
   */
-  submitCravingForm() {
-    const formData = this.getCravingFormData();
+  submitCravingForm(): Promise<Craving> {
+    const formData: CravingForm = this.getCravingFormData();
 
     let id;
 
@@ -293,8 +300,8 @@ export class FormService {
    *
    * @return {object} returns newly created meal.
   */
-  submitBeforeMealForm() {
-    const formData = this.getBeforeFormData();
+  submitBeforeMealForm(): Promise<Meal> {
+    const formData: BeforeMealForm = this.getBeforeFormData();
     let id;
 
     return this.mealsService.addMeal(formData)
@@ -365,8 +372,8 @@ export class FormService {
    *
    * @return {object} returns meal object.
   */
-  submitNewAfterMealForm() {
-    const formData = this.getAfterFormData()
+  submitNewAfterMealForm(): Promise<Meal> {
+    const formData: CompleteMealForm = this.getAfterFormData()
     //format for database insert method
     let id;
 
@@ -400,8 +407,8 @@ export class FormService {
    *
    * @return {object} returns meal object.
   */
-  submitAttachedMealAfterForm(mealId: number, previousEmotions, previousFoods ) {
-    const formData = this.getAfterFormData();
+  submitAttachedMealAfterForm(mealId: number, previousEmotions, previousFoods ): Promise<Meal> {
+    const formData: CompleteMealForm = this.getAfterFormData();
 
     return this.mealsService.updateMeal(mealId, formData)
     .then(() => this.updateBeforeMealItems(mealId, previousEmotions, previousFoods))
@@ -427,8 +434,8 @@ export class FormService {
    *
    * @return {object} returns meal object.
   */
-  submitCravingUpdates(cravingId: number, previousEmotions, previousFoods) {
-    const formData = this.getCravingFormData();
+  submitCravingUpdates(cravingId: number, previousEmotions, previousFoods): Promise<Craving> {
+    const formData: CravingForm = this.getCravingFormData();
 
     return this.cravingsService.updateCraving(cravingId, formData)
     .then(() => this.updateCravingItems(cravingId, previousEmotions, previousFoods))
@@ -497,7 +504,7 @@ export class FormService {
    *
    * * @param {foods} object representing cravings associated foods
   */
-  updateFormToBeforeMeal(meal, emotions, foods) {
+  updateFormToBeforeMeal(meal: Partial<Meal> | Partial<LogMeal>, emotions: object, foods: object) {
     const {
       mealTime,
       mealDate,
@@ -521,6 +528,44 @@ export class FormService {
   }
 
   /**
+   * Updates form behavior subjects for selected before items (emotion/foods) on form service
+   * Updates form to with before log items to a given meal. Needed for editing log.
+   *
+   * @param {meal} object representing meal
+   *
+   * @param {emotions} object representing cravings associated emotions
+   *
+   * * @param {foods} object representing cravings associated foods
+  */
+  updateFormToCompletedMeal(meal: Meal | LogMeal, beforeEmotions: object, afterEmotions: object, beforeFoods: object, afterFoods: object, distractions: object) {
+    const {
+      mealTime,
+      mealDate,
+      mealType,
+      hungerLevelBefore,
+      intensityLevel,
+      triggerDescription
+    } = meal;
+
+    this.updateFormItems({
+      intensityLevel,
+      hungerLevelBefore,
+      date: mealDate,
+      time: mealTime,
+      mealType,
+      triggerDescription,
+    });
+
+    this.updateBeforeEmotions(beforeEmotions);
+    this.updateAfterEmotions(afterEmotions);
+
+    this.updateBeforeFoods(beforeFoods);
+    this.updateAfterFoods(afterFoods);
+
+    this.updateDistractions(distractions);
+  }
+
+  /**
    * Takes a craving and its emotions/foods and updates form with its values
    *
    * @param {craving} object representing craving
@@ -529,7 +574,7 @@ export class FormService {
    *
    * * @param {foods} object representing cravings associated foods
   */
-  updateFormToCraving(craving, emotions, foods) {
+  updateFormToCraving(craving: Craving | LogCraving, emotions: object, foods: object) {
     const {
       cravingTime,
       cravingDate,
@@ -556,8 +601,8 @@ export class FormService {
    *
    * @return {object} returns object with form data with correction column names that match database.
   */
-  getCravingFormData() {
-    const form: any = this.form.getValue();
+  getCravingFormData(): CravingForm {
+    const form: FormObject = this.form.getValue();
 
     return {
       cravingTime: form.time,
@@ -574,8 +619,8 @@ export class FormService {
    *
    * @return {object} returns object with form data with correction column names that match database.
   */
-  getBeforeFormData() {
-    const form: any = this.form.getValue();
+  getBeforeFormData(): BeforeMealForm {
+    const form: FormObject = this.form.getValue();
 
     return {
       mealTime: form.time,
@@ -593,8 +638,8 @@ export class FormService {
    *
    * @return {object} returns object with form data with correction column names that match database.
   */
-  getAfterFormData() {
-    const form: any = this.form.getValue();
+  getAfterFormData(): CompleteMealForm {
+    const form: FormObject = this.form.getValue();
 
     return {
       mealTime: form.time,

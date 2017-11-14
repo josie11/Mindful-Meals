@@ -9,6 +9,12 @@ import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
 import { DistractionsListPage } from '../distractions-list/distractions-list';
 import { AddAdjustBeforeFormPage } from '../add-adjust-before-form/add-adjust-before-form';
+
+import {
+  FormObject,
+  Meal,
+} from '../../../common/types';
+
 /**
  * Generated class for the AfterFormPage page.
  *
@@ -27,19 +33,23 @@ export class AfterFormPage implements OnDestroy, OnInit {
   emotions: object = {};
   foods: object = {};
 
-  adjustedBeforeEmotions: object = {};
-  adjustedBeforeFoods: object = {}
+  beforeEmotionsEdits: object = {};
+  beforeFoodsEdits: object = {}
 
   form: any = {};
 
-  incompleteMeals: Array<object> = [];
+  incompleteMeals: Partial<Meal>[] = [];
   attachedMeal: any = {};
   isMealAttached: boolean = false;
 
   toggle: boolean = false;
 
-  emotionsSubscription;
-  foodsSubscription;
+  //have to do this to prevent expression changed after check error
+  date: string;
+  time: string;
+
+  afterEmotionsSubscription;
+  afterFoodsSubscription;
   distractionsSubscription;
   formSubscription;
 
@@ -47,12 +57,14 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   ngOnInit() {
-    this.emotionsSubscription = this.formService.selectedAfterEmotions.subscribe(emotions => this.emotions = emotions);
-    this.foodsSubscription = this.formService.selectedAfterFoods.subscribe(foods => this.foods = foods);
-    this.distractionsSubscription = this.formService.selectedDistractions.subscribe(distractions => this.distractions = distractions);
-    this.formSubscription = this.formService.form.subscribe((form) => this.form = {...form});
+    this.afterEmotionsSubscription = this.formService.selectedAfterEmotions.subscribe(emotions => this.emotions = emotions);
+    this.afterFoodsSubscription = this.formService.selectedAfterFoods.subscribe(foods => this.foods = foods);
 
-    this.mealsService.getIncompleteMeals().then(meals => this.incompleteMeals = meals);
+    this.distractionsSubscription = this.formService.selectedDistractions.subscribe(distractions => this.distractions = distractions);
+
+    this.formSubscription = this.formService.form.subscribe((form: FormObject) => this.form = {...form});
+
+    this.mealsService.getIncompleteMeals().then((meals: Partial<Meal>[]) => this.incompleteMeals = meals);
     this.formService.setForAfterForm();
   }
 
@@ -85,6 +97,12 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.modalService.presentModal(DistractionsListPage);
   }
 
+  /**
+   * Controls process of attaching a meal/unattaching a meal
+   * If a meal is not attached, a prompt will appear giving the user the option to attach a meal
+   * Otherwise, the user is untoggling an attached meal and it removes the attached meal,
+   * and clears any log edits.
+  */
   beforeFormToggle(e) {
     this.toggle = !this.toggle;
     if (!this.isMealAttached) {
@@ -96,8 +114,12 @@ export class AfterFormPage implements OnDestroy, OnInit {
     }
   }
 
+  /**
+   * Presents the prompt populated with incomplete meal logs (before meal logs)
+   * A user can select on to attach as before meal data for the after meal log
+   */
   presentBeforeMealPrompt() {
-    const options = this.incompleteMeals.map((meal: any) => ({
+    const options = this.incompleteMeals.map((meal: Partial<Meal>) => ({
       value: meal.id,
       label: this.datePipe.transform(`${meal.mealDate}T${meal.mealTime}`, ' MMM d, y, h:mm a'),
       checked: false,
@@ -110,38 +132,72 @@ export class AfterFormPage implements OnDestroy, OnInit {
     })
   }
 
+  /**
+   * Processes the before meal log the user and attaches it to the after meal log.
+   * updates the form in the formService to include the attached meal data.
+  */
   linkWithExistingMeal(id) {
     if (id == this.attachedMeal['id']) return;
-    return this.mealsService.getMeal(id).then((meal: any) => {
+    return this.mealsService.getMeal(id).then((meal: Meal) => {
       const formattedEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
       const formattedFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
 
       this.attachedMeal = meal
       this.isMealAttached = true;
 
-      this.adjustedBeforeEmotions = {...formattedEmotions};
-      this.adjustedBeforeFoods = {...formattedFoods};
+      //We need to keep track of this to hold onto to repeated meal log edits
+      //that haven't been submitted. DO NOT REMOVE
+      this.beforeEmotionsEdits = formattedEmotions;
+      this.beforeFoodsEdits = formattedFoods;
+
       this.setFormToAttachedMeal({...formattedEmotions}, {...formattedFoods});
     }).catch(console.error);
   }
 
+  /**
+   * Presents Modal that allows us to edit either an attached before meal log,
+   * or an empty before meal log
+  */
   openBeforeLogAddOrEdit() {
     this.modalService.presentModal(
       AddAdjustBeforeFormPage,
       {
         log: this.form,
-        emotions: this.adjustedBeforeEmotions,
-        foods: this.adjustedBeforeFoods,
+        emotions: this.beforeEmotionsEdits,
+        foods: this.beforeFoodsEdits,
         formType: 'meal',
-        submit: this.submitLogEdits.bind(this)
+        submit: this.submitLogEdits.bind(this),
+        cancel: this.cancelLogEdits.bind(this)
       });
   }
 
+  /**
+   * Updates the form in the form service with an attached before meal log.
+  */
   setFormToAttachedMeal(emotions, foods) {
     this.formService.updateFormToBeforeMeal(this.attachedMeal, emotions, foods);
   }
 
-  submitLogEdits(log) {
+  /**
+   * Fires when user cancels edits in AddAdjustBeforeFormPage
+   * As a user is editing a before log via the AddAdjustBeforeFormPage
+   * the edits are changing before emotions/foods in the form service
+   * when they hit cancel - this will revert the form service before emotion/foods back to
+   * the values that existed prior to edits in AddAdjustBeforeFormPage
+   * I don't like this, but i'd have to rewrite a bunch of stuff in order to change this....
+  */
+  cancelLogEdits() {
+    this.formService.updateBeforeEmotions(this.beforeEmotionsEdits);
+    this.formService.updateBeforeFoods(this.beforeFoodsEdits);
+  }
+
+  /**
+   * Fires when a user submits edits in the AddAdjustBeforeFormPage
+   * will update form service form object with the edits.
+   * form service before emotions/foods have already been updated via the before-form-content component
+   * we store the last edits for foods/emotions in case of edit cancellations (see above cancelLogEdits)
+  */
+  submitLogEdits(log: Partial<FormObject>) {
     const {
       intensityLevel,
       hungerLevelBefore,
@@ -149,12 +205,14 @@ export class AfterFormPage implements OnDestroy, OnInit {
       time,
       mealType,
       triggerDescription,
-      emotions,
-      foods
     } = log;
 
-    this.adjustedBeforeEmotions = emotions;
-    this.adjustedBeforeFoods = foods;
+    // we need to store a copy of last item edits (before food/ before emotions) in case they go to edit
+    // and make changes to these items, and click cancel - because the process
+    // of editing these items is adjusting the forms directly in form service, so we need to be able to revert this on cancel
+    // see cancelLogEdits function
+    const updatedBeforeEmotions = {...this.formService.selectedBeforeEmotions.getValue()};
+    const updatedBeforeFoods = {...this.formService.selectedBeforeFoods.getValue()};
 
     this.formService.updateFormItems({
       intensityLevel,
@@ -164,33 +222,43 @@ export class AfterFormPage implements OnDestroy, OnInit {
       mealType,
       triggerDescription,
     });
+
+    this.beforeEmotionsEdits = updatedBeforeEmotions;
+    this.beforeFoodsEdits = updatedBeforeFoods;
   }
 
+  /**
+   * clears form service of before meal log, resets it to defaults.
+   * would triggers when needing to remove an attached meal from after log
+  */
   clearLogEdits() {
-    //have to do this here or triggers on change check error
     const newDate = new Date();
     const date = this.datePipe.transform(newDate, 'yyyy-MM-dd');
     const time = this.datePipe.transform(newDate, 'HH:mm:ss');
 
-    this.formService.updateFormItems({
-      intensityLevel: 1,
-      hungerLevelBefore:  1,
-      date: date,
-      time: time,
-      mealType: 'Breakfast',
-      triggerDescription: '',
-    });
+    //have to do this here or triggers on change check error
+    //upon untoggling an attached meal, we need to reset time to current
+    this.date = date;
+    this.time = time;
 
-    this.adjustedBeforeFoods = {};
-    this.adjustedBeforeEmotions = {};
+    this.formService.refreshFormToBeforeFormDefaults(date, time);
+
+    this.beforeEmotionsEdits = {};
+    this.beforeFoodsEdits = {};
     this.formService.clearBeforeForm();
   }
 
+  /**
+   * submits after form.
+  */
   submitForm() {
     if (this.isMealAttached) this.submitUpdateForm()
     else this.submitNewForm();
   }
 
+  /**
+   * If no before meal log is attached, submits after meal log form as a new meal to the database.
+  */
   submitNewForm() {
     return this.formService.submitNewAfterMealForm()
     .then(() => this.dismissForm())
@@ -198,6 +266,9 @@ export class AfterFormPage implements OnDestroy, OnInit {
 
   }
 
+  /**
+   * If before meal log is attached, submits after meal log as an update to existing meal log.
+  */
   submitUpdateForm() {
     const { id } = this.attachedMeal;
     const beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(this.attachedMeal.beforeEmotions);
@@ -209,11 +280,12 @@ export class AfterFormPage implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.emotionsSubscription.unsubscribe();
-    this.foodsSubscription.unsubscribe();
-    this.distractionsSubscription.unsubscribe();
-    this.formSubscription.unsubscribe();
+    this.afterEmotionsSubscription.unsubscribe();
+    this.afterFoodsSubscription.unsubscribe();
 
+    this.distractionsSubscription.unsubscribe();
+
+    this.formSubscription.unsubscribe();
     this.formService.clearAfterForm();
   }
 }

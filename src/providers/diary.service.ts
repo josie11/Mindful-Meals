@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { MealsService } from './meals.service';
 import { CravingsService } from './craving.service';
 import { FormService } from './form.service';
-
+import {
+    Craving,
+    Meal
+  } from '../common/types';
 import { BehaviorSubject } from "rxjs";
 import groupBy from 'lodash.groupby';
 
@@ -34,10 +37,10 @@ export class DiaryService {
     this.year = date.getFullYear();
     this.date = new BehaviorSubject(new Date());
 
-    formService.cravingUpdated.subscribe((craving: any) => this.checkIfShouldRefreshCravings(craving));
-    formService.mealUpdated.subscribe((meal: any) => this.checkIfShouldRefreshMeals(meal));
-    formService.cravingAdded.subscribe((craving: any) => this.checkIfShouldRefreshCravings(craving));
-    formService.mealAdded.subscribe((meal: any) => this.checkIfShouldRefreshMeals(meal));
+    formService.cravingUpdated.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving));
+    formService.mealUpdated.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal));
+    formService.cravingAdded.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving));
+    formService.mealAdded.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal));
   }
 
   decreaseCurrentMonth() {
@@ -102,29 +105,29 @@ export class DiaryService {
     if (checkIfAlreadyRequested && this.allMeals[`${year}-${month}`]) return Promise.resolve(this.meals.next(this.allMeals[`${year}-${month}`]));
     const adjustedMonth = (month < 10) ? `0${month}` : month;
     return this.mealsService.getMealsForMonth(adjustedMonth, year)
-    .then((meals: any) => this.handleNewMealsResults(month, year, meals));
+    .then((meals: Partial<Meal>[]) => this.handleNewMealsResults(month, year, meals));
   }
 
   getCravingsForMonth(month: number, year: number, checkIfAlreadyRequested = false) {
     if (checkIfAlreadyRequested && this.allCravings[`${year}-${month}`]) return Promise.resolve(this.cravings.next(this.allCravings[`${year}-${month}`]));
     const adjustedMonth = (month < 10) ? `0${month}` : month;
     return this.cravingsService.getCravingsForMonth(adjustedMonth, year)
-    .then((cravings) => this.handleNewCravingsResults(month, year, cravings));
+    .then((cravings: Partial<Craving>[]) => this.handleNewCravingsResults(month, year, cravings));
   }
 
-  handleNewMealsResults(month: number, year: number, meals: object[]) {
+  handleNewMealsResults(month: number, year: number, meals: Partial<Meal>[]) {
     const mealsData = this.groupEntryResultsByDate('mealDate', meals);
     this.allMeals[`${year}-${month}`] = mealsData;
     if(this.year === year && this.month === month) this.meals.next(mealsData);
   }
 
-  handleNewCravingsResults(month: number, year: number, cravings: object[]) {
+  handleNewCravingsResults(month: number, year: number, cravings: Partial<Craving>[]) {
     const cravingsData = this.groupEntryResultsByDate('cravingDate', cravings);
     this.allCravings[`${year}-${month}`] = cravingsData;
     if(this.year === year && this.month === month) this.cravings.next(cravingsData);
   }
 
-  groupEntryResultsByDate(dateName: string, entries: object[]) {
+  groupEntryResultsByDate(dateName: string, entries: Partial<Craving>[] | Partial<Meal>[]) {
     const dataObject = groupBy(entries, dateName);
     const dataArray = [];
     for (let date in dataObject) {

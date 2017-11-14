@@ -7,14 +7,19 @@ import { DiaryService } from '../../../providers/diary.service';
 import { MealLogPage } from '../meal-log/meal-log';
 import { CravingLogPage } from '../craving-log/craving-log';
 
+import {
+  Craving,
+  Meal
+} from '../../../common/types';
+
 @Component({
   selector: 'diary-page',
   templateUrl: 'diary.html'
 })
 export class DiaryPage implements OnInit, OnDestroy {
 
-  meals = [];
-  cravings = [];
+  meals: Meal[] = [];
+  cravings: Craving[] = [];
   date: Date = new Date();
   listingType: string = 'craving';
   isMeal: boolean = false;
@@ -27,9 +32,9 @@ export class DiaryPage implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.mealEntriesSubscription = this.diaryService.meals.subscribe((meals) => this.meals = meals);
-    this.cravingEntriesSubscription = this.diaryService.cravings.subscribe((cravings) => this.cravings = cravings);
-    this.dateSubscription = this.diaryService.date.subscribe((date) => this.date = date);
+    this.mealEntriesSubscription = this.diaryService.meals.subscribe((meals: Meal[]) => this.meals = meals);
+    this.cravingEntriesSubscription = this.diaryService.cravings.subscribe((cravings: Craving[]) => this.cravings = cravings);
+    this.dateSubscription = this.diaryService.date.subscribe((date: Date) => this.date = date);
 
     const date = new Date();
     this.diaryService.setDateAndUpdateEntries(date.getMonth() + 1, date.getFullYear());

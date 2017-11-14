@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
-import { SharedService } from './shared.service';
-
+import { CravingForm, Craving } from '../common/types';
+import { findChangesToItems, formatItemsArrayToObject } from '../common/utils';
 import 'rxjs/add/operator/map';
 
 /*
@@ -15,7 +15,7 @@ export class CravingsService {
 
   dbName: string = 'craving';
 
-  constructor(private databaseService: DatabaseService, private sharedService: SharedService) {
+  constructor(private databaseService: DatabaseService) {
   }
 
  /**
@@ -25,7 +25,7 @@ export class CravingsService {
    *
    * @return {object} return craving object.
  */
-  getCraving(cravingId: number) {
+  getCraving(cravingId: number): Promise<Craving> {
     return this.databaseService.select({
       selection: '*',
       dbName: `${this.dbName}s`,
@@ -46,7 +46,7 @@ export class CravingsService {
    *
    * @return {array} returns array of craving objects
  */
-  getCravingsForMonth(month: string | number, year: number) {
+  getCravingsForMonth(month: string | number, year: number): Promise<Partial<Craving>[]> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -61,11 +61,15 @@ export class CravingsService {
    *
    * @return {array} returns array of craving object
   */
-  getCravingsForDate(date: string) {
+  getCravingsForDate(date: string): Promise<Craving> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
       extraStatement: `WHERE cravingDate = '${date}'`
+    })
+    .then((data: any) => {
+      const craving = data[0];
+      return this.returnCravingWithItems(craving);
     });
   }
 
@@ -80,7 +84,7 @@ export class CravingsService {
    * @return {(object|undefined)} returns a craving object if exists in database, or undefined. There may be no previous date.
   */
   //BUG: if by chance 2 submissions on same day have exact same time, will loop back and forth between the entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
-  getPreviousCraving(cravingId: number, date: string, time: string) {
+  getPreviousCraving(cravingId: number, date: string, time: string): Promise<Craving> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -109,7 +113,7 @@ export class CravingsService {
    * @return {(object|undefined)} returns a craving object if exists in database, or undefined. There may be no next date.
   */
   //BUG: if by chance 2 submissions on same day have exact same time, will loop through back and forth between these entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
-  getNextCraving(cravingId: number, date: string, time: string) {
+  getNextCraving(cravingId: number, date: string, time: string): Promise<Craving> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -133,7 +137,7 @@ export class CravingsService {
    *
    * @return {object} returns craving object.
   */
-  returnCravingWithItems(craving: any) {
+  returnCravingWithItems(craving: any): Promise<Craving> {
     const items: any = {};
 
     return this.getCravingFoods(craving.id)
@@ -153,7 +157,7 @@ export class CravingsService {
    *
    * @return {object} return craving object
  */
-  addCraving(form: object) {
+  addCraving(form: CravingForm) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
       item: form
@@ -168,7 +172,7 @@ export class CravingsService {
    *
    * @param {values} form object to update craving with.
   */
-  updateCraving(cravingId: number, values: object) {
+  updateCraving(cravingId: number, values: Partial<CravingForm>) {
     return this.databaseService.update({
       dbName: `${this.dbName}s`,
       values,
@@ -322,7 +326,7 @@ export class CravingsService {
    * @return {object} returns formatted object --> { itemId: itemName, ... }
   */
   formatCravingItemsToCheckboxObject(items: Array<object>) {
-    return this.sharedService.formatItemsArrayToObject(items);
+    return formatItemsArrayToObject(items);
   }
 
   /**
@@ -335,7 +339,7 @@ export class CravingsService {
    * @return {object} returns object with array on add property and delete property --> { add: [], delete: [] }
   */
   findChangesToCravingItems(beforeIds: Array<number>, afterIds: Array<number>) {
-    return this.sharedService.findChangesToItems(beforeIds, afterIds);
+    return findChangesToItems(beforeIds, afterIds);
   }
 
 }

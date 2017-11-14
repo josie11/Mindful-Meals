@@ -3,7 +3,13 @@ import { MealsService } from './meals.service';
 import { CravingsService } from './craving.service';
 import { FormService } from './form.service';
 import { BehaviorSubject } from "rxjs";
-
+import {
+    FormObject,
+    Craving,
+    Meal,
+    LogCraving,
+    LogMeal,
+  } from '../common/types';
 
 import 'rxjs/add/operator/map';
 
@@ -16,16 +22,20 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class LogService {
 
-  meal: BehaviorSubject<object> = new BehaviorSubject({});
-  craving: BehaviorSubject<object> = new BehaviorSubject({});
+  meal: BehaviorSubject<object | LogMeal> = new BehaviorSubject({});
+  craving: BehaviorSubject<object | LogCraving> = new BehaviorSubject({});
 
-  constructor(private mealsService: MealsService, private cravingsService: CravingsService, private formService: FormService) {
-    this.formService.mealUpdated.subscribe((meal: any) => {
+  constructor(
+    private mealsService: MealsService,
+    private cravingsService: CravingsService,
+    private formService: FormService
+  ) {
+    this.formService.mealUpdated.subscribe((meal: Meal) => {
       const currentMeal: any = this.meal.getValue();
       if (currentMeal.id === meal.id) this.formatAndUpdateMeal(meal);
     })
 
-    this.formService.cravingUpdated.subscribe((craving: any) => {
+    this.formService.cravingUpdated.subscribe((craving: Craving) => {
       const currentCraving: any = this.craving.getValue();
       if (currentCraving.id === craving.id) this.formatAndUpdateCraving(craving);
     })
@@ -67,12 +77,7 @@ export class LogService {
    * @param {cravingId} cravingId - the id of the craving to get
   */
   getCraving(cravingId: number) {
-    return this.cravingsService.getCraving(cravingId).then((craving) => {
-      craving.foods = this.cravingsService.formatCravingItemsToCheckboxObject(craving.foods);
-      craving.emotions = this.cravingsService.formatCravingItemsToCheckboxObject(craving.emotions);
-
-      this.craving.next({...craving});
-    });
+    return this.cravingsService.getCraving(cravingId).then((craving: Craving) => this.formatAndUpdateCraving(craving));
   }
 
   /**
@@ -84,7 +89,7 @@ export class LogService {
   */
   getNextCraving() {
     const craving: any = this.craving.getValue();
-    return this.cravingsService.getNextCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving) => this.formatAndUpdateCraving(craving));
+    return this.cravingsService.getNextCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving: Craving) => this.formatAndUpdateCraving(craving));
   }
 
   /**
@@ -94,7 +99,7 @@ export class LogService {
   */
   getPreviousCraving() {
     const craving: any = this.craving.getValue();
-    return this.cravingsService.getPreviousCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving) => this.formatAndUpdateCraving(craving));
+    return this.cravingsService.getPreviousCraving(craving.id, craving.cravingDate, craving.cravingTime).then((craving: Craving) => this.formatAndUpdateCraving(craving));
   }
 
   /**
@@ -102,7 +107,7 @@ export class LogService {
    *
    * @return {BehaviorSubject} form behavior subject from form service.
   */
-  getFormSubscription() {
+  getFormSubscription(): BehaviorSubject<FormObject> {
     return this.formService.form;
   }
 
@@ -111,16 +116,17 @@ export class LogService {
    * if no meal is passed.
    * @param {meal} takes meal object and formats items and updates meal behavior subject.
   */
-  formatAndUpdateMeal(meal) {
+  formatAndUpdateMeal(meal: Meal) {
     if (!meal) return;
 
-    meal.distractions = this.mealsService.formatMealItemsToCheckboxObject(meal.distractions);
-    meal.beforeFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
-    meal.afterFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.afterFoods);
-    meal.beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
-    meal.afterEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.afterEmotions);
+    const distractions = this.mealsService.formatMealItemsToCheckboxObject(meal.distractions);
+    const beforeFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeFoods);
+    const afterFoods = this.mealsService.formatMealItemsToCheckboxObject(meal.afterFoods);
+    const beforeEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.beforeEmotions);
+    const afterEmotions = this.mealsService.formatMealItemsToCheckboxObject(meal.afterEmotions);
 
-    this.meal.next({...meal});
+    const updatedMeal: LogMeal = {...meal, distractions, beforeFoods, afterFoods, beforeEmotions, afterEmotions}
+    this.meal.next(updatedMeal);
   }
 
   /**
@@ -128,13 +134,14 @@ export class LogService {
    * Does nothing if no craving is passed.
    * @param {craving} takes craving object and formats items and updates craving behavior subject.
   */
-  formatAndUpdateCraving(craving) {
+  formatAndUpdateCraving(craving: Craving) {
     if (!craving) return;
 
-    craving.foods = this.mealsService.formatMealItemsToCheckboxObject(craving.foods);
-    craving.emotions = this.mealsService.formatMealItemsToCheckboxObject(craving.emotions);
+    const foods = this.mealsService.formatMealItemsToCheckboxObject(craving.foods);
+    const emotions = this.mealsService.formatMealItemsToCheckboxObject(craving.emotions);
 
-    this.craving.next({...craving});
+    const updatedCraving: LogCraving = {...craving, foods, emotions};
+    this.craving.next(updatedCraving);
   }
 
   /**
@@ -155,11 +162,15 @@ export class LogService {
   */
   updateFormToMeal() {
     const meal: any = this.meal.getValue();
-    this.formService.updateBeforeFoods(meal.beforeFoods);
-    this.formService.updateBeforeEmotions(meal.beforeEmotions);
-    this.formService.updateAfterFoods(meal.afterFoods);
-    this.formService.updateAfterEmotions(meal.afterEmotions);
-    this.formService.updateDistractions(meal.distractions);
+
+    this.formService.updateFormToCompletedMeal(
+      meal,
+      meal.beforeEmotions,
+      meal.afterEmotions,
+      meal.beforeFoods,
+      meal.afterFoods,
+      meal.distractions
+    );
   }
 
   /**

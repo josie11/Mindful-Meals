@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
 import { LogService } from '../../../providers/log.service';
-
+import {
+  LogCraving,
+  FormObject
+} from '../../../common/types';
 
 @Component({
   selector: 'craving-log-page',
@@ -23,8 +26,8 @@ export class CravingLogPage implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.cravingId = this.navParams.get('id');
-    this.cravingSubscription = this.logService.craving.subscribe((craving) => this.craving = craving);
-    this.formSubscription = this.logService.getFormSubscription().subscribe((form) => this.form = form);
+    this.cravingSubscription = this.logService.craving.subscribe((craving: LogCraving) => this.craving = craving);
+    this.formSubscription = this.logService.getFormSubscription().subscribe((form: FormObject) => this.form = form);
     this.logService.getCraving(this.cravingId).catch(console.error);
   }
 

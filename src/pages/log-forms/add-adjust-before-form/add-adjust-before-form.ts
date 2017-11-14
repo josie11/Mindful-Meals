@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
-import { AlertService } from '../../../providers/alert.service';
 import { ModalService } from '../../../providers/modal.service';
 import { FormService } from '../../../providers/form.service';
-import { MealsService } from '../../../providers/meals.service';
 import { EmotionsListPage } from '../emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../foods-list/foods-list';
+import {
+  FormObject,
+} from '../../../common/types';
 
 /**
  * Generated class for the AddAjustBeforeFormPage page.
@@ -23,22 +24,19 @@ export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
   log: object;
   formType: string;
   submit;
+  cancel;
 
-  constructor(public navCtrl: NavController, public navParams: NavParams, public modalService: ModalService, public alertService: AlertService, public formService: FormService, public mealsService: MealsService) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public modalService: ModalService, public formService: FormService) {
   }
 
   ngOnInit() {
     //prevent mutations!
     const log: any = {...this.navParams.get('log')};
-    const emotions: any = {...this.navParams.get('emotions')};
-    const foods: any = {...this.navParams.get('foods')};
-
-    log.emotions = emotions
-    log.foods = foods
 
     this.log = log;
     this.formType = this.navParams.get('formType');
     this.submit = this.navParams.get('submit');
+    this.cancel = this.navParams.get('cancel');
   }
 
   onFormItemChange({ item, value }) {
@@ -59,14 +57,11 @@ export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
 
   onCancel() {
     //have to undo any edits to emotions/foods
-    this.formService.updateBeforeEmotions(this.log['emotions']);
-    this.formService.updateBeforeFoods(this.log['foods']);
+    this.cancel();
     this.dismissForm();
   }
 
   onSubmit() {
-    this.log['emotions'] = {...this.formService.selectedBeforeEmotions.getValue()};
-    this.log['foods'] = {...this.formService.selectedBeforeFoods.getValue()};
     this.submit(this.log)
     this.dismissForm();
   }

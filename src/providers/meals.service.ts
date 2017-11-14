@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
-import { SharedService } from './shared.service';
-
 import 'rxjs/add/operator/map';
-
+import { CompleteMealForm, BeforeMealForm, Meal } from '../common/types';
+import { findChangesToItems, formatItemsArrayToObject } from '../common/utils';
 /*
   Generated class for the MealsService provider.
 
@@ -15,7 +14,7 @@ export class MealsService {
 
   dbName: string = 'meal';
 
-  constructor(private databaseService: DatabaseService, private sharedService: SharedService) {
+  constructor(private databaseService: DatabaseService) {
   }
 
   /**
@@ -25,7 +24,7 @@ export class MealsService {
    *
    * @return {object} return meal object
  */
-  getMeal(mealId: number) {
+  getMeal(mealId: number): Promise<Meal> {
     return this.databaseService.select({
       selection: '*',
       dbName: `${this.dbName}s`,
@@ -60,7 +59,7 @@ export class MealsService {
    *
    * @return {array} returns array of meal objects
   */
-  getMealsForMonth(month: string | number, year: string | number) {
+  getMealsForMonth(month: string | number, year: string | number): Promise<Partial<Meal>[]> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -80,7 +79,7 @@ export class MealsService {
    * @return {(object|undefined)} returns a meal object if exists in database, or undefined. There may be no previous date.
   */
   //BUG: if by chance 2 submissions on same day have exact same time, will loop back and forth between the entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
-  getPreviousMeal(mealId: number, date: string, time: string) {
+  getPreviousMeal(mealId: number, date: string, time: string): Promise<Meal> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -109,7 +108,7 @@ export class MealsService {
    * @return {(object|undefined)} returns a meal object if exists in database, or undefined. There may be no next date.
   */
   //BUG: if by chance 2 submissions on same day have exact same time, will loop through back and forth between these entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
-  getNextMeal(mealId: number, date: string, time: string) {
+  getNextMeal(mealId: number, date: string, time: string): Promise<Meal> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -132,7 +131,7 @@ export class MealsService {
    *
    * @return {array} returns array of meal objects.
   */
-  getIncompleteMeals() {
+  getIncompleteMeals(): Promise<Partial<Meal>[]> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
       selection: '*',
@@ -146,7 +145,7 @@ export class MealsService {
    *
    * @return {object} returns meal object.
   */
-  returnMealWithItems(meal) {
+  returnMealWithItems(meal): Promise<Meal> {
     const items: any = {};
 
     return this.getMealFoods(meal.id)
@@ -175,7 +174,7 @@ export class MealsService {
    *
    * @return {object} returns meal object.
   */
-  addMeal(form) {
+  addMeal(form: CompleteMealForm | BeforeMealForm) {
     return this.databaseService.insert({
       dbName: `${this.dbName}s`,
       item: form
@@ -188,7 +187,7 @@ export class MealsService {
    *
    * @param {values} values to update meal, from form services. Object where key represents the column and value is update.
   */
-  updateMeal(mealId: number, values: object) {
+  updateMeal(mealId: number, values: Partial<CompleteMealForm>) {
     return this.databaseService.update({
       dbName: `${this.dbName}s`,
       values,
@@ -409,7 +408,7 @@ export class MealsService {
    * @return {object} returns formatted object --> { itemId: itemName, ... }
   */
   formatMealItemsToCheckboxObject(items: Array<object>) {
-    return this.sharedService.formatItemsArrayToObject(items);
+    return formatItemsArrayToObject(items);
   }
 
   /**
@@ -422,7 +421,7 @@ export class MealsService {
    * @return {object} returns object with array on add property and delete property --> { add: [], delete: [] }
   */
   findChangesToMealItems(beforeIds: Array<number>, afterIds: Array<number>) {
-    return this.sharedService.findChangesToItems(beforeIds, afterIds);
+    return findChangesToItems(beforeIds, afterIds);
   }
 
   /**
