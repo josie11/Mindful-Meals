@@ -14,7 +14,9 @@ export class FoodsService {
   foodsList = new BehaviorSubject([]);
 
   constructor(private databaseService: DatabaseService) {
-    this.getFoods();
+    this.databaseService.databaseReady.subscribe((ready: boolean) => {
+      if (ready) this.getFoods()
+    });
   }
 
   getFoods() {

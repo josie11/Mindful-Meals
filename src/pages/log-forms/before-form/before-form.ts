@@ -49,14 +49,12 @@ export class BeforeFormPage implements OnDestroy, OnInit {
 
   submitMealForm() {
     this.formService.submitBeforeMealForm()
-    .then(() => this.dismissForm())
-    .catch(console.error);
+    .then(() => this.dismissForm());
   }
 
   submitCravingForm() {
     return this.formService.submitCravingForm()
-    .then(() => this.dismissForm())
-    .catch(console.error);
+    .then(() => this.dismissForm());
   }
 
   ngOnDestroy() {

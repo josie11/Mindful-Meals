@@ -18,7 +18,8 @@
     <ion-list *ngIf="!editing">
        <date-switch-divider
         *ngIf="craving.id"
-        [date]="(craving.cravingDate + 'T' + craving.cravingTime) | date: 'MMM d, y, h:mm a'"
+        [date]="craving.cravingDate + 'T' + craving.cravingTime"
+        [time]="true"
         (onDateDecrement)="previousCraving($event)"
         (onDateIncrement)="nextCraving($event)"
       ></date-switch-divider>
@@ -28,7 +29,7 @@
       <ion-item>
         <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
         <h4 *ngIf="craving.cravingDate">{{craving.cravingDate | date:'EEEE, MMM d'}}</h4>
-        <p *ngIf="craving.cravingDate && craving.cravingTime">{{(craving.cravingDate + 'T' + craving.cravingTime) | date:'shortTime'}}</p>
+        <p *ngIf="craving.cravingDate && craving.cravingTime">{{(craving.cravingDate + 'T' + craving.cravingTime) | time}}</p>
       </ion-item>
     </ion-list>
     <log-view-section
@@ -66,7 +67,7 @@
         </button>
       </ion-buttons>
       <ion-buttons start>
-        <button ion-button icon-only (click)="dismiss()" *ngIf="!editing">
+        <button ion-button icon-only (click)="triggerCravingDeletePrompt()" *ngIf="!editing">
           <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
         </button>
         <button ion-button (click)="cancelCravingChanges()" *ngIf="editing">

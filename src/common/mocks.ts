@@ -1,5 +1,5 @@
-import { SQLiteDatabaseConfig, /*SQLiteObject*/ } from '@ionic-native/sqlite';
-
+import { SQLiteDatabaseConfig } from '@ionic-native/sqlite';
+//SQL file is loaded via script tag
 declare var SQL;
 
 export class SQLiteObject{
@@ -41,7 +41,7 @@ export class SQLiteObject{
       });
     };
 
-    batchSql(statements: string[], params: any): Promise<any>{
+    sqlBatch(statements: string[], params: any): Promise<any>{
       return new Promise((resolve,reject)=>{
         try {
           var rows :Array<any> = [];
@@ -102,7 +102,7 @@ export class SQLitePorterMock {
               delete statements[i];
           }
         }
-        return db.batchSql(statements)
+        return db.sqlBatch(statements)
       } catch(e) {
         console.error(e.message);
       }

@@ -23,7 +23,8 @@
     <ion-list>
       <date-switch-divider
         *ngIf="meal.id"
-        [date]="(meal.mealDate + 'T' + meal.mealTime) | date: 'MMM d, y, h:mm a'"
+        [date]="meal.mealDate + 'T' + meal.mealTime"
+        [time]="true"
         (onDateDecrement)="previousMeal($event)"
         (onDateIncrement)="nextMeal($event)"
       ></date-switch-divider>
@@ -33,7 +34,7 @@
       <ion-item>
         <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
         <h4 *ngIf="meal.mealDate">{{meal.mealDate | date:'EEEE, MMM d'}}</h4>
-        <p *ngIf="meal.mealDate && meal.mealTime">{{(meal.mealDate + 'T' + meal.mealTime) | date:'shortTime'}}</p>
+        <p *ngIf="meal.mealDate && meal.mealTime">{{(meal.mealDate + 'T' + meal.mealTime) | time}}</p>
         <p>{{meal.mealType}}</p>
       </ion-item>
     </ion-list>
@@ -59,13 +60,24 @@
     ></log-view-section>
   </ion-content>
 
-  <!-- <ion-footer>
+  <ion-footer>
     <ion-toolbar color="primary">
       <ion-buttons end>
-        <button ion-button icon-only (click)="dismiss()">
+        <button ion-button icon-only (click)="submitMealChanges()" *ngIf="editing">
           <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
+        </button>
+        <button ion-button (click)="toggleEditView()" *ngIf="!editing">
+          Edit
+        </button>
+      </ion-buttons>
+      <ion-buttons start>
+        <button ion-button icon-only (click)="triggerMealDeletePrompt()" *ngIf="!editing">
+          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
+        </button>
+        <button ion-button (click)="cancelMealChanges()" *ngIf="editing">
+          Cancel
         </button>
       </ion-buttons>
     </ion-toolbar>
-  </ion-footer> -->
+  </ion-footer>
 </modal>

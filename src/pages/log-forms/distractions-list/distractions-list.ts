@@ -52,8 +52,7 @@ export class DistractionsListPage implements OnDestroy, OnInit {
     this.formService.addNewDistraction(distraction)
     .then((data: any) => {
       this.selectedDistractions[data.id] = data.name;
-    })
-    .catch(console.error);
+    });
   }
 
   triggerDistractionPrompt() {

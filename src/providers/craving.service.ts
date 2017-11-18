@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
 import { CravingForm, Craving } from '../common/types';
+import { Subject } from "rxjs";
 import { findChangesToItems, formatItemsArrayToObject } from '../common/utils';
 import 'rxjs/add/operator/map';
 
@@ -14,6 +15,15 @@ import 'rxjs/add/operator/map';
 export class CravingsService {
 
   dbName: string = 'craving';
+
+  //fired when we create a new meal/craving --> to trigger update in segments
+  cravingAdded: Subject<Craving> = new Subject();
+
+  //fired when we update a meal/craving --> to trigger update in segments
+  cravingUpdated: Subject<Craving> = new Subject();
+
+  //fired when we dete a meal/craving --> to trigger update in segments
+  cravingDeleted: Subject<object> = new Subject();
 
   constructor(private databaseService: DatabaseService) {
   }
@@ -83,7 +93,6 @@ export class CravingsService {
    *
    * @return {(object|undefined)} returns a craving object if exists in database, or undefined. There may be no previous date.
   */
-  //BUG: if by chance 2 submissions on same day have exact same time, will loop back and forth between the entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
   getPreviousCraving(cravingId: number, date: string, time: string): Promise<Craving> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -112,7 +121,6 @@ export class CravingsService {
    *
    * @return {(object|undefined)} returns a craving object if exists in database, or undefined. There may be no next date.
   */
-  //BUG: if by chance 2 submissions on same day have exact same time, will loop through back and forth between these entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
   getNextCraving(cravingId: number, date: string, time: string): Promise<Craving> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -177,6 +185,19 @@ export class CravingsService {
       dbName: `${this.dbName}s`,
       values,
       id: cravingId
+    });
+  }
+
+  /**
+   * Deletes a craving
+   *
+   * @param {cravingId} Id of craving.
+   *
+  */
+  deleteCraving(cravingId: number) {
+    return this.databaseService.delete({
+      dbName: `${this.dbName}s`,
+      extraStatement: `WHERE id = ${cravingId}`,
     });
   }
 

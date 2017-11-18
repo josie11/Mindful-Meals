@@ -130,3 +130,13 @@ export interface LogMeal {
   afterFoods: object;
   distractions: object;
 };
+
+export interface DeletedCravingData {
+  id: number;
+  cravingDate: string;
+}
+
+export interface DeletedMealData {
+  id: number;
+  cravingDate: string;
+}

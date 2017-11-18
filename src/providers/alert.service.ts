@@ -55,4 +55,23 @@ export class AlertService {
     });
     alert.present();
   }
+
+  presentConfirm({ title, message, cancelButtonText = 'Cancel', submitButtonText = 'Submit', submitHandler = (data) => {}, cancelHandler = () => {}}) {
+    let alert = this.alertCtrl.create({
+      title,
+      message,
+      buttons: [
+        {
+          text: cancelButtonText,
+          role: 'cancel',
+          handler: cancelHandler
+        },
+        {
+          text: submitButtonText,
+          handler: submitHandler
+        }
+      ]
+    });
+    alert.present();
+  }
 }

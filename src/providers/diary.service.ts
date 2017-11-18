@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { MealsService } from './meals.service';
 import { CravingsService } from './craving.service';
-import { FormService } from './form.service';
 import {
     Craving,
-    Meal
+    Meal,
+    DeletedCravingData
   } from '../common/types';
 import { BehaviorSubject } from "rxjs";
 import groupBy from 'lodash.groupby';
@@ -30,17 +30,18 @@ export class DiaryService {
   year: number;
   date: BehaviorSubject<Date>;
 
-  constructor(private mealsService: MealsService, private cravingsService: CravingsService, private formService: FormService) {
+  constructor(private mealsService: MealsService, private cravingsService: CravingsService) {
     const date = new Date();
     //months start at 0 for date object
     this.month = date.getMonth() + 1;
     this.year = date.getFullYear();
     this.date = new BehaviorSubject(new Date());
 
-    formService.cravingUpdated.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving));
-    formService.mealUpdated.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal));
-    formService.cravingAdded.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving));
-    formService.mealAdded.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal));
+    cravingsService.cravingUpdated.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving.cravingDate));
+    mealsService.mealUpdated.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal.mealDate));
+    cravingsService.cravingAdded.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving.cravingDate));
+    mealsService.mealAdded.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal.mealDate));
+    cravingsService.cravingDeleted.subscribe(({ id, cravingDate }: DeletedCravingData) => this.checkIfShouldRefreshCravings(cravingDate));
   }
 
   decreaseCurrentMonth() {
@@ -81,8 +82,8 @@ export class DiaryService {
     .then(() => this.getCravingsForMonth(this.month, this.year, true))
   }
 
-  checkIfShouldRefreshCravings(craving: any) {
-    const cravingDate = new Date(craving.cravingDate);
+  checkIfShouldRefreshCravings(date: string) {
+    const cravingDate = new Date(date);
     const year = cravingDate.getFullYear();
     const month = cravingDate.getMonth() + 1;
 
@@ -91,8 +92,8 @@ export class DiaryService {
     return Promise.resolve();
   }
 
-  checkIfShouldRefreshMeals(meal: any) {
-    const mealDate = new Date(meal.mealDate);
+  checkIfShouldRefreshMeals(date: string) {
+    const mealDate = new Date(date);
     const year = mealDate.getFullYear();
     const month = mealDate.getMonth() + 1;
 

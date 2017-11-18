@@ -52,8 +52,7 @@ export class FoodCravingsListPage implements OnDestroy, OnInit {
     this.formService.addNewFood(food)
     .then((data: any) => {
       this.selectedFoods[data.id] = data.name;
-    })
-    .catch(console.error);
+    });
   }
 
   triggerFoodPrompt() {

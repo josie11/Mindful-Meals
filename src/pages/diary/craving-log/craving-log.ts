@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavController, NavParams } from 'ionic-angular';
+import { AlertService } from '../../../providers/alert.service';
 import { LogService } from '../../../providers/log.service';
 import {
   LogCraving,
@@ -12,7 +13,7 @@ import {
 })
 export class CravingLogPage implements OnInit, OnDestroy {
 
-  craving: object = {};
+  craving: LogCraving | any = {};
   cravingId: number;
   form: object = {};
 
@@ -21,14 +22,19 @@ export class CravingLogPage implements OnInit, OnDestroy {
   cravingSubscription;
   formSubscription;
 
-  constructor(public navCtrl: NavController, private navParams: NavParams, private logService: LogService) {
+  constructor(
+    private navCtrl: NavController,
+    private navParams: NavParams,
+    private logService: LogService,
+    private alertService: AlertService
+  ) {
   }
 
   ngOnInit() {
     this.cravingId = this.navParams.get('id');
     this.cravingSubscription = this.logService.craving.subscribe((craving: LogCraving) => this.craving = craving);
     this.formSubscription = this.logService.getFormSubscription().subscribe((form: FormObject) => this.form = form);
-    this.logService.getCraving(this.cravingId).catch(console.error);
+    this.logService.getCraving(this.cravingId);
   }
 
   dismiss() {
@@ -53,7 +59,7 @@ export class CravingLogPage implements OnInit, OnDestroy {
   }
 
   submitCravingChanges() {
-    this.logService.submitcravingChanges()
+    this.logService.submitCravingChanges()
     .then(() => {
       this.toggleEditView();
       this.logService.clearLogChanges();
@@ -63,6 +69,21 @@ export class CravingLogPage implements OnInit, OnDestroy {
   cancelCravingChanges() {
     this.toggleEditView();
     this.logService.clearLogChanges();
+  }
+
+  triggerCravingDeletePrompt() {
+    this.alertService.presentConfirm({
+      title: 'Delete Craving',
+      message: 'Confirm Log Deletion.',
+      submitButtonText: 'Delete',
+      submitHandler: this.onCravingDelete.bind(this)
+    })
+  }
+
+  onCravingDelete() {
+    this.logService.deleteCraving(this.craving.id, this.craving.cravingDate);
+    //will clear logService w/ ngondestroy
+    this.dismiss();
   }
 
   ngOnDestroy() {

@@ -52,8 +52,7 @@ export class EmotionsListPage implements OnDestroy, OnInit {
     this.formService.addNewEmotion(emotion)
     .then((data: any) => {
       this.selectedEmotions[data.id] = data.name;
-    })
-    .catch(console.error);
+    });
   }
 
   triggerEmotionPrompt() {

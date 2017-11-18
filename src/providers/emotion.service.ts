@@ -8,7 +8,9 @@ export class EmotionsService {
   emotionsList = new BehaviorSubject([]);
 
   constructor(private databaseService: DatabaseService) {
-    this.getEmotions();
+    this.databaseService.databaseReady.subscribe((ready: boolean) => {
+      if (ready) this.getEmotions()
+    });
   }
 
   getEmotions() {

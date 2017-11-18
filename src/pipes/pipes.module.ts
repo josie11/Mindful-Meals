@@ -9,6 +9,7 @@ import { SatisfactionRangePipe } from './satisfaction-range/satisfaction-range';
 import { SortArrayDateStringsPipe } from './sort-array-date-strings/sort-array-date-strings';
 import { SortArrayEntriesByTimePipe } from './sort-array-entries-by-time/sort-array-entries-by-time';
 import { SortArraysByDatePipe } from './sort-arrays-by-date/sort-arrays-by-date';
+import { TimePipe } from './time/time';
 @NgModule({
 	declarations: [CravingsRangePipe,
     HungerRangePipe,
@@ -19,7 +20,8 @@ import { SortArraysByDatePipe } from './sort-arrays-by-date/sort-arrays-by-date'
     SatisfactionRangePipe,
     SortArrayDateStringsPipe,
     SortArrayEntriesByTimePipe,
-    SortArraysByDatePipe],
+    SortArraysByDatePipe,
+    TimePipe],
 	imports: [],
 	exports: [CravingsRangePipe,
     HungerRangePipe,
@@ -30,6 +32,7 @@ import { SortArraysByDatePipe } from './sort-arrays-by-date/sort-arrays-by-date'
     SatisfactionRangePipe,
     SortArrayDateStringsPipe,
     SortArrayEntriesByTimePipe,
-    SortArraysByDatePipe]
+    SortArraysByDatePipe,
+    TimePipe]
 })
 export class PipesModule {}

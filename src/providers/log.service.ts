@@ -4,7 +4,6 @@ import { CravingsService } from './craving.service';
 import { FormService } from './form.service';
 import { BehaviorSubject } from "rxjs";
 import {
-    FormObject,
     Craving,
     Meal,
     LogCraving,
@@ -30,12 +29,12 @@ export class LogService {
     private cravingsService: CravingsService,
     private formService: FormService
   ) {
-    this.formService.mealUpdated.subscribe((meal: Meal) => {
+    this.mealsService.mealUpdated.subscribe((meal: Meal) => {
       const currentMeal: any = this.meal.getValue();
       if (currentMeal.id === meal.id) this.formatAndUpdateMeal(meal);
     })
 
-    this.formService.cravingUpdated.subscribe((craving: Craving) => {
+    this.cravingsService.cravingUpdated.subscribe((craving: Craving) => {
       const currentCraving: any = this.craving.getValue();
       if (currentCraving.id === craving.id) this.formatAndUpdateCraving(craving);
     })
@@ -107,7 +106,7 @@ export class LogService {
    *
    * @return {BehaviorSubject} form behavior subject from form service.
   */
-  getFormSubscription(): BehaviorSubject<FormObject> {
+  getFormSubscription() {
     return this.formService.form;
   }
 
@@ -145,6 +144,31 @@ export class LogService {
   }
 
   /**
+   * Deletes a meal.
+   *
+   * @param {mealId} meal id of meal to delete.
+   * @param {mealDate} date of meal, to trigger diary view refresh.
+   *
+  */
+  deleteMeal(mealId: number, mealDate: string) {
+    return this.mealsService.deleteMeal(mealId)
+    .then(() => this.mealsService.mealDeleted.next({ id: mealId, mealDate }));
+  }
+
+
+  /**
+   * Deletes a craving.
+   *
+   * @param {cravingId} craving id of craving to delete.
+   * @param {cravingDate} date of craving, to trigger diary view refresh.
+   *
+  */
+  deleteCraving(cravingId: number, cravingDate: string) {
+    return this.cravingsService.deleteCraving(cravingId)
+    .then(() => this.cravingsService.cravingDeleted.next({ id: cravingId, cravingDate }));
+  }
+
+  /**
    * Returns before item behavior subjects from form service.
    * Used for editing a log.
    * @return {object} object with behavior subjects.
@@ -161,7 +185,7 @@ export class LogService {
    * to that of current meal. Needed for editing log, form service is where all editing filters through.
   */
   updateFormToMeal() {
-    const meal: any = this.meal.getValue();
+    const meal: = this.meal.getValue();
 
     this.formService.updateFormToCompletedMeal(
       meal,
@@ -201,10 +225,20 @@ export class LogService {
     this.formService.clearAfterForm();
   }
 
+   /**
+   * Submits any edits to the meal log via the form service.
+  */
+  submitMealChanges() {
+    const meal: any = this.meal.getValue();
+
+    return this.formService.submitMealUpdates(meal.id, meal.beforeEmotions, meal.beforeFoods, meal.afterEmotions, meal.afterFoods, meal.distractions)
+    .then(() => this.clearLogChanges())
+  }
+
   /**
    * Submits any edits to the craving log via the form service.
   */
-  submitcravingChanges() {
+  submitCravingChanges() {
     const craving: any = this.craving.getValue();
 
     return this.formService.submitCravingUpdates(craving.id, craving.emotions, craving.foods)

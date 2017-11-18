@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DatabaseService } from './database.service';
+import { Subject } from "rxjs";
 import 'rxjs/add/operator/map';
 import { CompleteMealForm, BeforeMealForm, Meal } from '../common/types';
 import { findChangesToItems, formatItemsArrayToObject } from '../common/utils';
@@ -13,6 +14,15 @@ import { findChangesToItems, formatItemsArrayToObject } from '../common/utils';
 export class MealsService {
 
   dbName: string = 'meal';
+
+  //fired when we create a new meal --> to trigger update in segments
+  mealAdded: Subject<Meal> = new Subject();
+
+  //fired when we update a meal --> to trigger update in segments
+  mealUpdated: Subject<Meal> = new Subject();
+
+  //fired when we dete a meal --> to trigger update in segments
+  mealDeleted: Subject<object> = new Subject();
 
   constructor(private databaseService: DatabaseService) {
   }
@@ -78,7 +88,6 @@ export class MealsService {
    *
    * @return {(object|undefined)} returns a meal object if exists in database, or undefined. There may be no previous date.
   */
-  //BUG: if by chance 2 submissions on same day have exact same time, will loop back and forth between the entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
   getPreviousMeal(mealId: number, date: string, time: string): Promise<Meal> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -107,7 +116,6 @@ export class MealsService {
    *
    * @return {(object|undefined)} returns a meal object if exists in database, or undefined. There may be no next date.
   */
-  //BUG: if by chance 2 submissions on same day have exact same time, will loop through back and forth between these entries with same date/time indefinitely. I added seconds to time storing to reduce possiblity of this happening, and seems unlikely user will create this circumstance.
   getNextMeal(mealId: number, date: string, time: string): Promise<Meal> {
     return this.databaseService.select({
       dbName: `${this.dbName}s`,
@@ -192,6 +200,19 @@ export class MealsService {
       dbName: `${this.dbName}s`,
       values,
       id: mealId
+    });
+  }
+
+  /**
+   * Deletes a meal
+   *
+   * @param {mealId} Id of meal.
+   *
+  */
+  deleteMeal(mealId: number) {
+    return this.databaseService.delete({
+      dbName: `${this.dbName}s`,
+      extraStatement: `WHERE id = ${mealId}`,
     });
   }
 
@@ -398,6 +419,35 @@ export class MealsService {
 
     const items = distractionIds.map(distractionId => ({ mealId, distractionId }));
     return this.databaseService.bulkInsert({ dbName: `${this.dbName}Distractions`, items })
+  }
+
+  /**
+   * Updates distractions associated with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {beforeDistractions} Array of distraction ids that are already associated with meal.
+   *
+   * @param {afterDistractions} Array of distraction ids that will be associated with meal.
+  */
+  updateMealDistractions(mealId: number, beforeDistractions: Array<number>, afterDistractions: Array<number>) {
+    const { addIds, deleteIds } = this.findChangesToMealItems(beforeDistractions, afterDistractions);
+
+    return this.addMealDistractions(mealId, addIds)
+    .then(() => this.deleteMealDistractions(mealId, deleteIds));
+  }
+
+  /**
+   * Deletes distractions associated with meal.
+   * @param {mealId} Id of meal.
+   *
+   * @param {distractionIds} Array of distraction ids that are associated with meal.
+  */
+  deleteMealDistractions(mealId: number, distractionIds: Array<number>) {
+    if (distractionIds.length < 1) return Promise.resolve({id : mealId });
+
+    const extraStatements = distractionIds.map(distractionId => `WHERE distractionId = ${distractionId} AND mealId = ${mealId}`);
+
+    return this.databaseService.bulkDelete({ dbName: `${this.dbName}Distractions`, extraStatements });
   }
 
   /**

@@ -21,7 +21,7 @@ import {
 })
 export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
 
-  log: object;
+  log: FormObject;
   formType: string;
   submit;
   cancel;
@@ -31,7 +31,7 @@ export class AddAdjustBeforeFormPage implements OnDestroy, OnInit {
 
   ngOnInit() {
     //prevent mutations!
-    const log: any = {...this.navParams.get('log')};
+    const log: FormObject = {...this.navParams.get('log')};
 
     this.log = log;
     this.formType = this.navParams.get('formType');

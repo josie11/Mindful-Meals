@@ -4,7 +4,7 @@ import { FoodsService } from './food.service';
 import { DistractionsService } from './distraction.service';
 import { MealsService } from './meals.service';
 import { CravingsService } from './craving.service';
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 import 'rxjs/add/operator/map';
 
 import {
@@ -32,14 +32,6 @@ export class FormService {
   selectedDistractions: BehaviorSubject<object> = new BehaviorSubject({});
   selectedAfterEmotions: BehaviorSubject<object> = new BehaviorSubject({});
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
-
-  //fired when we create a new meal/craving --> to trigger update in diary view
-  mealAdded: Subject<Meal> = new Subject();
-  cravingAdded: Subject<Craving> = new Subject();
-
-  //fired when we update a meal/craving --> to trigger update in diary view
-  mealUpdated: Subject<Meal> = new Subject();
-  cravingUpdated: Subject<Craving> = new Subject();
 
   form: BehaviorSubject<FormObject> = new BehaviorSubject({
     time: '',
@@ -222,21 +214,6 @@ export class FormService {
   }
 
   /**
-   * Links beforeEmotions and beforeFoods with a meal.
-   *
-   * @param {mealId} The meal id to link items with.
-   *
-   * @return {object} returns object {id : mealId}.
-  */
-  linkBeforeFormItemsWithMeal(mealId: number) {
-    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
-
-    return this.mealsService.addMealEmotions(mealId, selectedBeforeEmotionIds, 'before')
-    .then(() => this.mealsService.addMealFoods(mealId, selectedBeforeFoodsIds, 'before'))
-    .then(() => ({id: mealId}));
-  }
-
-  /**
    * Creates a new craving using.
    *
    * @return {object} returns newly created craving.
@@ -249,14 +226,14 @@ export class FormService {
     return this.cravingsService.addCraving(formData)
     .then((data: any) => {
       id = data.id;
-      return this.linkCravingItemsWithCraving(data.id);
+      return this.linkCravingItemsWithCraving(id);
     })
     .then(() => {
       this.clearBeforeForm();
       return this.cravingsService.getCraving(id);
     })
     .then((craving) => {
-      this.cravingAdded.next(craving);
+      this.cravingsService.cravingAdded.next(craving);
       return craving;
     });
   }
@@ -277,6 +254,20 @@ export class FormService {
     return this.cravingsService.addCravingEmotions(cravingId, selectedBeforeEmotionIds)
     .then(() => this.cravingsService.addCravingFoods(cravingId, selectedBeforeFoodsIds))
     .then(() => ({id: cravingId}));
+  }
+
+  /**
+   * Links beforeEmotions and beforeFoods with a meal.
+   *
+   * @param {mealId} The meal id to link items with.
+   *
+   * @return {object} returns object {id : mealId}.
+  */
+  linkBeforeFormItemsWithMeal(mealId: number) {
+    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
+    return this.mealsService.addMealEmotions(mealId, selectedBeforeEmotionIds, 'before')
+    .then(() => this.mealsService.addMealFoods(mealId, selectedBeforeFoodsIds, 'before'))
+    .then(() => ({id: mealId}));
   }
 
   /**
@@ -303,18 +294,17 @@ export class FormService {
   submitBeforeMealForm(): Promise<Meal> {
     const formData: BeforeMealForm = this.getBeforeFormData();
     let id;
-
     return this.mealsService.addMeal(formData)
     .then((data: any) => {
       id = data.id;
-      return this.linkBeforeFormItemsWithMeal(data.id)
+      return this.linkBeforeFormItemsWithMeal(id)
     })
     .then((data: any) => {
       this.clearBeforeForm();
       return this.mealsService.getMeal(id)
     })
     .then((meal) => {
-      this.mealAdded.next(meal);
+      this.mealsService.mealAdded.next(meal);
       return meal;
     });
   }
@@ -342,6 +332,42 @@ export class FormService {
 
     return this.mealsService.updateMealEmotions(mealId, 'before', previousEmotionsIds, selectedBeforeEmotionIds)
     .then(() => this.mealsService.updateMealFoods(mealId, 'before', previousFoodsIds, selectedBeforeFoodsIds))
+    .then(() => ({id: mealId}));
+  }
+
+  /**
+   * Updates all a meals items based on new values stored in form service - compares with previous meals items.
+
+   * @param {mealId} The meal id.
+   *
+   * @param {previousBeforeEmotions} The before emotions already associated with the meal.
+   *
+   * @param {previousBeforeFoods} The before foods already associated with the meal.
+   *
+   * @param {previousAfterEmotions} The after emotions already associated with the meal.
+   *
+   * @param {previousAfterFoods} The after foods already associated with the meal.
+   *
+   * @param {distractions} The distractions already associated with the meal.
+   *
+   * @return {object} returns object {id : mealId}.
+  */
+  updateAllMealItems(mealId: number, previousBeforeEmotions: object, previousBeforeFoods: object, previousAfterEmotions: object, previousAfterFoods: object, previousDistractions: object) {
+    const { selectedBeforeEmotionIds, selectedBeforeFoodsIds } = this.getSelectedBeforeItemsIds();
+
+    const { selectedAfterEmotionIds, selectedAfterFoodsIds, selectedDistractionsIds } = this.getSelectedAfterItemsIds();
+
+    const previousBeforeEmotionsIds = Object.keys(previousBeforeEmotions).map(val => Number(val));
+    const previousBeforeFoodsIds = Object.keys(previousBeforeFoods).map(val => Number(val));
+    const previousAfterEmotionsIds = Object.keys(previousAfterEmotions).map(val => Number(val));
+    const previousAfterFoodsIds = Object.keys(previousAfterFoods).map(val => Number(val));
+    const previousDistractionIds = Object.keys(previousDistractions).map(val => Number(val));
+
+    return this.mealsService.updateMealEmotions(mealId, 'before', previousBeforeEmotionsIds, selectedBeforeEmotionIds)
+    .then(() => this.mealsService.updateMealFoods(mealId, 'before', previousBeforeFoodsIds, selectedBeforeFoodsIds))
+    .then(() => this.mealsService.updateMealEmotions(mealId, 'after', previousAfterEmotionsIds, selectedAfterEmotionIds))
+    .then(() => this.mealsService.updateMealFoods(mealId, 'after', previousAfterFoodsIds, selectedAfterFoodsIds))
+    .then(() => this.mealsService.updateMealDistractions(mealId, previousDistractionIds, selectedDistractionsIds))
     .then(() => ({id: mealId}));
   }
 
@@ -389,7 +415,7 @@ export class FormService {
       return this.mealsService.getMeal(id);
     })
     .then((meal) => {
-      this.mealAdded.next(meal);
+      this.mealsService.mealAdded.next(meal);
       return meal;
     })
   }
@@ -407,7 +433,7 @@ export class FormService {
    *
    * @return {object} returns meal object.
   */
-  submitAttachedMealAfterForm(mealId: number, previousEmotions, previousFoods ): Promise<Meal> {
+  submitAttachedMealAfterForm(mealId: number, previousEmotions: object, previousFoods: object): Promise<Meal> {
     const formData: CompleteMealForm = this.getAfterFormData();
 
     return this.mealsService.updateMeal(mealId, formData)
@@ -418,7 +444,41 @@ export class FormService {
       return this.mealsService.getMeal(mealId)
     })
     .then((meal) => {
-      this.mealUpdated.next(meal);
+      this.mealsService.mealUpdated.next(meal);
+      return meal;
+    });
+  }
+
+  /**
+   * Updates a existing meal log (created from the before meal form) with form data,
+   * and marks it as completed. It will update and before meal items as well that
+   * may have been edited by user. Associates after items with updated meal.
+   *
+   * @param {mealId} The meal id to be updated.
+   *
+   * @param {previousBeforeEmotions} The before emotions already associated with the meal.
+   *
+   * @param {previousBeforeFoods} The before foods already associated with the meal.
+   *
+   * @param {previousAfterEmotions} The after emotions already associated with the meal.
+   *
+   * @param {previousAfterFoods} The after foods already associated with the meal.
+   *
+   * @param {distractions} The distractions already associated with the meal.
+   *
+   * @return {object} returns meal object.
+  */
+  submitMealUpdates(mealId: number, previousBeforeEmotions: object, previousBeforeFoods: object, previousAfterEmotions: object, previousAfterFoods: object, previousDistractions: object): Promise<Meal> {
+    const formData: CompleteMealForm = this.getAfterFormData();
+
+    return this.mealsService.updateMeal(mealId, formData)
+    .then(() => this.updateAllMealItems(mealId, previousBeforeEmotions, previousBeforeFoods, previousAfterEmotions, previousAfterFoods, previousDistractions))
+    .then(() => {
+      this.clearAfterForm();
+      return this.mealsService.getMeal(mealId)
+    })
+    .then((meal) => {
+      this.mealsService.mealUpdated.next(meal);
       return meal;
     });
   }
@@ -434,7 +494,7 @@ export class FormService {
    *
    * @return {object} returns meal object.
   */
-  submitCravingUpdates(cravingId: number, previousEmotions, previousFoods): Promise<Craving> {
+  submitCravingUpdates(cravingId: number, previousEmotions: object, previousFoods: object): Promise<Craving> {
     const formData: CravingForm = this.getCravingFormData();
 
     return this.cravingsService.updateCraving(cravingId, formData)
@@ -444,7 +504,7 @@ export class FormService {
       return this.cravingsService.getCraving(cravingId);
     })
     .then((craving) => {
-      this.cravingUpdated.next(craving);
+      this.cravingsService.cravingUpdated.next(craving);
       return craving;
     });
   }

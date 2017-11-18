@@ -12,7 +12,7 @@ export class DatabaseService {
 
   database: SQLiteObject;
   // kind of an Observable - can emit new values to the subscribers by calling next() on it
-  private databaseReady: BehaviorSubject<boolean>;
+  databaseReady: BehaviorSubject<boolean>;
 
   constructor(private http: Http, private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
     this.initializeDatabase();
@@ -20,8 +20,8 @@ export class DatabaseService {
 
   initializeDatabase(dbName: string = 'mindful') {
     this.databaseReady = new BehaviorSubject(false);
-    this.platform.ready().then(() => {
-      this.sqlite.create({
+    return this.platform.ready().then(() => {
+      return this.sqlite.create({
         name: `${dbName}.db`,
         location: 'default'
       })
@@ -34,10 +34,10 @@ export class DatabaseService {
           //sets to true and emits to subscribers that database is ready to access
           this.databaseReady.next(true);
         } else {
-          this.fillDatabase();
+          return this.fillDatabase();
         }
       })
-    });
+    })
   }
 
   fillDatabase() {
@@ -145,13 +145,7 @@ export class DatabaseService {
   }
 
   batchSql(sql: Array<string>) {
-    return this.database['batchSql'](sql, {})
-    .then(data => {
-      return this.processSqlResults(data)
-    }, err => {
-      console.log('Error: ', err);
-      return err;
-    });
+    return this.database.sqlBatch(sql);
   }
 
   processSqlResults(data) {

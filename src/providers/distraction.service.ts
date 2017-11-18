@@ -14,7 +14,9 @@ export class DistractionsService {
   distractionsList = new BehaviorSubject([]);
 
   constructor(private databaseService: DatabaseService) {
-    this.getDistractions();
+    this.databaseService.databaseReady.subscribe((ready) => {
+      if (ready) this.getDistractions();
+    });
   }
 
   getDistractions() {

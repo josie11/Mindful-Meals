@@ -151,7 +151,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
       this.beforeFoodsEdits = formattedFoods;
 
       this.setFormToAttachedMeal({...formattedEmotions}, {...formattedFoods});
-    }).catch(console.error);
+    })
   }
 
   /**
@@ -262,7 +262,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
   submitNewForm() {
     return this.formService.submitNewAfterMealForm()
     .then(() => this.dismissForm())
-    .catch(console.error);
+
 
   }
 
@@ -276,7 +276,7 @@ export class AfterFormPage implements OnDestroy, OnInit {
 
     return this.formService.submitAttachedMealAfterForm(id, beforeEmotions, beforeFoods)
     .then(() => this.dismissForm())
-    .catch(console.error);
+
   }
 
   ngOnDestroy() {
