@@ -4,7 +4,8 @@ import { CravingsService } from './craving.service';
 import {
     Craving,
     Meal,
-    DeletedCravingData
+    DeletedCravingData,
+    DeletedMealData
   } from '../common/types';
 import { BehaviorSubject } from "rxjs";
 import groupBy from 'lodash.groupby';
@@ -42,6 +43,7 @@ export class DiaryService {
     cravingsService.cravingAdded.subscribe((craving: Craving) => this.checkIfShouldRefreshCravings(craving.cravingDate));
     mealsService.mealAdded.subscribe((meal: Meal) => this.checkIfShouldRefreshMeals(meal.mealDate));
     cravingsService.cravingDeleted.subscribe(({ id, cravingDate }: DeletedCravingData) => this.checkIfShouldRefreshCravings(cravingDate));
+    mealsService.mealDeleted.subscribe(({ id, mealDate }: DeletedMealData) => this.checkIfShouldRefreshMeals(mealDate));
   }
 
   decreaseCurrentMonth() {

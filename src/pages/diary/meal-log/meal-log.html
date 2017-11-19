@@ -1,29 +1,33 @@
 <modal>
-  <!-- header for ng-content -->
   <ion-header>
     <ion-navbar color="primary">
-      <ion-buttons start>
-        <button ion-button icon-only (click)="dismiss()">
-          <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
-        </button>
-      </ion-buttons>
-      <ion-buttons end>
-        <button ion-button icon-only (click)="dismiss()">
-          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
-        </button>
-      </ion-buttons>
       <ion-title>
         Meal
       </ion-title>
     </ion-navbar>
+    <ion-toolbar color="primary">
+      <ion-buttons start *ngIf="!editing">
+        <button ion-button icon-only (click)="triggerMealDeletePrompt()">
+          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
+        </button>
+      </ion-buttons>
+      <ion-segment [(ngModel)]="mealStage" color="white">
+        <ion-segment-button value="before">
+          Before
+        </ion-segment-button>
+        <ion-segment-button value="after">
+          After
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
   </ion-header>
 
-  <!-- content for ng-content -->
   <ion-content>
-    <ion-list>
+    <ion-list *ngIf="!editing">
       <date-switch-divider
         *ngIf="meal.id"
         [date]="meal.mealDate + 'T' + meal.mealTime"
+        dateFormat="MMM d, y"
         [time]="true"
         (onDateDecrement)="previousMeal($event)"
         (onDateIncrement)="nextMeal($event)"
@@ -38,8 +42,10 @@
         <p>{{meal.mealType}}</p>
       </ion-item>
     </ion-list>
+    <!-- BEFORE MEAL DETAILS -->
     <log-view-section
-      title="Before Meal"
+      *ngIf="!editing && mealStage === 'before'"
+      title="Before Eating"
       [progressData1]="{ title: 'Mental Hunger', description: meal.intensityLevel | cravingsRange, max: 4, current: meal.intensityLevel}"
       [progressData2]="{ title: 'Physical Hunger', description: meal.hungerLevelBefore | hungerRange, max: 5, current: meal.hungerLevelBefore}"
       [emotions]="meal.beforeEmotions"
@@ -47,9 +53,27 @@
       descriptionTitle="Trigger Description"
       [description]="meal.triggerDescription"
     ></log-view-section>
+
+    <!-- EDIT BEFORE MEAL -->
+    <before-form-content
+      *ngIf="editing && mealStage === 'before'"
+      [emotionsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedBeforeEmotions"
+      [foodsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedBeforeFoods"
+      [type]="form.mealType"
+      [date]="form.date"
+      [time]="form.time"
+      [intensityLevel]="form.intensityLevel"
+      [hungerLevelBefore]="form.hungerLevelBefore"
+      [triggerDescription]="form.triggerDescription"
+      [showMealType]="true"
+      (onFormItemChange)="onMealItemChange($event)"
+    >
+    </before-form-content>
+
+    <!-- AFTER MEAL DETAILS -->
     <log-view-section
-      *ngIf="meal.completed === 1"
-      title="After Meal"
+      *ngIf="meal.completed === 1 && !editing  && mealStage === 'after'"
+      title="After Eating"
       [progressData1]="{ title: 'Hunger Level', description: meal.hungerLevelAfter | hungerRange, max: 5, current: meal.hungerLevelAfter }"
       [progressData2]="{ title: 'Satisfaction Level', description: meal.satisfactionLevel | satisfactionRange, max: 4, current: meal.satisfactionLevel }"
       [emotions]="meal.afterEmotions"
@@ -58,24 +82,37 @@
       descriptionTitle="Meal Description"
       [description]="meal.mealDescription"
     ></log-view-section>
+
+    <!-- EDIT AFTER MEAL -->
+     <after-form-content
+      *ngIf="editing && mealStage === 'after'"
+      [emotionsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedAfterEmotions"
+      [foodsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedAfterFoods"
+      [distractionsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedDistractions"
+      [satisfactionLevel]="form.satisfactionLevel"
+      [hungerLevelAfter]="form.hungerLevelAfter"
+      [mealDescription]="form.mealDescription"
+      (onFormItemChange)="onMealItemChange($event)"
+    >
+    </after-form-content>
   </ion-content>
 
   <ion-footer>
     <ion-toolbar color="primary">
+      <ion-buttons start>
+        <button ion-button icon-only (click)="dismiss()" *ngIf="!editing">
+          <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
+        </button>
+        <button ion-button (click)="cancelMealChanges()" *ngIf="editing">
+          Cancel
+        </button>
+      </ion-buttons>
       <ion-buttons end>
         <button ion-button icon-only (click)="submitMealChanges()" *ngIf="editing">
           <ion-icon ios="ios-checkmark-circle" md="md-checkmark-circle"></ion-icon>
         </button>
         <button ion-button (click)="toggleEditView()" *ngIf="!editing">
           Edit
-        </button>
-      </ion-buttons>
-      <ion-buttons start>
-        <button ion-button icon-only (click)="triggerMealDeletePrompt()" *ngIf="!editing">
-          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
-        </button>
-        <button ion-button (click)="cancelMealChanges()" *ngIf="editing">
-          Cancel
         </button>
       </ion-buttons>
     </ion-toolbar>

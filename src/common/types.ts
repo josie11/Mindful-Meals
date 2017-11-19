@@ -138,5 +138,5 @@ export interface DeletedCravingData {
 
 export interface DeletedMealData {
   id: number;
-  cravingDate: string;
+  mealDate: string;
 }

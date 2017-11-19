@@ -173,10 +173,13 @@ export class LogService {
    * Used for editing a log.
    * @return {object} object with behavior subjects.
   */
-  getBeforeItemsBehaviorSubjects() {
+  getItemsBehaviorSubjects():object {
     return {
       selectedBeforeFoods: this.formService.selectedBeforeFoods,
-      selectedBeforeEmotions: this.formService.selectedBeforeEmotions
+      selectedBeforeEmotions: this.formService.selectedBeforeEmotions,
+      selectedAfterFoods: this.formService.selectedAfterFoods,
+      selectedAfterEmotions: this.formService.selectedAfterEmotions,
+      selectedDistractions: this.formService.selectedDistractions,
     };
   }
 

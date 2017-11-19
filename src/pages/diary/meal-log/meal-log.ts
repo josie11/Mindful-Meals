@@ -19,6 +19,7 @@ export class MealLogPage implements OnInit, OnDestroy {
   form: object = {};
 
   editing: boolean = false;
+  mealStage: string = 'before';
 
   mealSubscription;
   formSubscription;

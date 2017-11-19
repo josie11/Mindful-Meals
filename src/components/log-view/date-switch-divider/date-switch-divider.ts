@@ -4,7 +4,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   selector: 'date-switch-divider',
   template: `
     <ion-item-divider>
-      <h2>{{date | date: 'MMM d, y'}}</h2>
+      <h2>{{date | date: dateFormat}}</h2>
       <p *ngIf="time">{{date | time}}</p>
       <p>{{mealType}}</p>
       <button ion-button icon-only item-start clear (click)="decrement()">
@@ -18,6 +18,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class DateSwitchDividerComponent {
   @Input() date: string;
+  @Input() dateFormat: string;
   @Input() time: boolean;
   @Input() mealType: string;
 

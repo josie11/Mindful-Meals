@@ -34,6 +34,5 @@ import { TimePipe } from './time/time';
     SortArrayEntriesByTimePipe,
     SortArraysByDatePipe,
     TimePipe],
-    providers: [TimePipe]
 })
 export class PipesModule {}

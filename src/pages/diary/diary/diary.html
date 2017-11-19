@@ -24,6 +24,7 @@
   <ion-list>
     <date-switch-divider
       [date]="date.toISOString()"
+      dateFormat="MMMM, y"
       (onDateDecrement)="selectPreviousMonth($event)"
       (onDateIncrement)="selectNextMonth($event)"
     ></date-switch-divider>

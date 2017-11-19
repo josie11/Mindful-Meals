@@ -4,6 +4,7 @@ import { ModalService } from '../../../providers/modal.service';
 import { EmotionsListPage } from '../../../pages/log-forms/emotions-list/emotions-list';
 import { FoodCravingsListPage } from '../../../pages/log-forms/foods-list/foods-list';
 
+import { BehaviorSubject } from "rxjs";
 /**
  * Generated class for the BeforeFormPage page.
  *
@@ -26,8 +27,8 @@ export class BeforeFormContentComponent implements OnDestroy, OnInit {
   @Input() time: string;
   @Input() triggerDescription: string;
   @Input() showMealType: boolean;
-  @Input() emotionsBehaviorSubject;
-  @Input() foodsBehaviorSubject;
+  @Input() emotionsBehaviorSubject: BehaviorSubject<object>;
+  @Input() foodsBehaviorSubject: BehaviorSubject<object>;
 
   @Output() onFormItemChange = new EventEmitter();
 

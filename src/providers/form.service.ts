@@ -593,7 +593,9 @@ export class FormService {
    *
    * @param {emotions} object representing cravings associated emotions
    *
-   * * @param {foods} object representing cravings associated foods
+   * @param {foods} object representing cravings associated foods
+   *
+   * @param {distractions} object representing cravings associated distractions
   */
   updateFormToCompletedMeal(meal: Meal | LogMeal, beforeEmotions: object, afterEmotions: object, beforeFoods: object, afterFoods: object, distractions: object) {
     const {
@@ -601,17 +603,23 @@ export class FormService {
       mealDate,
       mealType,
       hungerLevelBefore,
+      hungerLevelAfter,
       intensityLevel,
-      triggerDescription
+      satisfactionLevel,
+      triggerDescription,
+      mealDescription,
     } = meal;
 
     this.updateFormItems({
-      intensityLevel,
       hungerLevelBefore,
+      hungerLevelAfter,
+      intensityLevel,
+      satisfactionLevel,
       date: mealDate,
       time: mealTime,
       mealType,
       triggerDescription,
+      mealDescription
     });
 
     this.updateBeforeEmotions(beforeEmotions);

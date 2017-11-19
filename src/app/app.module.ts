@@ -31,7 +31,7 @@ import { PipesModule } from '../pipes/pipes.module';
 
 //IMPORTANT: ALLOWS FOR DEVELOPMENT IN THE BROWSER
 //MOCKS THE NATIVE STORAGE - SQLITE
-// import { SQLitePorterMock, SQLiteMock } from '../common/mocks';
+import { SQLitePorterMock, SQLiteMock } from '../common/mocks';
 
 @NgModule({
   declarations: [
@@ -78,11 +78,11 @@ import { PipesModule } from '../pipes/pipes.module';
   providers: [
     StatusBar,
     SplashScreen,
-    // {provide: SQLite, useClass: SQLiteMock},
-    // {provide: SQLitePorter, useClass: SQLitePorterMock },
+    {provide: SQLite, useClass: SQLiteMock},
+    {provide: SQLitePorter, useClass: SQLitePorterMock },
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    SQLite,
-    SQLitePorter,
+    // SQLite,
+    // SQLitePorter,
   ]
 })
 export class AppModule {}

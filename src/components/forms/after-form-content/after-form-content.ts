@@ -5,6 +5,9 @@ import { EmotionsListPage } from '../../../pages/log-forms/emotions-list/emotion
 import { DistractionsListPage } from '../../../pages/log-forms/distractions-list/distractions-list';
 import { FoodCravingsListPage } from '../../../pages/log-forms/foods-list/foods-list';
 
+import { BehaviorSubject } from "rxjs";
+
+
 /**
  * Generated class for the BeforeFormPage page.
  *
@@ -25,9 +28,9 @@ export class AfterFormContentComponent implements OnDestroy, OnInit {
   @Input() satisfactionLevel: number;
   @Input() hungerLevelAfter: number;
   @Input() mealDescription: string;
-  @Input() emotionsBehaviorSubject;
-  @Input() foodsBehaviorSubject;
-  @Input() distractionsBehaviorSubject;
+  @Input() emotionsBehaviorSubject: BehaviorSubject<object>;
+  @Input() foodsBehaviorSubject: BehaviorSubject<object>;
+  @Input() distractionsBehaviorSubject: BehaviorSubject<object>;
 
   @Output() onFormItemChange = new EventEmitter();
 

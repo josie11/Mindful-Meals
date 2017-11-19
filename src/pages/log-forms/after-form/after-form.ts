@@ -23,7 +23,7 @@ import {
 @Component({
   selector: 'after-form',
   templateUrl: 'after-form.html',
-  providers: [DatePipe]
+  providers: [DatePipe, TimePipe]
 })
 export class AfterFormPage implements OnDestroy, OnInit {
 

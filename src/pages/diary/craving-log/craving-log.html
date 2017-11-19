@@ -2,9 +2,9 @@
   <!-- header for ng-content -->
   <ion-header>
     <ion-navbar color="primary">
-      <ion-buttons start>
-        <button ion-button icon-only (click)="dismiss()">
-          <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
+      <ion-buttons start *ngIf="!editing">
+        <button ion-button icon-only (click)="triggerCravingDeletePrompt()">
+          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
         </button>
       </ion-buttons>
       <ion-title>
@@ -19,6 +19,7 @@
        <date-switch-divider
         *ngIf="craving.id"
         [date]="craving.cravingDate + 'T' + craving.cravingTime"
+        dateFormat="MMM d, y"
         [time]="true"
         (onDateDecrement)="previousCraving($event)"
         (onDateIncrement)="nextCraving($event)"
@@ -44,8 +45,8 @@
     ></log-view-section>
     <before-form-content
       *ngIf="editing"
-      [emotionsBehaviorSubject]="logService.getBeforeItemsBehaviorSubjects().selectedBeforeEmotions"
-      [foodsBehaviorSubject]="logService.getBeforeItemsBehaviorSubjects().selectedBeforeFoods"
+      [emotionsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedBeforeEmotions"
+      [foodsBehaviorSubject]="logService.getItemsBehaviorSubjects().selectedBeforeFoods"
       [date]="form.date"
       [time]="form.time"
       [intensityLevel]="form.intensityLevel"
@@ -67,11 +68,11 @@
         </button>
       </ion-buttons>
       <ion-buttons start>
-        <button ion-button icon-only (click)="triggerCravingDeletePrompt()" *ngIf="!editing">
-          <ion-icon ios="ios-trash" md="md-trash"></ion-icon>
-        </button>
         <button ion-button (click)="cancelCravingChanges()" *ngIf="editing">
           Cancel
+        </button>
+        <button ion-button icon-only (click)="dismiss()" *ngIf="!editing">
+          <ion-icon ios="ios-arrow-back" md="md-arrow-back"></ion-icon>
         </button>
       </ion-buttons>
     </ion-toolbar>
