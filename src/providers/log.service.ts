@@ -185,7 +185,7 @@ export class LogService {
    * to that of current meal. Needed for editing log, form service is where all editing filters through.
   */
   updateFormToMeal() {
-    const meal: = this.meal.getValue();
+    const meal: any = this.meal.getValue();
 
     this.formService.updateFormToCompletedMeal(
       meal,

@@ -1,0 +1,41 @@
+<ion-list>
+  <ion-list-header>
+    Physical Hunger
+    <ion-note item-end color="secondary">{{hungerLevelAfter | hungerRange}}</ion-note>
+  </ion-list-header>
+  <range name="hungerLevelAfter" [min]="1" [max]="5" (onRangeChange)="onRangeChange($event)" [initialValue]="hungerLevelAfter"></range>
+</ion-list>
+<ion-list>
+  <ion-list-header>
+    Satisfaction Level
+    <ion-note item-end color="secondary">{{satisfactionLevel | satisfactionRange }}</ion-note>
+  </ion-list-header>
+  <range name="satisfactionLevel" [min]="1" [max]="4" (onRangeChange)="onRangeChange($event)" [initialValue]="satisfactionLevel"></range>
+</ion-list>
+<ion-list>
+  <ion-list-header>
+    Details
+  </ion-list-header>
+  <checkbox-trigger
+    (onClick)="openEmotionsList($event)"
+    ios="ios-happy"
+    md="md-happy"
+    title="Emotions"
+    [items]="emotions">
+  </checkbox-trigger>
+  <checkbox-trigger
+    (onClick)="openFoodsList($event)"
+    ios="ios-nutrition"
+    md="md-nutrition"
+    title="Foods Consumed"
+    [items]="foods">
+  </checkbox-trigger>
+  <checkbox-trigger
+    (onClick)="openDistractionsList($event)"
+    ios="ios-laptop"
+    md="md-laptop"
+    title="Distractions"
+    [items]="distractions">>
+  </checkbox-trigger>
+  <detail-textarea title="Meal Notes" (onDescriptionChange)="onDescriptionChange($event)" [description]="mealDescription"></detail-textarea>
+</ion-list>

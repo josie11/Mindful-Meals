@@ -1,13 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavController } from 'ionic-angular';
 import { DatePipe } from '@angular/common';
+import { TimePipe } from '../../../pipes/time/time';
 import { AlertService } from '../../../providers/alert.service';
 import { ModalService } from '../../../providers/modal.service';
 import { FormService } from '../../../providers/form.service';
 import { MealsService } from '../../../providers/meals.service';
-import { EmotionsListPage } from '../emotions-list/emotions-list';
-import { FoodCravingsListPage } from '../foods-list/foods-list';
-import { DistractionsListPage } from '../distractions-list/distractions-list';
 import { AddAdjustBeforeFormPage } from '../add-adjust-before-form/add-adjust-before-form';
 
 import {
@@ -23,7 +21,7 @@ import {
  */
 
 @Component({
-  selector: 'page-after-form',
+  selector: 'after-form',
   templateUrl: 'after-form.html',
   providers: [DatePipe]
 })
@@ -53,7 +51,15 @@ export class AfterFormPage implements OnDestroy, OnInit {
   distractionsSubscription;
   formSubscription;
 
-  constructor(private navCtrl: NavController, private modalService: ModalService, private alertService: AlertService, private formService: FormService, private mealsService: MealsService, private datePipe: DatePipe) {
+  constructor(
+    private navCtrl: NavController,
+    private modalService: ModalService,
+    private alertService: AlertService,
+    private formService: FormService,
+    private mealsService: MealsService,
+    private datePipe: DatePipe,
+    private timePipe: TimePipe,
+  ) {
   }
 
   ngOnInit() {
@@ -68,33 +74,16 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.formService.setForAfterForm();
   }
 
-  onRangeChange({ name, number }) {
-    this.formService.updateFormItem(name, number);
-    this[name] = number;
-  }
-
   onTimeDateChange({ type, value }) {
     this.formService.updateFormItem(type, value);
   }
 
-  onDescriptionChange({ value }) {
-    this.formService.updateFormItem('mealDescription', value);
-  }
+  /**
+   * Passed to before/after form content components for adjusting form in form service
+  */
 
-  dismissForm() {
-    this.navCtrl.pop();
-  }
-
-  openEmotionsList() {
-    this.modalService.presentModal(EmotionsListPage, { mealType: 'After' });
-  }
-
-  openFoodsList() {
-    this.modalService.presentModal(FoodCravingsListPage, { mealType: 'After' });
-  }
-
-  openDistractionsList() {
-    this.modalService.presentModal(DistractionsListPage);
+  onFormItemChange({ item, value}) {
+    this.formService.updateFormItem(item, value);
   }
 
   /**
@@ -119,12 +108,16 @@ export class AfterFormPage implements OnDestroy, OnInit {
    * A user can select on to attach as before meal data for the after meal log
    */
   presentBeforeMealPrompt() {
-    const options = this.incompleteMeals.map((meal: Partial<Meal>) => ({
-      value: meal.id,
-      label: this.datePipe.transform(`${meal.mealDate}T${meal.mealTime}`, ' MMM d, y, h:mm a'),
-      checked: false,
-      type: 'radio'
-    }))
+    const options = this.incompleteMeals.map((meal: Partial<Meal>) => {
+        const date = this.datePipe.transform(`${meal.mealDate}T${meal.mealTime}`, ' MMM d, y');
+        const time = this.timePipe.transform(`${meal.mealDate}T${meal.mealTime}`);
+        return {
+          value: meal.id,
+          label: `${date} ${time}`,
+          checked: false,
+          type: 'radio'
+        }
+    })
     this.alertService.presentRadio({
       title: 'Incomplete Meal Logs',
       inputs: options,
@@ -277,6 +270,10 @@ export class AfterFormPage implements OnDestroy, OnInit {
     return this.formService.submitAttachedMealAfterForm(id, beforeEmotions, beforeFoods)
     .then(() => this.dismissForm())
 
+  }
+
+  dismissForm() {
+    this.navCtrl.pop();
   }
 
   ngOnDestroy() {

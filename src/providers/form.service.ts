@@ -372,7 +372,7 @@ export class FormService {
   }
 
   /**
-   * Similar to updateBeforeMealItems
+   * Similar to updateBeforeMealItems, updates a cravings items.
    *
    * @param {cravingId} The craving id.
    *
@@ -450,9 +450,7 @@ export class FormService {
   }
 
   /**
-   * Updates a existing meal log (created from the before meal form) with form data,
-   * and marks it as completed. It will update and before meal items as well that
-   * may have been edited by user. Associates after items with updated meal.
+   * Updates a existing meal log.
    *
    * @param {mealId} The meal id to be updated.
    *
