@@ -24,6 +24,8 @@ module.exports = function(config) {
     // list of files / patterns to load in the browser
     files: [
         { pattern: './src/test.ts', watched: false },
+        // this file only gets watched and is otherwise ignored
+        { pattern: './src/assets/sql/sql.js', included: true },
     ],
 
 

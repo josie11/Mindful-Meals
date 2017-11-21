@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
 import { Platform } from 'ionic-angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { BehaviorSubject } from 'rxjs/Rx';
 import { Storage } from '@ionic/storage';
+import { tables } from '../assets/sql/tables';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class DatabaseService {
   // kind of an Observable - can emit new values to the subscribers by calling next() on it
   databaseReady: BehaviorSubject<boolean>;
 
-  constructor(private http: Http, private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
+  constructor(private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
     this.initializeDatabase();
   }
 
@@ -41,21 +41,17 @@ export class DatabaseService {
   }
 
   fillDatabase() {
-    return this.http.get('assets/sql/tables.sql')
-      .map(res => res.text())
-      .subscribe(sql => {
-        return this.sqlitePorter.importSqlToDb(this.database, sql)
-          .then(data => {
-            this.databaseReady.next(true);
-            this.storage.set('database_filled', true);
-          })
-      });
+    return this.sqlitePorter.importSqlToDb(this.database, tables)
+    .then(data => {
+      this.databaseReady.next(true);
+      this.storage.set('database_filled', true);
+    })
   }
 
   formatSqlValue(val) {
     if (typeof val === 'number') return val;
     val = val.replace(/\'/g, "''")
-    return `'${val}'`;;
+    return `'${val}'`;
   }
 
   //items = [{col, value, selector }] -> [{col: id, val: 1, selector: '=' }]
@@ -65,22 +61,22 @@ export class DatabaseService {
     return `WHERE ${whereStatements}`
   }
 
-  createSqlInsertStatement(cols, values, dbName) {
+  createSqlInsertStatement(cols: string[], values: string[], dbName: string) {
     const sqlCols = cols.join(', ');
     const sqlValues = values.map(val => this.formatSqlValue(val)).join(", ");
     return `INSERT INTO ${dbName} (${sqlCols}) VALUES (${sqlValues});`;
   }
 
-  createSqlSelectStatement(selection, dbName, extraStatement) {
+  createSqlSelectStatement(selection: string, dbName: string, extraStatement: string) {
     return `SELECT ${selection} FROM ${dbName} ${extraStatement};`
   }
 
-  createSqlUpdateStatement(values, id, dbName) {
-    const updateSql = values.map(val => `${val.col} = ${this.formatSqlValue(val.value)}`).join(', ');
+  createSqlUpdateStatement(values: object[], id: number, dbName: string) {
+    const updateSql = values.map((val: any) => `${val.col} = ${this.formatSqlValue(val.value)}`).join(', ');
     return `UPDATE ${dbName} SET ${updateSql} WHERE id = ${id};`;
   }
 
-  createSqlDeleteStatement(dbName, extraStatement) {
+  createSqlDeleteStatement(dbName: string, extraStatement: string) {
     return `DELETE FROM ${dbName} ${extraStatement};`;
   }
 
