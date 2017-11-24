@@ -3,7 +3,7 @@ import { ProvidersModule } from './providers.module';
 import { Platform } from 'ionic-angular';
 import { SQLite } from '@ionic-native/sqlite';
 import { SQLitePorter } from '@ionic-native/sqlite-porter';
-import { SQLitePorterMock, SQLiteMock } from '../common/mocks';
+import { SQLitePorterMock, SQLiteMock, SQLiteObject } from '../common/mocks';
 import { PlatformMock } from '../mocks';
 import { IonicStorageModule } from '@ionic/storage';
 
@@ -24,29 +24,22 @@ describe('DatabaseService', () => {
       ]
     });
 
+    localStorage.setItem("database", null);
     databaseService = TestBed.get(DatabaseService);
-    databaseService.initializeDatabase('testDb');
+    databaseService.initializeDatabase('testDb')
+    .then(() => {
+      return databaseService.database.executeSql(
+      `CREATE TABLE IF NOT EXISTS emotions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date DATETIME DEFAULT CURRENT_TIMESTAMP,
+        name CHAR(50));`, {});
+    });
   }));
 
-  it('database should be created with all tables after initialization', fakeAsync(() => {
-    let results;
-
-    databaseService.select(({selection: 'name', dbName: 'sqlite_master', extraStatement: "WHERE type='table'"}))
-    .then((data) => results = data.map(({name}) => name))
-
-    flushMicrotasks();
-    expect(results.length).toBe(11);
-    expect(results).toContain('meals');
-    expect(results).toContain('cravings');
-    expect(results).toContain('emotions');
-    expect(results).toContain('distractions');
-    expect(results).toContain('foods');
-    expect(results).toContain('cravingEmotions');
-    expect(results).toContain('cravingFoods');
-    expect(results).toContain('mealEmotions');
-    expect(results).toContain('mealFoods');
-    expect(results).toContain('mealDistractions');
-  }));
+  it('database should be created and open', () => {
+    expect(databaseService.database instanceof SQLiteObject).toEqual(true);
+    expect(databaseService.database).toBeDefined();
+  });
 
   it('formatDataforInsert takes an object of key/value pairs and returns an object with cols/values arrays', () => {
     const object = {
@@ -105,4 +98,75 @@ describe('DatabaseService', () => {
 
     expect(sql).toEqual("UPDATE db SET name = 'name', type = 'type' WHERE id = 1;");
   });
+
+  it('createSqlDeleteStatement should format a sql statement for delete', () => {
+    const dbName = 'db';
+    const extraStatement = 'WHERE id = 1'
+    const sql = databaseService.createSqlDeleteStatement(dbName, extraStatement);
+
+    expect(sql).toEqual("DELETE FROM db WHERE id = 1;");
+  });
+
+  it('processSqlResults should process results from database into an array based on # of rows' , () => {
+    const itemFunc = (i) => {
+      const results = ['item1', 'item2'];
+      return results[i];
+    };
+
+    const data = {
+      rows: {
+        item: itemFunc,
+        length: 2
+      }
+    }
+
+    const results = databaseService.processSqlResults(data);
+
+    expect(results).toEqual(['item1', 'item2']);
+  });
+
+  it('can insert an item into the database and return the id of the created item. Can select item from database.', fakeAsync(() => {
+    let insert: any;
+    let result: any;
+
+    const dbName = 'emotions';
+    const item = { name: 'Sad' }
+
+    databaseService.insert({ dbName, item }).then((data: any) => insert = data);
+
+    flushMicrotasks();
+
+    expect(insert.id).toBeDefined();
+    expect(insert.id).toMatch(/\d+/);
+
+    databaseService.select({
+      dbName,
+      selection: '*',
+      extraStatement: `WHERE id = ${insert.id}`
+    }).then((data: any) => result = data[0]);
+
+    flushMicrotasks();
+
+    expect(result.id).toEqual(insert.id);
+    expect(result.name).toEqual(item.name);
+  }));
+
+  it('can insert multiple items into database', fakeAsync(() => {
+    let results;
+
+    const dbName = 'emotions'
+    const items = [
+      { name: 'Sad' },
+      { name: 'Happy' }
+    ];
+
+    databaseService.bulkInsert({ items, dbName })
+    .then(() => databaseService.select({ dbName, selection: '*', extraStatement: "WHERE name = 'Sad' OR name = 'Happy'" }))
+    .then((data: any) => results = [data[0].name, data[1].name]);
+
+    flushMicrotasks();
+
+    expect(results).toContain('Sad');
+    expect(results).toContain('Happy');
+  }));
 });

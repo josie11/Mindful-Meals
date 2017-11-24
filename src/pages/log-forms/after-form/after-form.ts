@@ -78,6 +78,10 @@ export class AfterFormPage implements OnDestroy, OnInit {
     this.formService.updateFormItem(type, value);
   }
 
+  onMealTypeChange(value) {
+    this.formService.updateFormItem('mealType', value);
+  }
+
   /**
    * Passed to before/after form content components for adjusting form in form service
   */
@@ -117,12 +121,20 @@ export class AfterFormPage implements OnDestroy, OnInit {
           checked: false,
           type: 'radio'
         }
-    })
-    this.alertService.presentRadio({
-      title: 'Incomplete Meal Logs',
-      inputs: options,
-      submitHandler: this.linkWithExistingMeal.bind(this)
-    })
+    });
+
+    if (options.length > 0) {
+      this.alertService.presentRadio({
+        title: 'Incomplete Meal Logs',
+        inputs: options,
+        submitHandler: this.linkWithExistingMeal.bind(this)
+      })
+    } else {
+      this.alertService.presentAlert({
+        title: 'Incomplete Meal Logs',
+        subTitle: 'No Incomplete Meal Logs'
+      })
+    }
   }
 
   /**

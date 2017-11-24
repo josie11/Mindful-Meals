@@ -10,6 +10,7 @@ import { DistractionsService } from './distraction.service';
 import { CravingsService } from './craving.service';
 import { DiaryService } from './diary.service';
 import { LogService } from './log.service';
+import { AppSetupService } from './app-setup.service';
 
 @NgModule({
   imports: [],
@@ -25,6 +26,7 @@ import { LogService } from './log.service';
     CravingsService,
     DiaryService,
     LogService,
+    AppSetupService
    ],
   exports: []
 })

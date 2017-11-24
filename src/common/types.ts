@@ -1,3 +1,15 @@
+/**
+ * Represents database version object.
+ * schema - full representation of current database
+ * changes - any changes made to previous database version
+*/
+export interface DatabaseVersion {
+  version: number;
+  schema: string;
+  changes?: string;
+  versionSpecificSeed?: string;
+  allVersionSeed?: string;
+}
 
 /**
  * Represents form used to create/edit logs, passed to components for building a new log.

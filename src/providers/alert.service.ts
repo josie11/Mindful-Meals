@@ -14,6 +14,15 @@ export class AlertService {
   constructor(public alertCtrl: AlertController) {
   }
 
+  presentAlert({ title, subTitle, buttons = ['OK']}) {
+    let alert = this.alertCtrl.create({
+      title,
+      subTitle,
+      buttons
+    });
+    alert.present();
+  }
+
   //inputs => [{ name, placeholder }]
   presentPrompt({ title, inputs, cancelButtonText = 'Cancel', submitButtonText = 'Submit', submitHandler = (data) => {}, cancelHandler = () => {} }) {
     const alert = this.alertCtrl.create({

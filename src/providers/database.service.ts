@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
-import { SQLitePorter } from '@ionic-native/sqlite-porter';
 import { BehaviorSubject } from 'rxjs/Rx';
 import { Storage } from '@ionic/storage';
-import { tables } from '../assets/sql/tables';
 import 'rxjs/add/operator/map';
 
 @Injectable()
@@ -14,38 +12,19 @@ export class DatabaseService {
   // kind of an Observable - can emit new values to the subscribers by calling next() on it
   databaseReady: BehaviorSubject<boolean>;
 
-  constructor(private platform: Platform, private sqlite: SQLite, private sqlitePorter: SQLitePorter, private storage: Storage) {
-    this.initializeDatabase();
+  constructor(private platform: Platform, private sqlite: SQLite, private storage: Storage) {
   }
 
   initializeDatabase(dbName: string = 'mindful') {
     this.databaseReady = new BehaviorSubject(false);
-    return this.platform.ready().then(() => {
-      return this.sqlite.create({
-        name: `${dbName}.db`,
-        location: 'default'
-      })
-      .then((db: SQLiteObject) => {
-        this.database = db;
-        return this.select({ selection: 'name', dbName: 'sqlite_master', extraStatement: "WHERE type='table'"})
-      }).then(data => {
-        //If there are tables, database has been seeded
-        if (data.length > 0) {
-          //sets to true and emits to subscribers that database is ready to access
-          this.databaseReady.next(true);
-        } else {
-          return this.fillDatabase();
-        }
-      })
+    return this.platform.ready().then(() => this.sqlite.create({
+      name: `${dbName}.db`,
+      location: 'default'
     })
-  }
-
-  fillDatabase() {
-    return this.sqlitePorter.importSqlToDb(this.database, tables)
-    .then(data => {
+    .then((db: SQLiteObject) => {
+      this.database = db;
       this.databaseReady.next(true);
-      this.storage.set('database_filled', true);
-    })
+    }));
   }
 
   formatSqlValue(val) {
@@ -145,6 +124,7 @@ export class DatabaseService {
   }
 
   processSqlResults(data) {
+    console.log(data.rows)
     let results = [];
     if (data.rows && data.rows.length > 0) {
       for (let i = 0; i < data.rows.length; i++) {

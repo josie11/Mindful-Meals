@@ -40,11 +40,11 @@
       <ion-item *ngIf="!isMealAttached">
         <ion-icon ios="ios-restaurant" md="md-restaurant" item-start color="secondary"></ion-icon>
         <ion-label>Meal</ion-label>
-        <ion-select [(ngModel)]="form.mealType" interface="action-sheet">
-          <ion-option value="Breakfast">Breakfast</ion-option>
-          <ion-option value="Lunch">Lunch</ion-option>
-          <ion-option value="Dinner">Dinner</ion-option>
-          <ion-option value="Snack">Snack</ion-option>
+        <ion-select interface="action-sheet" [(ngModel)]="form.mealType">
+          <ion-option (ionSelect)="onMealTypeChange('Breakfast')" value="Breakfast">Breakfast</ion-option>
+          <ion-option (ionSelect)="onMealTypeChange('Lunch')" value="Lunch">Lunch</ion-option>
+          <ion-option (ionSelect)="onMealTypeChange('Dinner')" value="Dinner">Dinner</ion-option>
+          <ion-option (ionSelect)="onMealTypeChange('Snack')" value="Snack">Snack</ion-option>
         </ion-select>
       </ion-item>
       <ion-item detail-push *ngIf="!isMealAttached" (click)="openBeforeLogAddOrEdit()">

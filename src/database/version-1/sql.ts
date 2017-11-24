@@ -1,5 +1,7 @@
-export const tables: string = `
+export const schema: string = `
   PRAGMA foreign_keys = ON;
+
+  PRAGMA app_version = 1;
 
   CREATE TABLE IF NOT EXISTS meals(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -82,3 +84,31 @@ export const tables: string = `
     date DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 `
+
+export const allVersionSeed = `
+INSERT INTO emotions (name)
+VALUES ('Happy' );
+INSERT INTO emotions (name)
+VALUES ('Stressed' );
+INSERT INTO emotions (name)
+VALUES ('Worried' );
+INSERT INTO emotions (name)
+VALUES ('Depressed' );
+INSERT INTO emotions (name)
+VALUES ('Sad' );
+
+INSERT INTO distractions (name)
+VALUES ('TV' );
+INSERT INTO distractions (name)
+VALUES ('Reading' );
+INSERT INTO distractions (name)
+VALUES ('Cellphone' );
+INSERT INTO distractions (name)
+VALUES ('Conversation' );
+INSERT INTO distractions (name)
+VALUES ('Thoughts' );
+INSERT INTO distractions (name)
+VALUES ('Driving' );
+INSERT INTO distractions (name)
+VALUES ('Work' );
+`;
