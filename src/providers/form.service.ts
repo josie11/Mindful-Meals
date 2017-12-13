@@ -33,18 +33,7 @@ export class FormService {
   selectedAfterEmotions: BehaviorSubject<object> = new BehaviorSubject({});
   selectedAfterFoods: BehaviorSubject<object> = new BehaviorSubject({});
 
-  form: BehaviorSubject<FormObject> = new BehaviorSubject({
-    time: '',
-    date: '',
-    hungerLevelBefore: 1,
-    intensityLevel: 1,
-    triggerDescription: '',
-    mealType: 'Breakfast',
-    completed: 0,
-    satisfactionLevel: undefined,
-    hungerLevelAfter: undefined,
-    mealDescription: ''
-  });
+  form: BehaviorSubject<FormObject> = new BehaviorSubject(this.getEmptyBeforeForm());
 
   constructor(
       private emotionsService: EmotionsService,
@@ -58,19 +47,8 @@ export class FormService {
   /**
    * refreshes form behavior subject to before form defaults.
   */
-  refreshForm() {
-    const beforeForm: FormObject = {
-      time: '',
-      date: '',
-      hungerLevelBefore: 1,
-      intensityLevel: 1,
-      triggerDescription: '',
-      mealType: 'Breakfast',
-      completed: 0,
-      satisfactionLevel: undefined,
-      hungerLevelAfter: undefined,
-      mealDescription: ''
-    };
+  setForBeforeForm() {
+    const beforeForm = this.getEmptyBeforeForm();
 
     this.form.next(beforeForm)
   }
@@ -79,20 +57,9 @@ export class FormService {
    * refreshes form behavior subject to be ready to after form defaults.
   */
   setForAfterForm() {
-    const beforeForm: FormObject = {
-      time: '',
-      date: '',
-      hungerLevelBefore: 1,
-      intensityLevel: 1,
-      triggerDescription: '',
-      mealType: 'Breakfast',
-      completed: 1,
-      satisfactionLevel: 1,
-      hungerLevelAfter: 1,
-      mealDescription: ''
-    };
+    const afterForm = this.getEmptyAfterForm();
 
-    this.form.next(beforeForm)
+    this.form.next(afterForm)
   }
 
   refreshFormToBeforeFormDefaults(date: string = '', time: string = '') {
@@ -513,7 +480,7 @@ export class FormService {
   clearBeforeForm() {
     this.selectedBeforeEmotions.next({});
     this.selectedBeforeFoods.next({});
-    this.refreshForm();
+    this.setForBeforeForm();
   }
 
   /**
@@ -719,5 +686,35 @@ export class FormService {
       mealType: form.mealType,
       completed: 1,
     }
+  }
+
+  getEmptyBeforeForm(): FormObject {
+    return {
+      time: '',
+      date: '',
+      hungerLevelBefore: 1,
+      intensityLevel: 1,
+      triggerDescription: '',
+      mealType: 'Breakfast',
+      completed: 0,
+      satisfactionLevel: undefined,
+      hungerLevelAfter: undefined,
+      mealDescription: ''
+    };
+  }
+
+  getEmptyAfterForm(): FormObject {
+    return {
+      time: '',
+      date: '',
+      hungerLevelBefore: 1,
+      intensityLevel: 1,
+      triggerDescription: '',
+      mealType: 'Breakfast',
+      completed: 1,
+      satisfactionLevel: 1,
+      hungerLevelAfter: 1,
+      mealDescription: ''
+    };
   }
 }

@@ -27,7 +27,7 @@ export class BeforeFormPage implements OnDestroy, OnInit {
 
   ngOnInit() {
     this.formSubscription = this.formService.form.subscribe((form) => this.form = form)
-    this.formService.refreshForm();
+    this.formService.setForBeforeForm();
   }
 
   onFormTypeChange() {

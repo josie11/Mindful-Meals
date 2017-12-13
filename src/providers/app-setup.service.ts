@@ -11,10 +11,9 @@ export class AppSetupService {
   }
 
   initializeApp(version: number) {
-    this.databaseService.initializeDatabase()
+    return this.databaseService.initializeDatabase()
     .then(() => this.checkCurrentDatabaseVersion())
     .then((databaseVersion) => {
-      console.log(databaseVersion, version)
       if (databaseVersion === 0) {
         return this.initializeDatabase(version);
       } else if (databaseVersion !== version) {

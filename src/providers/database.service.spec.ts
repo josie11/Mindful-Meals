@@ -2,8 +2,7 @@ import { TestBed, inject, fakeAsync, flushMicrotasks, async } from '@angular/cor
 import { ProvidersModule } from './providers.module';
 import { Platform } from 'ionic-angular';
 import { SQLite } from '@ionic-native/sqlite';
-import { SQLitePorter } from '@ionic-native/sqlite-porter';
-import { SQLitePorterMock, SQLiteMock, SQLiteObject } from '../common/mocks';
+import { SQLiteMock, SQLiteObject } from '../common/mocks';
 import { PlatformMock } from '../mocks';
 import { IonicStorageModule } from '@ionic/storage';
 
@@ -13,13 +12,54 @@ describe('DatabaseService', () => {
 
   let databaseService;
 
+  const dbName = 'emotions';
+
+  const exampleEmotion1 = {
+    name: 'Sad',
+    intensity: 2
+  }
+
+  const exampleEmotion2 = {
+    name: 'Happy',
+    intensity: 10
+  }
+
+  const updateValues1 = {
+    name: 'Morose',
+    intensity: 3
+  }
+
+
+  const updateValues2 = {
+    name: 'Ecstatic',
+    intensity: 5
+  }
+
+  const insertItemToDatabase = (item: object) => {
+    return databaseService.insert({ dbName, item })
+    .then((data: any) => databaseService.select({
+      dbName,
+      selection: '*',
+      extraStatement: `WHERE id = ${data.id}`
+    })
+    .then((data: any) => data[0]));
+  }
+
+  const insertItemsToDatabase = (items: object[]) => {
+    return databaseService.bulkInsert({ dbName, items })
+    .then((data: any) => databaseService.select({
+      dbName,
+      selection: '*',
+    })
+    .then((data: any) => data));
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [ProvidersModule, IonicStorageModule, IonicStorageModule.forRoot()],
       providers: [
         DatabaseService,
         {provide: SQLite, useClass: SQLiteMock},
-        {provide: SQLitePorter, useClass: SQLitePorterMock },
         {provide: Platform, useClass: PlatformMock },
       ]
     });
@@ -32,24 +72,23 @@ describe('DatabaseService', () => {
       `CREATE TABLE IF NOT EXISTS emotions(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         date DATETIME DEFAULT CURRENT_TIMESTAMP,
-        name CHAR(50));`, {});
+        name CHAR(50),
+        intensity INTEGER
+      );`, {});
     });
   }));
 
   it('database should be created and open', () => {
-    expect(databaseService.database instanceof SQLiteObject).toEqual(true);
     expect(databaseService.database).toBeDefined();
+    expect(databaseService.database instanceof SQLiteObject).toEqual(true);
+    expect(databaseService.databaseReady.value).toEqual(true);
   });
 
   it('formatDataforInsert takes an object of key/value pairs and returns an object with cols/values arrays', () => {
-    const object = {
-      id: 1,
-      name: 'food'
-    };
-    const { cols, values } = databaseService.formatDataforInsert(object);
+    const { cols, values } = databaseService.formatDataforInsert(exampleEmotion1);
 
-    expect(cols).toEqual(['id', 'name']);
-    expect(values).toEqual([1, 'food']);
+    expect(cols).toEqual(['name', 'intensity']);
+    expect(values).toEqual([exampleEmotion1.name, exampleEmotion1.intensity]);
   });
 
   it('formatSqlValue should format a value as a number or string', () => {
@@ -125,48 +164,79 @@ describe('DatabaseService', () => {
     expect(results).toEqual(['item1', 'item2']);
   });
 
-  it('can insert an item into the database and return the id of the created item. Can select item from database.', fakeAsync(() => {
-    let insert: any;
+  it('can insert an item into the database. Insert returns id of newly created item.', fakeAsync(() => {
     let result: any;
 
-    const dbName = 'emotions';
-    const item = { name: 'Sad' }
-
-    databaseService.insert({ dbName, item }).then((data: any) => insert = data);
+    databaseService.insert({ dbName, item: exampleEmotion1 })
+    .then((data: any) => result = data);
 
     flushMicrotasks();
 
-    expect(insert.id).toBeDefined();
-    expect(insert.id).toMatch(/\d+/);
+    expect(result.id).toBeDefined();
+    expect(result.id).toMatch(/\d+/);
+  }));
 
-    databaseService.select({
-      dbName,
-      selection: '*',
-      extraStatement: `WHERE id = ${insert.id}`
-    }).then((data: any) => result = data[0]);
+  it('can insert an item into the database. Can select item from database.', fakeAsync(() => {
+    let result: any;
+
+    insertItemToDatabase(exampleEmotion1).then((data: any) => result = data);
 
     flushMicrotasks();
 
-    expect(result.id).toEqual(insert.id);
-    expect(result.name).toEqual(item.name);
+    expect(result.name).toEqual(exampleEmotion1.name);
+    expect(result.intensity).toEqual(exampleEmotion1.intensity);
   }));
 
   it('can insert multiple items into database', fakeAsync(() => {
     let results;
 
-    const dbName = 'emotions'
     const items = [
-      { name: 'Sad' },
-      { name: 'Happy' }
+      exampleEmotion1,
+      exampleEmotion2
     ];
 
-    databaseService.bulkInsert({ items, dbName })
-    .then(() => databaseService.select({ dbName, selection: '*', extraStatement: "WHERE name = 'Sad' OR name = 'Happy'" }))
+    insertItemsToDatabase(items)
     .then((data: any) => results = [data[0].name, data[1].name]);
 
     flushMicrotasks();
 
-    expect(results).toContain('Sad');
-    expect(results).toContain('Happy');
+    expect(results).toContain(exampleEmotion1.name);
+    expect(results).toContain(exampleEmotion2.name);
+  }));
+
+  it('can update a database item', fakeAsync(() => {
+    let insert;
+    let update;
+
+    insertItemToDatabase(exampleEmotion1).then((data: any) => insert = data);
+
+    flushMicrotasks();
+
+    databaseService.update({ dbName, id: insert.id, values: updateValues1 })
+    .then(() => databaseService.select({
+      dbName,
+      selection: '*',
+      extraStatement: `WHERE id = ${insert.id}`
+    }))
+    .then((data: any) => update = data[0]);
+
+    flushMicrotasks();
+
+    expect(insert.name).toEqual(exampleEmotion1.name);
+    expect(insert.intensity).toEqual(exampleEmotion1.intensity);
+    expect(update.name).toEqual(updateValues1.name);
+    expect(update.intensity).toEqual(updateValues1.intensity);
+  }));
+
+  it('can bulk update database items', fakeAsync(() => {
+
+  }));
+
+  it('can delete a database items', fakeAsync(() => {
+
+  }));
+
+  it('can bulk delete database items', fakeAsync(() => {
+
   }));
 });

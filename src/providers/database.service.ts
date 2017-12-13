@@ -10,13 +10,12 @@ export class DatabaseService {
 
   database: SQLiteObject;
   // kind of an Observable - can emit new values to the subscribers by calling next() on it
-  databaseReady: BehaviorSubject<boolean>;
+  databaseReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
   constructor(private platform: Platform, private sqlite: SQLite, private storage: Storage) {
   }
 
   initializeDatabase(dbName: string = 'mindful') {
-    this.databaseReady = new BehaviorSubject(false);
     return this.platform.ready().then(() => this.sqlite.create({
       name: `${dbName}.db`,
       location: 'default'
@@ -88,7 +87,7 @@ export class DatabaseService {
     return this.batchSql(sqlStatements);
   }
 
-  // E.G. values = [{ col: 'name', value: 'Johanna' }, { col: 'age', value: 28}]
+  // E.G. values: object = { name: 'Hello', intensity: 2, ...}
   update({ dbName, values, id }) {
     if(values.length < 1) return Promise.resolve({ id });
 
@@ -98,7 +97,7 @@ export class DatabaseService {
     return this.executeSql(sql)
   }
 
-  //E.G. items = [{ id, values: []}, ...]
+  //E.G. items = [{ id, values: {} }, ...]
   bulkUpdate({ dbName, items}) {
     const sqlStatements = items.map(({ id, values }) => {
       const formattedValues = this.formatDataForUpdate(values);
@@ -107,14 +106,12 @@ export class DatabaseService {
     return this.batchSql(sqlStatements);
   }
 
-  delete({ dbName, extraStatement}) {
-    if (!extraStatement) return Promise.reject('No Where Statement Provided');
+  delete({ dbName, extraStatement = ''}) {
     const sql = this.createSqlDeleteStatement(dbName, extraStatement);
     return this.executeSql(sql);
   }
 
   bulkDelete({ dbName, extraStatements }) {
-    if (!extraStatements || extraStatements.length < 1) return Promise.reject('No Where Statements Provided');
     const sqlStatements = extraStatements.map(statement => this.createSqlDeleteStatement(dbName, statement));
     return this.batchSql(sqlStatements);
   }

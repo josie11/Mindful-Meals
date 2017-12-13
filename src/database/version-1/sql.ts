@@ -86,6 +86,14 @@ export const schema: string = `
 `
 
 export const allVersionSeed = `
+
+INSERT INTO foods (name)
+VALUES ('Chocolate' );
+INSERT INTO foods (name)
+VALUES ('Pizza' );
+INSERT INTO foods (name)
+VALUES ('Cheesecake' );
+
 INSERT INTO emotions (name)
 VALUES ('Happy' );
 INSERT INTO emotions (name)
