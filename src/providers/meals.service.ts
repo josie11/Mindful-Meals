@@ -227,8 +227,8 @@ export class MealsService {
   getMealEmotions(mealId: number, mealStage: string = '') {
     const parameters = {
       dbName: `${this.dbName}Emotions`,
-      selection: '*',
-      extraStatement: `INNER JOIN emotions on emotions.id = ${this.dbName}Emotions.emotionId WHERE ${this.dbName}Emotions.mealId = ${mealId}`
+      selection: `${this.dbName}Emotions.id, emotions.name, ${this.dbName}Emotions.emotionId, ${this.dbName}Emotions.mealId, ${this.dbName}Emotions.mealStage`,
+      extraStatement: `INNER JOIN emotions ON emotions.id = ${this.dbName}Emotions.emotionId WHERE ${this.dbName}Emotions.mealId = ${mealId}`
     };
 
     if (mealStage) parameters.extraStatement += ` AND mealStage = '${mealStage}'`;
@@ -294,7 +294,6 @@ export class MealsService {
     if (emotionIds.length < 1) return Promise.resolve({id : mealId });
 
     const extraStatements = emotionIds.map(emotionId => `WHERE emotionId = ${emotionId} AND mealId = ${mealId} AND mealStage = '${mealStage}'`);
-
     return this.databaseService.bulkDelete({ dbName: `${this.dbName}Emotions`, extraStatements });
   }
 
@@ -487,8 +486,8 @@ export class MealsService {
     const after = [];
 
     items.forEach((item: any) => {
-      if (item.mealStage === 'before') before.push(item)
-      else if (item.mealStage === 'after') after.push(item);
+      if (item.mealStage === 'before') before.push(item);
+      if (item.mealStage === 'after') after.push(item);
     });
 
     return { after, before };

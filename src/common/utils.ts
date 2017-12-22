@@ -1,4 +1,4 @@
-import difference from 'lodash.difference';
+import { difference } from 'lodash';
 
 /**
    * will compare two arrays of ids, and find which ids should be added/deleted

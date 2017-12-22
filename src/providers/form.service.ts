@@ -123,6 +123,7 @@ export class FormService {
    * @param {name} name of emotion to create.
    *
    * @return {object} returns object {id: name} of new emotion
+   *
   */
   addNewEmotion(name: string) {
     return this.emotionsService.addEmotion(name)
@@ -375,7 +376,6 @@ export class FormService {
       id = data.id;
       return this.linkBeforeFormItemsWithMeal(id);
     })
-    .then((data: any) => this.linkBeforeFormItemsWithMeal(id))
     .then((data: any) => this.linkAfterItemsWithMeal(id))
     .then((data: any) => {
       this.clearAfterForm();

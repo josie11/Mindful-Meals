@@ -64,7 +64,6 @@ describe('DatabaseService', () => {
       ]
     });
 
-    localStorage.setItem("database", null);
     databaseService = TestBed.get(DatabaseService);
     databaseService.initializeDatabase('testDb')
     .then(() => {
@@ -76,6 +75,10 @@ describe('DatabaseService', () => {
         intensity INTEGER
       );`, {});
     });
+  }));
+
+  afterEach(async(() => {
+    localStorage.setItem("database", null);
   }));
 
   it('database should be created and open', () => {
@@ -232,7 +235,7 @@ describe('DatabaseService', () => {
 
   }));
 
-  it('can delete a database items', fakeAsync(() => {
+  it('can delete database items', fakeAsync(() => {
 
   }));
 
